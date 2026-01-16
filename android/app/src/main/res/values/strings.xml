@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SanArte</string>
+    <string name="title_activity_main">SanArte</string>
+    <string name="package_name">com.sanarte.app</string>
+    <string name="custom_url_scheme">com.sanarte.app</string>
+</resources>

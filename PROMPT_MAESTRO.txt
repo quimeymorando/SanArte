@@ -1,0 +1,43 @@
+¡Hola! Necesito tu ayuda para generar contenido para una base de datos de Biodescodificación y Herbolaria.
+
+Tengo una lista de síntomas. Para CADA UNO de ellos, necesito que generes un objeto JSON con información profunda, empática y basada en medicina natural ARGENTINA/LATINOAMERICANA.
+
+Aquí tienes el formato JSON EXACTO que necesito para cada síntoma. Por favor, DEVUÉLVEME UNA LISTA (ARRAY) DE OBJETOS JSON, uno por cada síntoma que te pase.
+
+FORMATO JSON REQUERIDO:
+{
+  "slug": "nombre-del-sintoma-en-kebab-case",
+  "name": "Nombre original del síntoma",
+  "content": {
+    "name": "Nombre original del síntoma",
+    "shortDefinition": "Frase corta e impactante sobre el conflicto emocional.",
+    "emotionalAnalysis": "Explicación profunda, empática y sanadora sobre el origen emocional (Biodescodificación). Tono: Abuela sabia y amorosa.",
+    "sideSymbolism": "Significado del lado derecho/izquierdo si aplica (o null si no).",
+    "conflictList": [
+        { "conflict": "Nombre del conflicto", "manifestation": "Cómo se manifiesta" }
+    ],
+    "internalMonologue": "Frase en primera persona que suele pensar quien tiene este síntoma.",
+    "questionsForSoul": ["Pregunta reflexiva 1", "Pregunta reflexiva 2"],
+    "physicalAdvice": ["Consejo físico simple 1", "Consejo físico simple 2"],
+    "naturalRemedies": "Receta de remedios caseros ACCESIBLES y SIMPLES. Usa hierbas comunes en Argentina/Latam (Cedrón, Tilo, Malva, Marcela, Boldo, Romero, Manzanilla, Lavanda). Evita ingredientes caros o raros. Escribe con calidez.",
+    "aromatherapy": [
+        { "name": "Esencia", "benefit": "Beneficio emocional" }
+    ],
+    "archangel": "Nombre del Arcángel sugerido y su color de luz.",
+    "holisticTherapies": "Reiki, Yoga, Baños de sol, etc.",
+    "meditationScript": "Pequeño guion de visualización sanadora (2-3 frases).",
+    "affirmations": ["Afirmación positiva 1", "Afirmación positiva 2"],
+    "finalMessage": "Mensaje de cierre esperanzador.",
+    "actionPlan": ["Paso de acción simple 1", "Paso de acción simple 2"]
+  }
+}
+
+INSTRUCCIONES IMPORTANTES:
+1. Sé muy poético y sanador en el "emotionalAnalysis".
+2. En "naturalRemedies", prioriza la flora local argentina (Cedrón, Tilo, etc.).
+3. Devuelve UN SOLO BLOQUE DE CÓDIGO JSON (un array [] con los objetos dentro).
+4. No pongas explicaciones previas, solo el JSON.
+
+A continuación te paso la lista de síntomas a procesar:
+
+[PEGAR AQUÍ UN GRUPO DE 10-20 SÍNTOMAS DE LA LISTA]

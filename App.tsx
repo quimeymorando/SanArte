@@ -1,0 +1,62 @@
+import React from 'react';
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Navigation from './components/Navigation';
+import ThemeToggle from './components/ThemeToggle';
+import LandingPage from './pages/LandingPage';
+import { HomePage, SearchPage } from './pages/HomePages';
+import { CommunityPage } from './pages/CommunityPage';
+import { SymptomDetailPage } from './pages/DetailPages';
+import { FavoritesPage, RoutinesPage, HistoryPage, ProfilePage } from './pages/UserPages';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
+import UpgradePage from './pages/UpgradePage';
+import { useRoutineNotifications } from './hooks/useRoutineNotifications';
+import ProtectedRoute from './components/ProtectedRoute';
+
+import { ThemeProvider } from './context/ThemeContext';
+
+import { XPToast } from './components/XPToast';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+import { Analytics } from "@vercel/analytics/react"
+
+const App: React.FC = () => {
+  // Initialize notification checker
+  useRoutineNotifications();
+
+  return (
+    <ThemeProvider>
+      <ErrorBoundary>
+        <XPToast />
+        <Analytics />
+        <BrowserRouter>
+          <div className="min-h-screen bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 transition-colors duration-200 font-sans">
+
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+
+              {/* Protected Routes - User must be logged in */}
+              <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+              <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+              <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+              <Route path="/symptom-detail" element={<ProtectedRoute><SymptomDetailPage /></ProtectedRoute>} />
+              <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
+              <Route path="/routines" element={<ProtectedRoute><RoutinesPage /></ProtectedRoute>} />
+              <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
+
+              {/* Public Pages */}
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+            </Routes>
+            <Navigation />
+          </div>
+        </BrowserRouter>
+      </ErrorBoundary>
+    </ThemeProvider>
+  );
+};
+
+export default App;

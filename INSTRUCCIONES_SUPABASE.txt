@@ -1,0 +1,15 @@
+
+Hola! Soy tu asistente de IA.
+
+Para que la aplicación funcione y se conecte a Supabase, necesitas configurar un archivo especial.
+Sigue estos pasos:
+
+1. En esta misma carpeta, crea un archivo llamado ".env.local" (si no existe).
+2. Abre ese archivo y pega el siguiente contenido:
+
+VITE_SUPABASE_URL=TU_URL_DE_SUPABASE
+VITE_SUPABASE_ANON_KEY=TU_CLAVE_ANON_DE_SUPABASE
+
+3. Reemplaza "TU_URL_DE_SUPABASE" y "TU_CLAVE_ANON_DE_SUPABASE" con los valores reales que encuentras en tu Dashboard de Supabase (Settings > API).
+
+Una vez hecho esto, avísame para arrancar la aplicación.

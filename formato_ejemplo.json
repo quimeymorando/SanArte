@@ -1,0 +1,49 @@
+[
+    {
+        "slug": "dolor-de-cabeza-ejemplo",
+        "name": "Dolor de Cabeza (Ejemplo)",
+        "content": {
+            "name": "Dolor de Cabeza",
+            "shortDefinition": "Autoexigencia desmedida y desvalorización intelectual.",
+            "emotionalAnalysis": "Aparece cuando queremos controlar todo desde la mente...",
+            "sideSymbolism": "Derecho: Razón / Izquierdo: Intuición",
+            "conflictList": [
+                {
+                    "conflict": "Control",
+                    "manifestation": "Presión en sienes"
+                }
+            ],
+            "internalMonologue": "Debo ser perfecto para ser amado.",
+            "questionsForSoul": [
+                "¿A quién quiero complacer?"
+            ],
+            "physicalAdvice": [
+                "Beber agua",
+                "Descansar vista"
+            ],
+            "naturalRemedies": "Infusión de Tilo y Lavanda.",
+            "aromatherapy": [
+                {
+                    "name": "Menta",
+                    "benefit": "Claridad"
+                }
+            ],
+            "archangel": "Arcángel Rafael (Luz Verde)",
+            "holisticTherapies": "Meditación",
+            "meditationScript": "Visualiza luz verde...",
+            "affirmations": [
+                "Suelto el control."
+            ],
+            "finalMessage": "Eres suficiente.",
+            "actionPlan": [
+                "Pausa 5 min"
+            ]
+        }
+    },
+    {
+        "slug": "segundo-sintoma",
+        "name": "Segundo Sïntoma",
+        "content": { ...
+        }
+    }
+]
