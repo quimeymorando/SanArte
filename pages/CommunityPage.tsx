@@ -367,9 +367,26 @@ export const CommunityPage: React.FC = () => {
                 </span>
               </div>
 
-              <p className="text-lg text-gray-800 dark:text-gray-200 font-medium leading-relaxed mb-6 pl-1">
+              <p className="text-lg text-gray-800 dark:text-gray-200 font-medium leading-relaxed mb-6 pl-1 pt-2">
                 "{item.text}"
               </p>
+
+              {/* Delete Intention Button */}
+              {user && item.isUser && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm('¿Eliminar esta publicación?')) {
+                      communityService.deleteIntention(item.id).then(() => {
+                        setIntentions(prev => prev.filter(i => i.id !== item.id));
+                      }).catch(() => alert('Error al eliminar'));
+                    }
+                  }}
+                  className="absolute top-4 right-4 text-gray-300 hover:text-red-500 p-2"
+                >
+                  <span className="material-symbols-outlined">delete</span>
+                </button>
+              )}
 
               <div className="flex items-center gap-6 pt-4 border-t border-gray-50 dark:border-gray-700/50">
                 {/* Candle Button */}
@@ -413,9 +430,9 @@ export const CommunityPage: React.FC = () => {
                               {comment.authorName || 'Alma Anónima'}
                             </span>
                             {/* Delete Button (Only for owner) */}
-                            {user && comment.userId === user.id && (
-                              <button onClick={() => handleDeleteComment(item.id, comment.id)} className="text-gray-300 hover:text-red-400 transition-colors p-1">
-                                <span className="material-symbols-outlined text-[14px]">delete</span>
+                            {user && (comment.userId === user.id || item.isUser) && (
+                              <button onClick={() => handleDeleteComment(item.id, comment.id)} className="text-gray-300 hover:text-red-500 transition-colors p-1" title="Eliminar">
+                                <span className="material-symbols-outlined text-[16px] font-bold">close</span>
                               </button>
                             )}
                           </div>

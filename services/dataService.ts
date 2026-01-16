@@ -155,6 +155,19 @@ export const communityService = {
             .eq('user_id', user.id); // Security: only delete own comments
 
         if (error) throw error;
+    },
+
+    deleteIntention: async (intentionId: string) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Debes iniciar sesión');
+
+        const { error } = await supabase
+            .from('intentions')
+            .delete()
+            .eq('id', intentionId)
+            .eq('user_id', user.id);
+
+        if (error) throw error;
     }
 };
 

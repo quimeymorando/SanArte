@@ -54,10 +54,10 @@ const InlineMarkdown = ({ text }: { text: string }) => {
       <>
          {parts.map((part, i) => {
             if (part.startsWith('**') && part.endsWith('**')) {
-               return <span key={i} className="font-black text-gray-900 dark:text-white">{part.slice(2, -2)}</span>;
+               return <span key={i} className="font-black text-primary dark:text-neon-cyan">{part.slice(2, -2)}</span>;
             }
             if (part.startsWith('*') && part.endsWith('*')) {
-               return <span key={i} className="font-serif italic text-gray-600 dark:text-gray-400">{part.slice(1, -1)}</span>;
+               return <span key={i} className="font-serif italic text-gray-600 dark:text-white">{part.slice(1, -1)}</span>;
             }
             return part;
          })}

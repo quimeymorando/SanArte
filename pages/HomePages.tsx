@@ -301,47 +301,6 @@ export const SearchPage: React.FC = () => {
   ];
   const [phraseIndex, setPhraseIndex] = useState(0);
 
-  // Autocomplete Logic
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-  useEffect(() => {
-    // Debounce para UX suave
-    const timeoutId = setTimeout(async () => {
-      if (query.length > 1) {
-        try {
-          // Busqueda Local: Instantánea y GRATIS (No consume API de OpenRouter)
-          // @ts-ignore
-          const results = await searchLocalSymptoms(query);
-          setSuggestions(results);
-          setShowSuggestions(true);
-        } catch (error) {
-          console.error("Error fetching suggestions:", error);
-          setSuggestions([]);
-        }
-      } else {
-        setSuggestions([]);
-        setShowSuggestions(false);
-      }
-    }, 300); // Debounce de 300ms es suficiente para local
-
-    return () => clearTimeout(timeoutId);
-  }, [query]);
-
-  // Handle click outside to close suggestions
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   useEffect(() => {
     let interval: any;
     if (isLoading) {
@@ -359,10 +318,9 @@ export const SearchPage: React.FC = () => {
     setIsLoading(true);
     setHasSearched(true);
     setResults([]);
-    setShowSuggestions(false); // Ocultar sugerencias al buscar
     try {
       // @ts-ignore
-      const data = await searchCatalog(searchTerm); // Usar alias searchCatalog
+      const data = await searchCatalog(searchTerm);
       setResults(data);
     } catch (error) {
       console.error("Search failed", error);
@@ -372,10 +330,10 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 w-full pb-24 min-h-screen bg-[#fcfdfe] dark:bg-background-dark">
-      <div className="sticky top-0 z-20 bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl pt-10 pb-6 px-6 border-b border-gray-100 dark:border-gray-800">
+    <div className="flex-1 w-full pb-24 min-h-screen bg-[#fcfdfe] dark:bg-background-dark md:pt-20">
+      <div className="sticky top-0 z-20 bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl pt-4 pb-4 px-6 border-b border-gray-100 dark:border-gray-800 md:static md:bg-transparent md:border-none md:p-0 md:mb-8">
         <div className="max-w-2xl mx-auto flex items-center gap-4">
-          <button onClick={() => navigate('/home')} className="size-12 rounded-2xl bg-gray-50 dark:bg-surface-dark flex items-center justify-center text-gray-400 hover:text-primary transition-colors">
+          <button onClick={() => navigate('/home')} className="size-12 rounded-2xl bg-gray-50 dark:bg-surface-dark flex items-center justify-center text-gray-400 hover:text-primary transition-colors md:hidden">
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div ref={searchContainerRef} className="relative flex-1 group">
@@ -390,20 +348,9 @@ export const SearchPage: React.FC = () => {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               autoFocus={!initialQuery}
+              autoComplete="off"
+              name="search_query_unique_id"
             />
-            {showSuggestions && suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-surface-dark rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                {suggestions.map((s, i) => (
-                  <div
-                    key={i}
-                    onClick={() => { setQuery(s); handleSearch(s); setShowSuggestions(false); }}
-                    className="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer text-gray-700 dark:text-gray-300 font-medium transition-colors border-b last:border-0 border-gray-50 dark:border-gray-800/50"
-                  >
-                    {s}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -494,6 +441,6 @@ export const SearchPage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </div >
   )
 }

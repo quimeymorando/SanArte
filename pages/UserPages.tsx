@@ -42,14 +42,15 @@ export const FavoritesPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((fav, index) => (
-            <div key={index} onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(fav.symptom_name)}`)} className="bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-lg border border-gray-50 dark:border-gray-800 cursor-pointer hover:border-primary/30 transition-all">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{fav.symptom_name}</h3>
+            <div key={index} onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(fav.symptom_name)}`)} className="relative bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-lg border border-gray-50 dark:border-gray-800 cursor-pointer hover:border-primary/30 transition-all group">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 pr-10">{fav.symptom_name}</h3>
               <p className="text-sm text-gray-500 line-clamp-3">{fav.description}</p>
               <button
                 onClick={(e) => handleDelete(fav.id, e)}
-                className="absolute top-4 right-4 p-2 bg-white/50 hover:bg-red-50 text-gray-300 hover:text-red-400 rounded-full transition-all"
+                className="absolute top-4 right-4 z-50 p-2 bg-red-50 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-md"
+                title="Eliminar de favoritos"
               >
-                <span className="material-symbols-outlined text-span">delete</span>
+                <span className="material-symbols-outlined text-[20px] font-bold">close</span>
               </button>
             </div>
           ))}
