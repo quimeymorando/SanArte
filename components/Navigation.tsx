@@ -14,6 +14,39 @@ const Navigation: React.FC = () => {
 
   return (
     <>
+      {/* Desktop Navigation Header */}
+      <nav className="hidden md:flex fixed top-0 w-full bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 py-4 px-8 z-[90] justify-between items-center transition-all duration-300">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/home')}>
+          <span className="material-symbols-outlined text-3xl text-primary animate-pulse-slow">spa</span>
+          <span className="text-xl font-heading font-bold text-gray-900 dark:text-white tracking-tight">San<span className="text-primary italic">Arte</span></span>
+        </div>
+
+        <div className="flex items-center gap-8">
+          <Link to="/home" className={`flex items-center gap-2 text-sm font-bold transition-colors ${isActive('/home')}`}>
+            <span className="material-symbols-outlined text-lg">home</span>
+            Inicio
+          </Link>
+          <Link to="/community" className={`flex items-center gap-2 text-sm font-bold transition-colors ${isActive('/community')}`}>
+            <span className="material-symbols-outlined text-lg">diversity_1</span>
+            Comunidad
+          </Link>
+          <Link to="/routines" className={`flex items-center gap-2 text-sm font-bold transition-colors ${isActive('/routines')}`}>
+            <span className="material-symbols-outlined text-lg">calendar_today</span>
+            Rutinas
+          </Link>
+          <Link to="/history" className={`flex items-center gap-2 text-sm font-bold transition-colors ${isActive('/history')}`}>
+            <span className="material-symbols-outlined text-lg">history</span>
+            Historial
+          </Link>
+          <Link to="/profile" className={`flex items-center gap-2 text-sm font-bold transition-colors ${isActive('/profile')}`}>
+            <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-lg">person</span>
+            </div>
+            Perfil
+          </Link>
+        </div>
+      </nav>
+
       {/* Mobile Bottom Navigation */}
       <nav className="fixed bottom-0 w-full bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 py-3 px-6 z-[90] flex justify-between items-center md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <Link to="/home" className={`flex flex-col items-center gap-1 ${isActive('/home')}`}>
@@ -37,17 +70,6 @@ const Navigation: React.FC = () => {
           <span className="text-[10px]">Perfil</span>
         </Link>
       </nav>
-
-      {/* Desktop Navigation - Back Button for Sections */}
-      {showDesktopBack && (
-        <button
-          onClick={() => navigate('/home')}
-          className="hidden md:flex fixed top-8 left-8 z-[90] bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-primary dark:hover:text-primary py-3 px-5 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:-translate-x-1 items-center gap-3 font-bold group animate-in fade-in slide-in-from-left-10 duration-500"
-        >
-          <span className="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">arrow_back</span>
-          <span className="text-sm">Inicio</span>
-        </button>
-      )}
     </>
   );
 };

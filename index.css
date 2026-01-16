@@ -128,6 +128,6 @@ strong {
 }
 
 .dark strong {
-  color: #fff;
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+  color: #00f2ff;
+  text-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
 }

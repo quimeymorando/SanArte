@@ -47,7 +47,7 @@ export const FavoritesPage: React.FC = () => {
               <p className="text-sm text-gray-500 line-clamp-3">{fav.description}</p>
               <button
                 onClick={(e) => handleDelete(fav.id, e)}
-                className="absolute top-4 right-4 p-2 bg-white/50 hover:bg-red-50 text-gray-300 hover:text-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                className="absolute top-4 right-4 p-2 bg-white/50 hover:bg-red-50 text-gray-300 hover:text-red-400 rounded-full transition-all"
               >
                 <span className="material-symbols-outlined text-span">delete</span>
               </button>
@@ -153,7 +153,7 @@ export const RoutinesPage: React.FC = () => {
               </div>
             </div>
 
-            <button onClick={(e) => handleDelete(routine.id, e)} className="p-2 text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+            <button onClick={(e) => handleDelete(routine.id, e)} className="p-2 text-gray-300 hover:text-red-400 transition-all">
               <span className="material-symbols-outlined">delete</span>
             </button>
           </div>

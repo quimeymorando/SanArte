@@ -59,6 +59,9 @@ export const CommunityPage: React.FC = () => {
           })) || []
         }));
 
+        // Sort by newest first
+        mappedData.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
         setIntentions(mappedData);
       } catch (error) {
         console.error("Error loading community data:", error);
@@ -359,7 +362,9 @@ export const CommunityPage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">hace un momento</span>
+                <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">
+                  {item.timestamp.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })} • {item.timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
               </div>
 
               <p className="text-lg text-gray-800 dark:text-gray-200 font-medium leading-relaxed mb-6 pl-1">
