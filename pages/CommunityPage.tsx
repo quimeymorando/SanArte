@@ -252,9 +252,9 @@ export const CommunityPage: React.FC = () => {
         <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
         <div className="relative z-10">
           <span className="material-symbols-outlined text-5xl text-primary mb-2">diversity_1</span>
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">Círculo de SanArte</h1>
+          <h1 className="font-heading text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">Comunidad SanArte</h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto text-lg leading-relaxed">
-            Bienvenida/o al Círculo. Este es un espacio sagrado para agradecer, soltar cargas, compartir tu proceso y contarnos si esta herramienta está siendo luz en tu camino.
+            Bienvenida/o a la Comunidad. Este es un espacio sagrado para agradecer, soltar cargas, compartir tu proceso y contarnos si esta herramienta está siendo luz en tu camino.
           </p>
         </div>
       </div>

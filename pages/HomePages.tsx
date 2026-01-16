@@ -252,7 +252,7 @@ export const HomePage: React.FC = () => {
             { id: 'community', name: 'Comunidad', emoji: '🤝', color: 'bg-pink-50 text-pink-500 border-pink-100', xp: '+10 Luz' },
             { id: 'favorites', name: 'Favoritos', emoji: '💖', color: 'bg-rose-50 text-rose-500 border-rose-100', xp: 'Ver listado' },
             { id: 'routines', name: 'Rutinas', emoji: '📅', color: 'bg-orange-50 text-orange-500 border-orange-100', xp: '+50 Luz' },
-            { id: 'history', name: 'Historial', emoji: '🕰️', color: 'bg-purple-50 text-purple-500 border-purple-100', xp: 'Tu camino' },
+            { id: 'journal', name: 'Diario', emoji: '📖', color: 'bg-cyan-50 text-cyan-500 border-cyan-100', xp: 'Tu sanación' },
           ].map(item => (
             <div
               key={item.id}
