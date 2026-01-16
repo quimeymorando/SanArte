@@ -7,6 +7,7 @@ interface Comment {
   authorName?: string;
   text: string;
   timestamp: Date;
+  userId?: string; // Added for ownership check
 }
 
 interface Intention {
@@ -53,7 +54,8 @@ export const CommunityPage: React.FC = () => {
             id: c.id,
             text: c.text,
             authorName: c.author_name,
-            timestamp: new Date(c.created_at || Date.now()) // Fallback for timestamp
+            userId: c.user_id, // Map user_id to local property
+            timestamp: new Date(c.created_at || Date.now())
           })) || []
         }));
 
@@ -115,6 +117,28 @@ export const CommunityPage: React.FC = () => {
     }
   };
 
+  const handleDeleteComment = async (intentionId: string, commentId: string) => {
+    if (!window.confirm("¿Borrar tu comentario?")) return;
+
+    // Optimistic Delete
+    const updatedIntentions = [...intentions];
+    const postIndex = updatedIntentions.findIndex(p => p.id === intentionId);
+    if (postIndex !== -1) {
+      updatedIntentions[postIndex] = {
+        ...updatedIntentions[postIndex],
+        comments: updatedIntentions[postIndex].comments.filter(c => c.id !== commentId)
+      };
+      setIntentions(updatedIntentions);
+    }
+
+    try {
+      await communityService.deleteComment(commentId);
+    } catch (err) {
+      console.error("Error deleting", err);
+      alert("No se pudo eliminar.");
+    }
+  };
+
   const handleComment = async (postId: string) => {
     if (!newComment.trim()) return;
 
@@ -127,6 +151,7 @@ export const CommunityPage: React.FC = () => {
       id: Date.now().toString(),
       text: newComment,
       authorName: showName ? user?.name : undefined,
+      userId: user?.id,
       timestamp: new Date()
     };
 
@@ -267,18 +292,29 @@ export const CommunityPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
 
             {/* Identity Toggle */}
-            <button
-              onClick={() => setShowName(!showName)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${showName
-                ? 'bg-primary/10 text-primary border-primary/30'
-                : 'bg-gray-100 dark:bg-white/5 text-gray-500 border-transparent'
-                }`}
-            >
-              <span className="material-symbols-outlined text-[16px]">
-                {showName ? 'visibility' : 'visibility_off'}
-              </span>
-              {showName ? `Publicar como ${user?.name || 'mí'}` : 'Anónimo y seguro'}
-            </button>
+            {/* Identity Toggle - Improved UI */}
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Publicando como:</span>
+              <button
+                onClick={() => setShowName(!showName)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black transition-all border ${showName
+                  ? 'bg-primary/10 text-primary border-primary shine-effect'
+                  : 'bg-gray-100 dark:bg-white/5 text-gray-500 border-gray-200 dark:border-gray-700'
+                  }`}
+              >
+                {showName ? (
+                  <>
+                    <span className="material-symbols-outlined text-[16px]">visibility</span>
+                    <span className="uppercase tracking-wide">{user?.name || 'Mí'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-[16px]">visibility_off</span>
+                    <span className="uppercase tracking-wide">Anónimo</span>
+                  </>
+                )}
+              </button>
+            </div>
 
             <button
               onClick={handlePost}
@@ -367,10 +403,16 @@ export const CommunityPage: React.FC = () => {
                     <div className="space-y-3 mb-4 max-h-60 overflow-y-auto no-scrollbar">
                       {item.comments.map(comment => (
                         <div key={comment.id} className="bg-gray-50 dark:bg-white/5 p-3 rounded-2xl text-sm">
-                          <div className="flex justify-between items-center mb-1">
+                          <div className="flex justify-between items-start mb-1">
                             <span className={`text-xs font-bold ${comment.authorName ? 'text-primary' : 'text-gray-500'}`}>
                               {comment.authorName || 'Alma Anónima'}
                             </span>
+                            {/* Delete Button (Only for owner) */}
+                            {user && comment.userId === user.id && (
+                              <button onClick={() => handleDeleteComment(item.id, comment.id)} className="text-gray-300 hover:text-red-400 transition-colors p-1">
+                                <span className="material-symbols-outlined text-[14px]">delete</span>
+                              </button>
+                            )}
                           </div>
                           <p className="text-gray-700 dark:text-gray-300">{comment.text}</p>
                         </div>

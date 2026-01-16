@@ -3,6 +3,7 @@ import { useTheme } from '../context/ThemeContext';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getStoredRoutines, toggleRoutine, deleteRoutine } from '../services/routineService';
+import { historyService } from '../services/dataService';
 import { Routine, SymptomLogEntry } from '../types';
 import { authService } from '../services/authService';
 import { supabase } from '../supabaseClient';
@@ -12,12 +13,24 @@ export const FavoritesPage: React.FC = () => {
   const [favorites, setFavorites] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchFavorites = async () => {
-      const { data } = await supabase.from('favorites').select('*');
-      if (data) setFavorites(data);
-    };
     fetchFavorites();
   }, []);
+
+  const fetchFavorites = async () => {
+    const data = await historyService.getFavorites();
+    if (data) setFavorites(data);
+  };
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm("¿Eliminar de favoritos?")) return;
+    try {
+      await historyService.deleteFavoriteById(id);
+      setFavorites(prev => prev.filter(f => f.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex-1 w-full max-w-7xl mx-auto px-6 py-12 pb-24">
@@ -32,6 +45,12 @@ export const FavoritesPage: React.FC = () => {
             <div key={index} onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(fav.symptom_name)}`)} className="bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-lg border border-gray-50 dark:border-gray-800 cursor-pointer hover:border-primary/30 transition-all">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{fav.symptom_name}</h3>
               <p className="text-sm text-gray-500 line-clamp-3">{fav.description}</p>
+              <button
+                onClick={(e) => handleDelete(fav.id, e)}
+                className="absolute top-4 right-4 p-2 bg-white/50 hover:bg-red-50 text-gray-300 hover:text-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+              >
+                <span className="material-symbols-outlined text-span">delete</span>
+              </button>
             </div>
           ))}
         </div>
@@ -69,6 +88,12 @@ export const RoutinesPage: React.FC = () => {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Confirmación amigable antes de eliminar
+    if (!window.confirm("¿Estás segura/o de que quieres eliminar esta rutina de tu lista?")) {
+      return;
+    }
+
     const success = await deleteRoutine(id);
     if (success) {
       setRoutines(prev => prev.filter(r => r.id !== id));
@@ -148,14 +173,28 @@ export const HistoryPage: React.FC = () => {
   const navigate = useNavigate();
   const [historyItems, setHistoryItems] = useState<any[]>([]);
   useEffect(() => {
-    const fetchHistory = async () => {
-      const user = await authService.getUser();
-      if (!user) return;
-      const { data } = await supabase.from('symptom_logs').select('*').order('created_at', { ascending: false });
-      if (data) setHistoryItems(data);
-    };
     fetchHistory();
   }, []);
+
+  const fetchHistory = async () => {
+    try {
+      const data = await historyService.getHistory();
+      if (data) setHistoryItems(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm("¿Eliminar este registro?")) return;
+    try {
+      await historyService.deleteLog(id);
+      setHistoryItems(prev => prev.filter(i => i.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="flex-1 w-full max-w-4xl mx-auto px-6 py-12 pb-24">
@@ -171,9 +210,14 @@ export const HistoryPage: React.FC = () => {
             >
               <div className="flex justify-between mb-2">
                 <span className="text-xs font-bold text-gray-400">{new Date(item.date).toLocaleDateString()}</span>
-                <span className={`text-xs font-bold ${item.intensity > 0 ? 'text-primary' : 'text-gray-400 uppercase tracking-widest'}`}>
-                  {item.intensity > 0 ? `Intensidad ${item.intensity}` : '👁️ Visualizado'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-bold ${item.intensity > 0 ? 'text-primary' : 'text-gray-400 uppercase tracking-widest'}`}>
+                    {item.intensity > 0 ? `Intensidad ${item.intensity}` : '👁️ Visualizado'}
+                  </span>
+                  <button onClick={(e) => handleDelete(item.id, e)} className="text-gray-300 hover:text-red-400 transition-colors p-1">
+                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                  </button>
+                </div>
               </div>
               <p className="text-gray-800 dark:text-gray-200 font-medium">
                 {item.notes}
@@ -293,6 +337,12 @@ export const ProfilePage: React.FC = () => {
           </svg>
 
           <div className="absolute inset-2 rounded-full overflow-hidden border-4 border-white dark:border-surface-dark shadow-xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 flex items-center justify-center group">
+            {/* Mensaje sutil si no hay foto */}
+            {!user.avatar && (
+              <div className="absolute bottom-6 left-0 right-0 text-center z-20 pointer-events-none">
+                <span className="text-[10px] bg-black/50 text-white px-2 py-1 rounded-full backdrop-blur-md">Sube tu foto</span>
+              </div>
+            )}
             {user.avatar ? (
               <img src={user.avatar} alt="User" className="w-full h-full object-cover" />
             ) : (
@@ -334,6 +384,8 @@ export const ProfilePage: React.FC = () => {
           <span className="text-2xl md:text-3xl mb-1">🔥</span>
           <span className="text-xl md:text-2xl font-black text-gray-800 dark:text-white">{streak}</span>
           <span className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider font-bold">Racha días</span>
+          {streak > 0 && <span className="text-[9px] text-green-500 font-bold mt-1">¡Sigue así!</span>}
+          {streak === 0 && <span className="text-[9px] text-orange-400 font-bold mt-1">¡Empieza hoy!</span>}
         </div>
         <div className="bg-white/60 dark:bg-white/5 backdrop-blur-xl p-4 md:p-6 rounded-[2rem] border border-white/50 dark:border-white/10 shadow-lg flex flex-col items-center border-t-4 border-t-primary/50">
           <span className="text-2xl md:text-3xl mb-1">⚡</span>
@@ -395,7 +447,7 @@ export const ProfilePage: React.FC = () => {
                   Eleva tu Consciencia
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mb-6 max-w-lg mx-auto leading-relaxed">
-                  ¿Sientes que te falta algo? El <span className="font-bold text-amber-600 dark:text-amber-400">Loto Dorado</span> te ofrece las herramientas profundas para tu sanación completa. No te quedes a mitad de camino.
+                  ¿Sientes que te falta algo? Desbloquea todo nuestro potencial por menos de lo que vale un Café. El <span className="font-bold text-amber-600 dark:text-amber-400">Loto Dorado</span> te ofrece las herramientas profundas para tu sanación completa.
                 </p>
               </div>
 
@@ -491,6 +543,14 @@ export const ProfilePage: React.FC = () => {
           </div>
         </button>
       </div >
+
+
+
+      <div className="mt-8 text-center pb-8">
+        <a href="/community?theme=feedback" className="text-sm text-primary font-bold hover:underline opacity-80 decoration-dashed underline-offset-4">
+          ¿Cómo podemos mejorar? Tu opinión nos sana.
+        </a>
+      </div>
 
     </div >
   );

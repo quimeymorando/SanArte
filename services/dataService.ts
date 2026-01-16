@@ -142,10 +142,24 @@ export const communityService = {
 
         if (error) throw error;
         return data;
+    },
+
+    deleteComment: async (commentId: string) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Debes iniciar sesión');
+
+        const { error } = await supabase
+            .from('comments')
+            .delete()
+            .eq('id', commentId)
+            .eq('user_id', user.id); // Security: only delete own comments
+
+        if (error) throw error;
     }
 };
 
 // --- HISTORIAL Y FAVORITOS ---
+
 export const historyService = {
     saveSymptomLog: async (log: Omit<SymptomLogEntry, 'id'>) => {
         const { data: { user } } = await supabase.auth.getUser();
@@ -174,6 +188,11 @@ export const historyService = {
             duration: d.duration,
             notes: d.notes
         }));
+    },
+
+    deleteLog: async (id: string) => {
+        const { error } = await supabase.from('symptom_logs').delete().eq('id', id);
+        if (error) throw error;
     },
 
     toggleFavorite: async (symptomName: string, description: string) => {
@@ -227,5 +246,9 @@ export const historyService = {
             }
             return []; // No cache and error
         }
+    },
+    deleteFavoriteById: async (id: string) => {
+        const { error } = await supabase.from('favorites').delete().eq('id', id);
+        if (error) throw error;
     }
 };

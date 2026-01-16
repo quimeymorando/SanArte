@@ -13,6 +13,7 @@ import TermsPage from './pages/TermsPage';
 import UpgradePage from './pages/UpgradePage';
 import { useRoutineNotifications } from './hooks/useRoutineNotifications';
 import ProtectedRoute from './components/ProtectedRoute';
+import { NotificationManager } from './components/NotificationManager';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -32,7 +33,7 @@ const App: React.FC = () => {
         <Analytics />
         <BrowserRouter>
           <div className="min-h-screen bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 transition-colors duration-200 font-sans">
-
+            <NotificationManager />
             <Routes>
               <Route path="/" element={<LandingPage />} />
 
