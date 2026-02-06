@@ -15,7 +15,7 @@ const Navigation: React.FC = () => {
   return (
     <>
       {/* Desktop Navigation Header */}
-      <nav className="hidden md:flex fixed top-0 w-full bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 py-4 px-8 z-[90] justify-between items-center transition-all duration-300">
+      <nav className="hidden md:flex fixed top-0 w-full bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 py-4 pt-[calc(1rem+env(safe-area-inset-top))] px-8 z-[90] justify-between items-center transition-all duration-300">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/home')}>
           <span className="material-symbols-outlined text-3xl text-primary animate-pulse-slow">spa</span>
           <span className="text-xl font-heading font-bold text-gray-900 dark:text-white tracking-tight">San<span className="text-primary italic">Arte</span></span>
@@ -48,7 +48,7 @@ const Navigation: React.FC = () => {
       </nav>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 w-full bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 py-3 px-6 z-[90] flex justify-between items-center md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <nav className="fixed bottom-0 w-full bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] px-6 z-[90] flex justify-between items-center md:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         <Link to="/home" className={`flex flex-col items-center gap-1 ${isActive('/home')}`}>
           <span className="material-symbols-outlined">home</span>
           <span className="text-[10px]">Inicio</span>

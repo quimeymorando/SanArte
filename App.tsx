@@ -14,6 +14,7 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import UpgradePage from './pages/UpgradePage';
 import { SharedResultPage } from './pages/SharedResultPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 import { useRoutineNotifications } from './hooks/useRoutineNotifications';
 import ProtectedRoute from './components/ProtectedRoute';
 import { NotificationManager } from './components/NotificationManager';
@@ -22,6 +23,9 @@ import { ThemeProvider } from './context/ThemeContext';
 
 import { XPToast } from './components/XPToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { GlobalErrorProvider } from './context/GlobalErrorContext';
+import { ConfettiManager } from './components/ConfettiManager';
+
 
 import { Analytics } from "@vercel/analytics/react"
 
@@ -34,8 +38,14 @@ const App: React.FC = () => {
       // If user just signed in (e.g. from email link), redirect to home if on landing
       if (event === 'SIGNED_IN' && session) {
         const currentPath = window.location.pathname;
-        if (currentPath === '/' || currentPath === '/login') {
-          // Use window.location to ensure clean state or we could use navigation if we had access to router
+        // Solo redirigir si estamos explícitamente en la landing o login, 
+        // y NO en una página compartida o legal.
+        const isLanding = currentPath === '/' || currentPath === '/login' || currentPath === '';
+        const isPublic = currentPath.includes('/share/') ||
+          currentPath.includes('/privacy') ||
+          currentPath.includes('/terms');
+
+        if (isLanding && !isPublic) {
           window.location.replace('/home');
         }
       }
@@ -45,36 +55,40 @@ const App: React.FC = () => {
   }, []);
   return (
     <ThemeProvider>
-      <ErrorBoundary>
-        <XPToast />
-        <Analytics />
-        <BrowserRouter>
-          <div className="min-h-screen bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 transition-colors duration-200 font-sans">
-            <NotificationManager />
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
+      <GlobalErrorProvider>
+        <ErrorBoundary>
+          <ConfettiManager />
+          <XPToast />
+          <Analytics />
+          <BrowserRouter>
+            <div className="min-h-screen ghl-full-screen bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 transition-colors duration-200 font-sans">
+              <NotificationManager />
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
-              {/* Protected Routes - User must be logged in */}
-              <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-              <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
-              <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
-              <Route path="/symptom-detail" element={<ProtectedRoute><SymptomDetailPage /></ProtectedRoute>} />
-              <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
+                {/* Protected Routes - User must be logged in */}
+                <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+                <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
+                <Route path="/symptom-detail" element={<ProtectedRoute><SymptomDetailPage /></ProtectedRoute>} />
+                <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
 
-              <Route path="/routines" element={<ProtectedRoute><RoutinesPage /></ProtectedRoute>} />
-              <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-              <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
+                <Route path="/routines" element={<ProtectedRoute><RoutinesPage /></ProtectedRoute>} />
+                <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
 
-              {/* Public Pages */}
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/share/:id" element={<SharedResultPage />} />
-            </Routes>
-            <Navigation />
-          </div>
-        </BrowserRouter>
-      </ErrorBoundary>
+                {/* Public Pages */}
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/share/:id" element={<SharedResultPage />} />
+              </Routes>
+              <Navigation />
+            </div>
+          </BrowserRouter>
+        </ErrorBoundary>
+      </GlobalErrorProvider>
     </ThemeProvider>
   );
 };

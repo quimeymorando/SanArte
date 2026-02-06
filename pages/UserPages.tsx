@@ -4,13 +4,13 @@ import { useTheme } from '../context/ThemeContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getStoredRoutines, toggleRoutine, deleteRoutine } from '../services/routineService';
 import { historyService } from '../services/dataService';
-import { Routine, SymptomLogEntry } from '../types';
+import { Routine, SymptomLogEntry, Favorite, UserProfile } from '../types';
 import { authService } from '../services/authService';
 import { supabase } from '../supabaseClient';
 
 export const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
-  const [favorites, setFavorites] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
 
   useEffect(() => {
     fetchFavorites();
@@ -26,7 +26,7 @@ export const FavoritesPage: React.FC = () => {
     if (!window.confirm("¿Eliminar de favoritos?")) return;
     try {
       await historyService.deleteFavoriteById(id);
-      setFavorites(prev => prev.filter(f => f.id !== id));
+      setFavorites((prev: Favorite[]) => prev.filter(f => f.id !== id));
     } catch (error) {
       console.error(error);
     }
@@ -41,12 +41,12 @@ export const FavoritesPage: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {favorites.map((fav, index) => (
+          {favorites.map((fav: Favorite, index: number) => (
             <div key={index} onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(fav.symptom_name)}`)} className="relative bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-lg border border-gray-50 dark:border-gray-800 cursor-pointer hover:border-primary/30 transition-all group">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 pr-10">{fav.symptom_name}</h3>
               <p className="text-sm text-gray-500 line-clamp-3">{fav.description}</p>
               <button
-                onClick={(e) => handleDelete(fav.id, e)}
+                onClick={(e: React.MouseEvent) => handleDelete(fav.id, e)}
                 className="absolute top-4 right-4 z-50 p-2 bg-red-50 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-md"
                 title="Eliminar de favoritos"
               >
@@ -73,13 +73,13 @@ export const RoutinesPage: React.FC = () => {
     if (!routine) return;
 
     // Optimistic update
-    setRoutines(prev => prev.map(r => r.id === id ? { ...r, completed: !r.completed } : r));
+    setRoutines((prev: Routine[]) => prev.map(r => r.id === id ? { ...r, completed: !r.completed } : r));
 
     const { success, xpEarned } = await toggleRoutine(id, routine.completed);
 
     if (!success) {
       // Revert if failed
-      setRoutines(prev => prev.map(r => r.id === id ? { ...r, completed: routine.completed } : r));
+      setRoutines((prev: Routine[]) => prev.map(r => r.id === id ? { ...r, completed: routine.completed } : r));
     } else if (xpEarned > 0) {
       authService.addXP(xpEarned);
       setXpAdded(xpEarned);
@@ -97,7 +97,7 @@ export const RoutinesPage: React.FC = () => {
 
     const success = await deleteRoutine(id);
     if (success) {
-      setRoutines(prev => prev.filter(r => r.id !== id));
+      setRoutines((prev: Routine[]) => prev.filter(r => r.id !== id));
     }
   };
 
@@ -124,7 +124,7 @@ export const RoutinesPage: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        {routines.map((routine) => (
+        {routines.map((routine: Routine) => (
           <div
             key={routine.id}
             onClick={() => handleToggle(routine.id)}
@@ -154,8 +154,8 @@ export const RoutinesPage: React.FC = () => {
               </div>
             </div>
 
-            <button onClick={(e) => handleDelete(routine.id, e)} className="p-2 text-gray-300 hover:text-red-400 transition-all">
-              <span className="material-symbols-outlined">delete</span>
+            <button onClick={(e: React.MouseEvent) => handleDelete(routine.id, e)} className="p-2 text-gray-300 hover:text-red-400 transition-all">
+              <span className="material-symbols-outlined">close</span>
             </button>
           </div>
         ))}
@@ -172,7 +172,7 @@ export const RoutinesPage: React.FC = () => {
 
 export const HistoryPage: React.FC = () => {
   const navigate = useNavigate();
-  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [historyItems, setHistoryItems] = useState<SymptomLogEntry[]>([]);
   useEffect(() => {
     fetchHistory();
   }, []);
@@ -191,7 +191,7 @@ export const HistoryPage: React.FC = () => {
     if (!window.confirm("¿Eliminar este registro?")) return;
     try {
       await historyService.deleteLog(id);
-      setHistoryItems(prev => prev.filter(i => i.id !== id));
+      setHistoryItems((prev: SymptomLogEntry[]) => prev.filter(i => i.id !== id));
     } catch (err) {
       console.error(err);
     }
@@ -201,7 +201,7 @@ export const HistoryPage: React.FC = () => {
     <div className="flex-1 w-full max-w-4xl mx-auto px-6 py-12 pt-32 pb-24">
       <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-8">Tu Historial 🕰️</h1>
       <div className="space-y-4">
-        {historyItems.length === 0 ? <p className="text-gray-500">Sin registros.</p> : historyItems.map(item => {
+        {historyItems.length === 0 ? <p className="text-gray-500">Sin registros.</p> : historyItems.map((item: SymptomLogEntry) => {
           const symptomName = item.notes?.replace('Síntoma: ', '').replace('Búsqueda: ', '').trim();
           return (
             <div
@@ -215,7 +215,7 @@ export const HistoryPage: React.FC = () => {
                   <span className={`text-xs font-bold ${item.intensity > 0 ? 'text-primary' : 'text-gray-400 uppercase tracking-widest'}`}>
                     {item.intensity > 0 ? `Intensidad ${item.intensity}` : '👁️ Visualizado'}
                   </span>
-                  <button onClick={(e) => handleDelete(item.id, e)} className="text-gray-300 hover:text-red-400 transition-colors p-1">
+                  <button onClick={(e: React.MouseEvent) => handleDelete(item.id, e)} className="text-gray-300 hover:text-red-400 transition-colors p-1">
                     <span className="material-symbols-outlined text-[16px]">delete</span>
                   </button>
                 </div>
@@ -233,7 +233,7 @@ export const HistoryPage: React.FC = () => {
 }
 
 export const ProfilePage: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const subscriptionRef = React.useRef<HTMLDivElement>(null);
@@ -263,7 +263,7 @@ export const ProfilePage: React.FC = () => {
       try {
         const newAvatarUrl = await authService.updateAvatar(file);
         if (newAvatarUrl) {
-          setUser((prev: any) => ({ ...prev, avatar: newAvatarUrl }));
+          setUser((prev: UserProfile | null) => prev ? ({ ...prev, avatar: newAvatarUrl }) : null);
         } else {
           alert('Error al subir imagen. Asegúrate de tener el bucket "avatars" creado en Supabase con acceso público.');
         }
@@ -309,10 +309,10 @@ export const ProfilePage: React.FC = () => {
   const userBadges = user.badges || [];
 
   const allBadges = [
-    { name: "Despertar", icon: "🌱", color: "bg-green-100 dark:bg-green-900/30 text-green-600" },
-    { name: "Constancia", icon: "🔥", color: "bg-orange-100 dark:bg-orange-900/30 text-orange-600" },
-    { name: "Sabiduría", icon: "🦉", color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600" },
-    { name: "Alquimista", icon: "⚗️", color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600" },
+    { name: "Despertar", icon: "check_circle", color: "bg-cyan-900/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.3)]" },
+    { name: "Constancia", icon: "local_fire_department", color: "bg-orange-900/20 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(251,146,60,0.3)]" },
+    { name: "Sabiduría", icon: "psychology", color: "bg-purple-900/20 text-purple-400 border border-purple-500/30 shadow-[0_0_15px_rgba(192,132,252,0.3)]" },
+    { name: "Alquimista", icon: "science", color: "bg-emerald-900/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(52,211,153,0.3)]" },
   ];
 
   const benefits = [
@@ -411,8 +411,8 @@ export const ProfilePage: React.FC = () => {
             const isUnlocked = userBadges.includes(badge.name);
             return (
               <div key={idx} className={`min-w-[100px] flex flex-col items-center gap-2 transition-all duration-500 ${isUnlocked ? 'opacity-100 scale-100' : 'opacity-40 grayscale scale-95'}`}>
-                <div className={`size-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg ${isUnlocked ? badge.color : 'bg-gray-200 dark:bg-gray-800'}`}>
-                  {badge.icon}
+                <div className={`size-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg transition-all duration-300 ${isUnlocked ? badge.color : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
+                  <span className="material-symbols-outlined text-[32px]">{badge.icon}</span>
                 </div>
                 <span className="text-xs font-bold text-gray-600 dark:text-gray-400 text-center max-w-[80px] leading-tight">
                   {badge.name}
@@ -448,7 +448,7 @@ export const ProfilePage: React.FC = () => {
                   Eleva tu Consciencia
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mb-6 max-w-lg mx-auto leading-relaxed">
-                  ¿Sientes que te falta algo? Desbloquea todo nuestro potencial por menos de lo que vale un Café. El <span className="font-bold text-amber-600 dark:text-amber-400">Loto Dorado</span> te ofrece las herramientas profundas para tu sanación completa.
+                  <span className="font-bold text-amber-600 dark:text-amber-400">Menos de un café, toda tu sanación.</span> Desbloquea todo nuestro potencial y comienza tu viaje. El Loto Dorado te ofrece las herramientas profundas para tu sanación completa.
                 </p>
               </div>
 

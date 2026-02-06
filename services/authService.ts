@@ -1,36 +1,19 @@
-
 import { supabase } from '../supabaseClient';
 import { UserProfile } from '../types';
+import { Database } from '../types_db';
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 const XP_PER_LEVEL = 500;
 const FREE_MESSAGE_LIMIT = 5;
 
-// Interface matching the Supabase 'profiles' table structure
-interface SupaProfile {
-  id: string;
-  name?: string;
-  email?: string;
-  avatar_url?: string;
-  join_date?: string;
-  is_premium?: boolean;
-  xp?: number;
-  level?: number;
-  role?: 'user' | 'admin';
-  badges?: string[];
-  daily_message_count?: number;
-  last_message_date?: string;
-  current_streak?: number;
-  longest_streak?: number;
-  healing_moments?: number;
-  last_active_at?: string;
-}
-
 // Helper to transform raw DB data to TypeScript UserProfile
-const mapProfileToUser = (profile: SupaProfile): UserProfile => ({
+const mapProfileToUser = (profile: ProfileRow): UserProfile => ({
   id: profile.id,
   name: profile.name || profile.email?.split('@')[0] || 'Sanador',
   email: profile.email || '',
-  avatar: profile.avatar_url,
+  avatar: profile.avatar_url || undefined,
   joinDate: profile.join_date || new Date().toISOString(),
   isPremium: !!profile.is_premium,
   xp: profile.xp || 0,
@@ -85,13 +68,16 @@ export const authService = {
       console.warn("Usando contraseña temporal. Actualiza tu UI para pedir contraseña.");
     }
 
+    // Explicitly type the options to ensure emailRedirectTo is accepted
+    const options = {
+      data: { name },
+      emailRedirectTo: `${window.location.origin}/auth/callback`
+    };
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { name }, // Used by Trigger to populate profiles table
-        emailRedirectTo: window.location.origin
-      }
+      options
     });
 
     if (error) {
@@ -165,7 +151,7 @@ export const authService = {
       const result = await safePromise(
         supabase.auth.getUser(),
         3000,
-        { data: { user: null }, error: null }
+        { data: { user: null }, error: null } as any
       );
 
       const user = result && 'data' in result ? result.data.user : null;
@@ -195,7 +181,7 @@ export const authService = {
         return null;
       }
 
-      const supaProfile = profile as SupaProfile;
+      const supaProfile = profile as ProfileRow;
 
       // --- UPDATE LOGIC ---
       const today = new Date();
@@ -204,7 +190,7 @@ export const authService = {
       const todayDateStr = today.toDateString();
 
       let needsUpdate = false;
-      const updates: Partial<SupaProfile> = {};
+      const updates: ProfileUpdate = {};
 
       // 1. Daily message reset
       if (lastMessageDateStr !== todayDateStr) {
@@ -248,6 +234,7 @@ export const authService = {
         badgesChanged = true;
       }
 
+
       if ((supaProfile.level || 1) >= 5 && !newBadges.includes("Sabiduría")) {
         newBadges.push("Sabiduría");
         badgesChanged = true;
@@ -260,18 +247,21 @@ export const authService = {
 
       if (needsUpdate) {
         await supabase.from('profiles').update(updates).eq('id', user.id);
-        // Update local object
+
+        // Update local object safely
         Object.assign(supaProfile, updates);
       }
 
       // SELF-HEAL: Update profile if it has placeholder data or mismatch
       if (supaProfile && user.email && (supaProfile.email === 'usuario@sanarte.app' || supaProfile.email !== user.email)) {
-        const syncUpdates: { email: string; name?: string } = { email: user.email };
+        const syncUpdates: ProfileUpdate = { email: user.email };
         if ((supaProfile.name === 'Usuario' || !supaProfile.name) && user.user_metadata?.name) {
           syncUpdates.name = user.user_metadata.name;
         }
+
         await supabase.from('profiles').update(syncUpdates).eq('id', user.id);
-        supaProfile.email = syncUpdates.email;
+
+        if (syncUpdates.email) supaProfile.email = syncUpdates.email;
         if (syncUpdates.name) supaProfile.name = syncUpdates.name;
       }
 
@@ -306,9 +296,10 @@ export const authService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return false;
 
+    const update: ProfileUpdate = { is_premium: true };
     const { error } = await supabase
       .from('profiles')
-      .update({ is_premium: true })
+      .update(update)
       .eq('id', user.id);
 
     return !error;
@@ -324,9 +315,10 @@ export const authService = {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return false;
 
+    const update: ProfileUpdate = { daily_message_count: user.dailyMessageCount + 1 };
     const { error } = await supabase
       .from('profiles')
-      .update({ daily_message_count: user.dailyMessageCount + 1 })
+      .update(update)
       .eq('id', session.user.id);
 
     return !error;
@@ -342,7 +334,7 @@ export const authService = {
     const newXp = currentProfile.xp + amount;
     const newLevel = Math.floor(newXp / XP_PER_LEVEL) + 1;
 
-    const updates: { xp: number; level?: number } = { xp: newXp };
+    const updates: ProfileUpdate = { xp: newXp };
     if (newLevel > currentProfile.level) {
       updates.level = newLevel;
     }
@@ -360,7 +352,7 @@ export const authService = {
       window.dispatchEvent(new CustomEvent('xp-gained', { detail: { amount, levelUp: newLevel > currentProfile.level } }));
     }
 
-    return mapProfileToUser(updatedProfile as SupaProfile);
+    return mapProfileToUser(updatedProfile as ProfileRow);
   },
 
   resendConfirmationEmail: async (email: string): Promise<boolean> => {
@@ -393,9 +385,10 @@ export const authService = {
       .getPublicUrl(filePath);
 
     // 3. Update Profile
+    const update: ProfileUpdate = { avatar_url: publicUrl };
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ avatar_url: publicUrl })
+      .update(update)
       .eq('id', user.id);
 
     if (updateError) {
@@ -410,9 +403,10 @@ export const authService = {
     const user = await authService.getUser();
     if (!user) return;
 
+    const update: ProfileUpdate = { healing_moments: (user.healingMoments || 0) + 1 };
     const { error } = await supabase
       .from('profiles')
-      .update({ healing_moments: (user.healingMoments || 0) + 1 })
+      .update(update)
       .eq('id', user.id);
 
     if (error) console.error("Error incrementing healing moments:", error);

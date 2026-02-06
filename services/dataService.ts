@@ -271,7 +271,7 @@ export const historyService = {
         }
     },
 
-    getFavorites: async () => {
+    getFavorites: async (): Promise<import('../types').Favorite[]> => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             // Try to get from local storage if no user (or offline check passed implicitly by failure above if session persisted but network fail)

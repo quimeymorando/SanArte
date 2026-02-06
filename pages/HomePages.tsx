@@ -12,7 +12,7 @@ import { SearchResult, UserProfile } from '../types';
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [streak, setStreak] = useState(0);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [homeSearchQuery, setHomeSearchQuery] = useState('');
   const [greeting, setGreeting] = useState('');
   const [showBreathing, setShowBreathing] = useState(false);
@@ -45,7 +45,8 @@ export const HomePage: React.FC = () => {
     if (hour < 12) setGreeting('Buenos días');
     else if (hour < 19) setGreeting('Buenas tardes');
     else setGreeting('Buenas noches');
-  }, []);
+    // Gender Neutrality: Welcome message is handled in the render
+  }, [],);
 
   const completeOnboarding = () => {
     localStorage.setItem('sanarte_onboarding_completed', 'true');
@@ -56,7 +57,7 @@ export const HomePage: React.FC = () => {
 
   // 4-7-8 Breathing Logic
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (isBreathing) {
       interval = setInterval(() => {
         setBreathCount((prev) => {
@@ -172,7 +173,7 @@ export const HomePage: React.FC = () => {
           <div className="flex flex-col gap-1">
 
             <h1 className="text-[#0d181c] dark:text-white text-2xl md:text-3xl font-black leading-tight tracking-tight text-neon-cyan">
-              Hola, {user?.name ? user.name.split(' ')[0] : 'Sanador'} 🌿
+              Hola, {user?.name ? user.name.split(' ')[0] : 'Sanador/a'} 🌿
             </h1>
             <p className="text-gray-500 dark:text-text-sub text-sm">
               ¿Qué parte de tu alma desea expresarse hoy?
@@ -199,7 +200,7 @@ export const HomePage: React.FC = () => {
           </button>
         </form>
 
-        {/* BREATHE SOS - Improved visual feedback */}
+        {/* BREATHE SOS - Moved Below Search */}
         <div className={`mb-8 w-full rounded-[2rem] p-6 shadow-xl transition-all duration-700 relative overflow-hidden group ${isBreathing ? 'bg-indigo-600 h-[280px]' : 'bg-gradient-to-br from-[#10b981] to-[#059669] h-auto'}`}>
           <div className="absolute top-0 right-0 w-56 h-56 bg-white/10 rounded-full blur-[80px] -mr-16 -mt-16 pointer-events-none group-hover:scale-110 transition-transform duration-1000"></div>
 
@@ -211,7 +212,7 @@ export const HomePage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-white mb-0.5 text-neon-green">Pausa Sagrada</h3>
-                  <p className="text-white/80 text-xs font-medium max-w-[200px] leading-tight">Técnica de respiración para pánico o ansiedad. Toca el botón y reinicia tu sistema parasimpático.</p>
+                  <p className="text-white/80 text-xs font-medium max-w-[200px] leading-tight">Técnica de respiración para ataques de pánico o ansiedad. Toca el botón y reinicia tu sistema parasimpático.</p>
                 </div>
               </div>
               <button
@@ -383,8 +384,7 @@ export const SearchPage: React.FC = () => {
         {!isLoading && results.length > 0 && (
           <div className="flex flex-col gap-6">
 
-            {/* Debugging Log */}
-            {console.log("Rendering results:", results)}
+
 
             {/* Fallback Warning - Only shows when offline/fallback data is used */}
             {results[0] && results[0].isFallback && (

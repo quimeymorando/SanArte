@@ -35,7 +35,7 @@ export const CommunityPage: React.FC = () => {
   const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
   const [newComment, setNewComment] = useState('');
 
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<import('../types').UserProfile | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -254,7 +254,7 @@ export const CommunityPage: React.FC = () => {
           <span className="material-symbols-outlined text-5xl text-primary mb-2">diversity_1</span>
           <h1 className="font-heading text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">Comunidad SanArte</h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto text-lg leading-relaxed">
-            Bienvenida/o a la Comunidad. Este es un espacio sagrado para agradecer, soltar cargas, compartir tu proceso y contarnos si esta herramienta está siendo luz en tu camino.
+            Bienvenid@ a la Comunidad. Este es un espacio sagrado para agradecer, soltar cargas, compartir tu proceso y contarnos si esta herramienta está siendo luz en tu camino.
           </p>
         </div>
       </div>
@@ -494,7 +494,7 @@ export const CommunityPage: React.FC = () => {
         </div>
 
         <div className="text-center mt-10 text-gray-400 text-sm italic">
-          "No estás solo/a. Todos somos uno."
+          "Tu crítica constructiva nos ayuda a crecer. Gracias por ser parte."
         </div>
       </div>
     </div>

@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { createChatSession, sendMessageToChat } from '../services/geminiService';
-import { ChatMessage } from '../types';
+import { sendMessageToChat } from '../services/geminiService';
+import { ChatMessage, UserProfile } from '../types';
 import { authService } from '../services/authService';
-import { ChatSession } from "@google/generative-ai";
 import UpgradeModal from './UpgradeModal';
 
 const ChatWidget: React.FC = () => {
@@ -13,21 +12,15 @@ const ChatWidget: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const chatSessionRef = useRef<ChatSession | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [user, setUser] = useState(authService.getUser());
+  const [user, setUser] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    const initChat = async () => {
-      if (!chatSessionRef.current) {
-        try {
-          chatSessionRef.current = await createChatSession();
-        } catch (e) {
-          console.error("Failed to init chat", e);
-        }
-      }
+    const loadUser = async () => {
+      const u = await authService.getUser();
+      setUser(u);
     };
-    initChat();
+    loadUser();
   }, []);
 
   useEffect(() => {
@@ -37,7 +30,7 @@ const ChatWidget: React.FC = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || !chatSessionRef.current) return;
+    if (!input.trim()) return;
 
     const canSend = authService.incrementMessageCount();
     if (!canSend) {
@@ -51,9 +44,14 @@ const ChatWidget: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const responseText = await sendMessageToChat(chatSessionRef.current, userMsg.text);
+      const history = messages.map(m => ({
+        role: m.role === 'model' ? 'assistant' : 'user',
+        content: m.text
+      }));
+      const responseText = await sendMessageToChat(history, userMsg.text);
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: responseText, timestamp: new Date() }]);
-      setUser(authService.getUser());
+      const updatedUser = await authService.getUser();
+      setUser(updatedUser);
     } catch (error) {
       console.error(error);
       setMessages(prev => [...prev, { id: 'error', role: 'model', text: 'Siento una interferencia en mi conexión. Intentémoslo de nuevo.', timestamp: new Date() }]);
@@ -66,7 +64,7 @@ const ChatWidget: React.FC = () => {
 
   return (
     <>
-      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} onSuccess={() => setUser(authService.getUser())} />}
+      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} onSuccess={async () => { const u = await authService.getUser(); setUser(u); }} />}
 
       <div className={`fixed bottom-24 right-4 z-[100] transition-all duration-500 transform ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'} md:bottom-8 md:right-8`}>
         <div className="w-[350px] sm:w-[400px] h-[500px] bg-white dark:bg-surface-dark rounded-[2.5rem] shadow-[0_20px_50px_rgba(13,185,242,0.2)] border border-gray-100 dark:border-gray-800 flex flex-col overflow-hidden">

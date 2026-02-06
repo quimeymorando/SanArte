@@ -159,11 +159,6 @@ export const JournalPage: React.FC = () => {
                                 )}
 
                                 {/* Legacy Symptom/Search Log Display */}
-                                {entry.symptom && !entry.symptom_name && (
-                                    <div className="mt-2 text-xs text-gray-500">
-                                        Búsqueda: <span className="text-primary/70">{entry.symptom}</span>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     ))

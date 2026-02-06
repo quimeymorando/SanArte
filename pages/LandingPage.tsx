@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { HeroSection } from '../components/HeroSection';
+import { FuturisticCard } from '../components/ui/FuturisticCard';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -112,7 +114,7 @@ const LandingPage: React.FC = () => {
               {/* Nuevo Logo Sagrado - Integrado como una gema profesional */}
               <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center relative z-10 animate-float overflow-hidden shadow-lg border border-white/20">
                 <img
-                  src="/logo_futuro.png"
+                  src="/logo_new.png"
                   alt="SanArte Logo"
                   className="w-full h-full object-cover"
                 />
@@ -130,84 +132,29 @@ const LandingPage: React.FC = () => {
       </nav>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
-        </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center flex flex-col items-center gap-8 animate-in fade-in zoom-in duration-1000">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 dark:bg-white/5 border border-primary/20 backdrop-blur-sm">
-            <span className="text-xs font-bold text-primary uppercase tracking-widest">Descubre el mensaje de tu alma</span>
-          </div>
-
-          <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9]">
-            Sanar es un<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-secondary animate-shimmer bg-[length:200%_auto]">
-              Viaje al Futuro.
-            </span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
-            Tu cuerpo no te ataca, te habla. Traduce tus síntomas, libera emociones atrapadas y recupera tu bienestar integral.
-          </p>
-
-          <button
-            onClick={openAuth}
-            className="mt-4 px-8 py-4 bg-primary hover:bg-primary-hover text-white text-lg font-bold rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 hover:shadow-2xl transition-all flex items-center gap-2"
-          >
-            <span>Comenzar mi Viaje</span>
-            <span className="material-symbols-outlined">arrow_forward</span>
-          </button>
-
-          {/* Indicador de Scroll Minimalista */}
-          {!scrolled && (
-            <div
-              className="flex flex-col items-center gap-0.5 animate-bounce opacity-60 cursor-pointer group mt-[-8px] hover:opacity-100 transition-opacity"
-              onClick={() => window.scrollTo({ top: window.innerHeight * 0.8, behavior: 'smooth' })}
-            >
-              <span className="text-[8px] font-black uppercase tracking-[0.4em] text-primary neo-glow">Desliza</span>
-              <span className="material-symbols-outlined text-primary text-xl neo-glow">keyboard_arrow_down</span>
-            </div>
-          )}
-
-          <div className="flex flex-col items-center justify-center gap-4 mt-4 opacity-70">
-            <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 border-2 border-white dark:border-black flex items-center justify-center text-xs font-bold">
-                  👤
-                </div>
-              ))}
-            </div>
-            <span className="text-sm font-medium text-gray-400">
-              Unite a +2,400 almas sanando hoy
-            </span>
-          </div>
-        </div>
-      </section>
+      <HeroSection onStart={openAuth} />
 
       {/* --- THE PAIN (EMOTIONAL CONNECTION) --- */}
-      <section className="py-24 bg-white dark:bg-black/20">
+      <section className="py-24 bg-surface-light dark:bg-transparent relative z-10">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent rounded-[3rem] blur-2xl -z-10"></div>
-            <div className="bg-gray-100 dark:bg-gray-900 rounded-[3rem] h-[500px] flex items-center justify-center p-8 relative overflow-hidden shadow-2xl skew-y-1">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-[3rem] blur-3xl -z-10 group-hover:blur-xl transition-all duration-700"></div>
+            <div className="glass-panel rounded-[3rem] h-[500px] flex items-center justify-center p-8 relative overflow-hidden shadow-2xl skew-y-1 hover:skew-y-0 transition-transform duration-500">
               {/* Abstract illustration of pain/blockage */}
-              <div className="absolute w-[120%] h-[120%] bg-[url('https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover opacity-20 dark:opacity-40 grayscale mix-blend-overlay"></div>
+              <div className="absolute w-[120%] h-[120%] bg-[url('https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover opacity-20 dark:opacity-30 grayscale mix-blend-overlay"></div>
               <div className="relative z-10 text-center">
-                <span className="text-6xl mb-4 block animate-bounce">🌩️</span>
-                <h3 className="text-2xl font-bold">"¿Por qué me duele siempre?"</h3>
-                <p className="text-gray-500 mt-2">Migrañas, gastritis, ansiedad...</p>
+                <span className="text-7xl mb-6 block animate-float">🌩️</span>
+                <h3 className="text-3xl font-black mb-2 dark:text-gray-100">"¿Por qué me duele?"</h3>
+                <p className="text-primary font-bold tracking-widest uppercase text-xs">Decodifica el mensaje</p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <h2 className="text-4xl font-black leading-tight text-gray-900 dark:text-white">
-              El cuerpo grita lo que <span className="text-primary underline decoration-wavy decoration-2">el alma calla</span>.
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-5xl font-black leading-tight text-gray-900 dark:text-white">
+              El cuerpo grita lo que <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent decoration-wavy decoration-2">el alma calla</span>.
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed border-l-4 border-primary/30 pl-6">
               Vivimos desconectados. Tomamos una pastilla para silenciar el síntoma, pero ignoramos el mensaje.
               La <strong>Biodescodificación</strong> nos enseña que cada dolor físico tiene una raíz emocional no resuelta.
             </p>
@@ -217,8 +164,10 @@ const LandingPage: React.FC = () => {
                 "Miedo al futuro se vuelve ansiedad.",
                 "Palabras no dichas se vuelven dolor de garganta."
               ].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-200 font-medium">
-                  <span className="material-symbols-outlined text-green-500">check_circle</span>
+                <li key={i} className="flex items-center gap-4 text-gray-700 dark:text-gray-200 font-medium">
+                  <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-sm text-primary">check</span>
+                  </div>
                   {item}
                 </li>
               ))}
@@ -229,24 +178,24 @@ const LandingPage: React.FC = () => {
 
       {/* --- THE SOLUTION (3 PILLARS) --- */}
       <section className="py-32 relative">
-        <div className="max-w-7xl mx-auto px-6 text-center mb-16">
-          <span className="text-primary font-black tracking-widest uppercase text-sm mb-2 block">El Método SanArte</span>
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">Tu camino hacia la plenitud</h2>
+        <div className="max-w-7xl mx-auto px-6 text-center mb-20">
+          <span className="inline-block py-1 px-3 rounded-full bg-white/5 border border-white/10 text-primary font-black tracking-widest uppercase text-xs mb-4 backdrop-blur-md">El Método SanArte</span>
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white drop-shadow-lg">Tu camino hacia la plenitud</h2>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
           {[
-            { icon: "psychology", color: "text-primary", title: "Entender", desc: "Descubre el conflicto emocional detrás de tu síntoma y su mensaje para ti." },
-            { icon: "self_improvement", color: "text-secondary", title: "Sanar", desc: "Meditaciones guiadas y afirmaciones holográficas para reprogramar tu mente." },
-            { icon: "local_florist", color: "text-accent", title: "Cuidar", desc: "Remedios naturales y medicina cuántica para apoyar a tu biología." }
+            { icon: "psychology", color: "text-primary", glow: "primary", title: "Entender", desc: "Descubre el conflicto emocional detrás de tu síntoma y su mensaje para ti." },
+            { icon: "self_improvement", color: "text-secondary", glow: "secondary", title: "Sanar", desc: "Meditaciones guiadas y afirmaciones holográficas para reprogramar tu mente." },
+            { icon: "local_florist", color: "text-accent", glow: "accent", title: "Cuidar", desc: "Remedios naturales y medicina cuántica para apoyar a tu Sistema inmune." }
           ].map((card, i) => (
-            <div key={i} className="glass-card bg-white/50 dark:bg-white/5 p-10 rounded-[3rem] border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-all hover:shadow-glow-primary group">
-              <div className={`w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-glass`}>
+            <FuturisticCard key={i} delay={i * 200} glowColor={card.glow as any}>
+              <div className={`w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-glass ring-1 ring-white/10`}>
                 <span className={`material-symbols-outlined text-5xl ${card.color} neo-glow`}>{card.icon}</span>
               </div>
               <h3 className="text-3xl font-black mb-4 text-gray-900 dark:text-white group-hover:text-primary transition-colors">{card.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">{card.desc}</p>
-            </div>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">{card.desc}</p>
+            </FuturisticCard>
           ))}
         </div>
       </section>

@@ -80,3 +80,11 @@ export interface SymptomDetail {
   recomendaciones_adicionales: string; // Checklist y Red Flags
   rutina_integral: string; // Plan del día (15-25 min)
 }
+
+export interface Favorite {
+  id: string;
+  user_id: string;
+  symptom_name: string;
+  description: string;
+  created_at?: string;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 // import { Share } from '@capacitor/share';
 import { SymptomDetail } from '../types';
@@ -8,127 +8,10 @@ import { authService } from '../services/authService';
 import { supabase } from '../supabaseClient';
 import { historyService } from '../services/dataService';
 import { PremiumLock } from '../components/PremiumLock';
-
-// --- Improved Markdown Renderer ---
-const MarkdownRenderer = ({ text, className = "" }: { text: string; className?: string }) => {
-   if (!text) return null;
-
-   return (
-      <div className={`space-y-3 ${className}`}>
-         {text.split('\n').map((line, idx) => {
-            const trimmed = line.trim();
-            if (!trimmed) return <div key={idx} className="h-2" />;
-
-            // Headers
-            if (trimmed.startsWith('### ')) return <h5 key={idx} className="text-sm font-black uppercase tracking-widest text-primary mt-4 mb-2">{trimmed.slice(4)}</h5>;
-            if (trimmed.startsWith('## ')) return <h4 key={idx} className="text-lg font-bold text-gray-900 dark:text-white mt-5 mb-2">{trimmed.slice(3)}</h4>;
-
-            // Lists
-            if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
-               const content = trimmed.slice(2);
-               return (
-                  <div key={idx} className="flex items-start gap-2 pl-2">
-                     <span className="mt-1.5 size-1.5 rounded-full bg-primary/60 flex-shrink-0"></span>
-                     <p className="leading-relaxed">
-                        <InlineMarkdown text={content} />
-                     </p>
-                  </div>
-               );
-            }
-
-            // Normal Paragraph
-            return (
-               <p key={idx} className="leading-relaxed text-gray-700 dark:text-gray-300">
-                  <InlineMarkdown text={line} />
-               </p>
-            );
-         })}
-      </div>
-   );
-};
-
-// Helper for inline bold/italic
-const InlineMarkdown = ({ text }: { text: string }) => {
-   const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
-   return (
-      <>
-         {parts.map((part, i) => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-               return <span key={i} className="font-black text-primary dark:text-neon-cyan">{part.slice(2, -2)}</span>;
-            }
-            if (part.startsWith('*') && part.endsWith('*')) {
-               return <span key={i} className="font-serif italic text-gray-600 dark:text-white">{part.slice(1, -1)}</span>;
-            }
-            return part;
-         })}
-      </>
-   );
-};
-
-// --- Magical Expandable Card Component ---
-interface MagicalCardProps {
-   id: string;
-   isOpen: boolean;
-   onToggle: (id: string) => void;
-   title: string;
-   subtitle?: string;
-   icon: string;
-   gradientTheme: string;
-   iconColor: string;
-   children: React.ReactNode;
-}
-
-const MagicalCard: React.FC<MagicalCardProps> = ({
-   id, isOpen, onToggle, title, subtitle, icon, gradientTheme, iconColor, children
-}) => {
-   return (
-      <div className={`group relative overflow-hidden transition-all duration-700 ease-in-out border rounded-[2rem] mb-3 shadow-sm ${isOpen
-         ? 'bg-white dark:bg-[#1a2c32] border-primary/20 shadow-primary/5'
-         : 'bg-white/60 dark:bg-surface-dark border-transparent hover:border-gray-200 dark:hover:border-gray-700'
-         }`}>
-         {/* Background Ambience */}
-         <div className={`absolute top-0 right-0 w-full h-full opacity-0 transition-opacity duration-700 pointer-events-none ${isOpen ? 'opacity-100' : ''}`}>
-            <div className={`absolute top-0 right-0 w-48 h-48 rounded-full blur-[60px] -mr-10 -mt-10 ${gradientTheme} opacity-10`}></div>
-         </div>
-
-         <button
-            onClick={() => onToggle(id)}
-            className="relative z-10 w-full p-5 flex items-center justify-between text-left outline-none"
-         >
-            <div className="flex items-center gap-4">
-               <div className={`size-11 rounded-xl flex items-center justify-center text-2xl shadow-sm transition-transform duration-500 group-hover:scale-105 ${isOpen ? `${gradientTheme} text-white` : `bg-gray-50 dark:bg-white/5 ${iconColor}`
-                  }`}>
-                  <span className="material-symbols-outlined text-[24px]">{icon}</span>
-               </div>
-               <div>
-                  <h3 className={`text-base md:text-lg font-bold tracking-tight transition-colors ${isOpen ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'
-                     }`}>
-                     {title}
-                  </h3>
-                  {subtitle && (
-                     <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-0.5">
-                        {subtitle}
-                     </p>
-                  )}
-               </div>
-            </div>
-            <div className={`size-8 rounded-full border border-gray-100 dark:border-gray-700 flex items-center justify-center transition-all duration-500 ${isOpen ? 'rotate-180 bg-gray-900 text-white dark:bg-white dark:text-gray-900' : 'bg-transparent text-gray-400'
-               }`}>
-               <span className="material-symbols-outlined text-lg">keyboard_arrow_down</span>
-            </div>
-         </button>
-
-         <div className={`relative z-10 grid transition-[grid-template-rows] duration-700 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-            <div className="overflow-hidden">
-               <div className="p-5 pt-0 space-y-4">
-                  <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent mb-4"></div>
-                  {children}
-               </div>
-            </div>
-         </div>
-      </div>
-   );
-};
+// New Atomic Components
+import { MarkdownRenderer } from '../components/ui/MarkdownRenderer';
+import { MagicalCard } from '../components/ui/MagicalCard';
+import { AudioVisualizer } from '../components/AudioVisualizer';
 
 export const SymptomDetailPage: React.FC = () => {
    const navigate = useNavigate();
@@ -141,17 +24,13 @@ export const SymptomDetailPage: React.FC = () => {
    const [openSections, setOpenSections] = useState<Set<string>>(new Set(['meaning']));
    const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
 
-   // Audio State
-   const [isPlaying, setIsPlaying] = useState(false);
-   const [isAudioGenerating, setIsAudioGenerating] = useState(false);
-   const [audioError, setAudioError] = useState(false);
-
    const [isFavorite, setIsFavorite] = useState(false);
    const [addedToRoutine, setAddedToRoutine] = useState(false);
    const [user, setUser] = useState<any>(null);
 
    // Loading messages cycle
    const loadingMessages = [
+      "Cada día que intentas sanar, le regalas vida a tu futuro.",
       "Consultando la sabiduría ancestral...",
       "Conectando con la memoria de tu cuerpo...",
       "Buscando las hierbas sanadoras...",
@@ -218,36 +97,6 @@ export const SymptomDetailPage: React.FC = () => {
       };
    }, [query]);
 
-   // Audio Toggle
-   const handleToggleAudio = () => {
-      if (!data?.meditacion_guiada || !user?.isPremium) return;
-      const synthesis = window.speechSynthesis;
-
-      if (isPlaying) {
-         synthesis.cancel();
-         setIsPlaying(false);
-         return;
-      }
-
-      try {
-         const utterance = new SpeechSynthesisUtterance(data.meditacion_guiada.replace(/\*/g, '')); // Clean markdown for speech
-         const voices = synthesis.getVoices();
-         const spanishVoice = voices.find(v => v.lang.includes('es') && (v.name.includes('Mexico') || v.name.includes('Latin') || v.lang === 'es-MX'));
-
-         if (spanishVoice) utterance.voice = spanishVoice;
-         utterance.rate = 0.85;
-         utterance.pitch = 0.95;
-
-         utterance.onstart = () => setIsPlaying(true);
-         utterance.onend = () => setIsPlaying(false);
-         utterance.onerror = () => { setIsPlaying(false); setAudioError(true); };
-
-         synthesis.speak(utterance);
-      } catch (e) {
-         setAudioError(true);
-      }
-   };
-
    // Share Functionality
    const handleShare = async () => {
       if (!data) return;
@@ -295,7 +144,7 @@ export const SymptomDetailPage: React.FC = () => {
             await supabase.from('favorites').delete().eq('user_id', user.id).eq('symptom_name', data.name);
             setIsFavorite(false);
          } else {
-            await supabase.from('favorites').insert({ user_id: user.id, symptom_name: data.name, description: data.shortDefinition });
+            await (supabase.from('favorites') as any).insert({ user_id: user.id, symptom_name: data.name, description: data.shortDefinition });
             setIsFavorite(true);
          }
       } catch (e) { console.error(e); }
@@ -357,7 +206,7 @@ export const SymptomDetailPage: React.FC = () => {
    return (
       <div className="flex-1 w-full min-h-screen bg-[#f8fafc] dark:bg-background-dark pb-32 relative">
          {/* HEADER NAV */}
-         <div className="fixed top-0 left-0 w-full z-50 px-5 pt-6 pb-4 bg-gradient-to-b from-[#fcfdfe] to-transparent dark:from-background-dark pointer-events-none">
+         <div className="fixed top-0 left-0 w-full z-50 px-5 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-4 bg-gradient-to-b from-[#fcfdfe] to-transparent dark:from-background-dark pointer-events-none">
             <div className="flex justify-between items-center max-w-2xl mx-auto pointer-events-auto">
                <button onClick={() => navigate(-1)} className="size-10 rounded-xl bg-white/80 dark:bg-surface-dark/80 backdrop-blur-md border border-gray-100 dark:border-gray-800 flex items-center justify-center shadow-lg text-gray-600 dark:text-gray-300">
                   <span className="material-symbols-outlined">arrow_back</span>
@@ -511,23 +360,8 @@ export const SymptomDetailPage: React.FC = () => {
             >
                <PremiumLock isLocked={!user?.isPremium} title="Ritual Completo" description="Meditación guiada y tu plan de acción integral.">
 
-                  {/* Audio Player */}
-                  <div className="rounded-3xl bg-gray-900 text-white p-6 mb-8 relative overflow-hidden">
-                     <div className="flex items-center gap-4 relative z-10">
-                        <button onClick={handleToggleAudio} className="size-14 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform">
-                           <span className="material-symbols-outlined text-3xl">{isPlaying ? 'pause' : 'play_arrow'}</span>
-                        </button>
-                        <div>
-                           <h5 className="font-bold">Meditación Guiada</h5>
-                           <p className="text-xs text-gray-400">{isPlaying ? "Reproduciendo..." : "Escuchar Guion"}</p>
-                        </div>
-                     </div>
-                     {/* Script Text */}
-                     <div className="mt-6 pt-6 border-t border-gray-800 text-sm text-gray-300">
-                        <h5 className="font-bold text-white mb-2">Guion:</h5>
-                        <MarkdownRenderer text={data.meditacion_guiada} />
-                     </div>
-                  </div>
+                  {/* New Audio Visualizer Component */}
+                  <AudioVisualizer scriptText={data.meditacion_guiada} isPremium={user?.isPremium} />
 
                   {/* Rutina Integral */}
                   <div className="mb-8">
@@ -566,3 +400,4 @@ export const SymptomDetailPage: React.FC = () => {
       </div>
    );
 };
+

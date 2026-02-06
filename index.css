@@ -6,10 +6,40 @@ body {
   font-family: 'Outfit', sans-serif;
   @apply bg-surface-light text-text-main dark:bg-[#050b0d] dark:text-gray-200;
   min-height: 100vh;
+  /* iOS Polish: Premuim rendering & Native feel */
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  /* Hide scrollbar for standard webkit */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prevent iOS Zoom on inputs */
+@media screen and (max-width: 768px) {
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Light Mode: Ceramic/Clean Health Vibe */
+body:not(.dark) {
+  background: radial-gradient(circle at 50% 0%, #eefcfd 0%, #f0f4f5 100%);
+}
+
+/* Dark Mode: Deep Space Healing */
 .dark body {
-  background: radial-gradient(circle at top right, #0a191e, #050b0d);
+  background: radial-gradient(circle at 50% -20%, #0f242d 0%, #050b0d 60%);
+  background-attachment: fixed;
 }
 
 h1,
@@ -130,4 +160,48 @@ strong {
 .dark strong {
   color: #00f2ff !important;
   text-shadow: 0 0 15px rgba(0, 242, 255, 0.4) !important;
+}
+
+/* Breakout Utility - Fuerza a las secciones a ocupar el 100% del viewport ignorando el contenedor padre (GHL) */
+.breakout {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* Modo Pantalla Completa (Overlay) - Solución definitiva para GHL */
+.ghl-full-screen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  overflow-y: auto !important;
+  background: white;
+  /* Safe Area Support for iPhone Notch/Home Bar */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.dark .ghl-full-screen {
+  background: #050b0d;
+}
+
+/* Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }

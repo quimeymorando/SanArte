@@ -39,8 +39,11 @@ export default {
             },
             animation: {
                 'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                 'float': 'float 6s ease-in-out infinite',
+                'float-slow': 'float-slow 8s ease-in-out infinite',
                 'shimmer': 'shimmer 2s infinite linear',
+                'breathing': 'breathing 4s ease-in-out infinite',
             },
             keyframes: {
                 shimmer: {
@@ -50,6 +53,14 @@ export default {
                 float: {
                     '0%, 100%': { transform: 'translateY(0)' },
                     '50%': { transform: 'translateY(-10px)' },
+                },
+                'float-slow': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-20px)' },
+                },
+                breathing: {
+                    '0%, 100%': { boxShadow: '0 0 20px rgba(0, 242, 255, 0.2)' },
+                    '50%': { boxShadow: '0 0 40px rgba(0, 242, 255, 0.6)' },
                 }
             }
         },
