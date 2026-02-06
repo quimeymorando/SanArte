@@ -134,90 +134,86 @@ const LandingPage: React.FC = () => {
       {/* --- HERO SECTION --- */}
       <HeroSection onStart={openAuth} />
 
-      {/* --- THE PAIN (EMOTIONAL CONNECTION) --- */}
+      {/* --- THE SHIFT (BREAKING FALSE BELIEFS) --- */}
       <section className="py-24 bg-surface-light dark:bg-transparent relative z-10">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
           <div className="relative group">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-[3rem] blur-3xl -z-10 group-hover:blur-xl transition-all duration-700"></div>
-            <div className="glass-panel rounded-[3rem] h-[500px] flex items-center justify-center p-8 relative overflow-hidden shadow-2xl skew-y-1 hover:skew-y-0 transition-transform duration-500">
-              {/* Abstract illustration of pain/blockage */}
-              <div className="absolute w-[120%] h-[120%] bg-[url('https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover opacity-20 dark:opacity-30 grayscale mix-blend-overlay"></div>
-              <div className="relative z-10 text-center">
-                <span className="text-7xl mb-6 block animate-float">🌩️</span>
-                <h3 className="text-3xl font-black mb-2 dark:text-gray-100">"¿Por qué me duele?"</h3>
-                <p className="text-primary font-bold tracking-widest uppercase text-xs">Decodifica el mensaje</p>
+            <div className="glass-panel rounded-[3rem] h-auto min-h-[500px] flex flex-col items-center justify-center p-8 relative overflow-hidden shadow-2xl skew-y-1 hover:skew-y-0 transition-transform duration-500">
+              <div className="absolute w-[120%] h-[120%] bg-[url('https://images.unsplash.com/photo-1512411516006-218206105f92?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover opacity-10 dark:opacity-20 mix-blend-overlay"></div>
+              <div className="relative z-10 text-center space-y-6">
+                <span className="text-8xl block animate-float">🗝️</span>
+                <h3 className="text-4xl font-black mb-2 dark:text-gray-100 leading-tight">Tu Cuerpo tiene un <br /><span className="text-primary">Diccionario Oculto</span></h3>
+                <p className="text-gray-500 font-medium max-w-sm mx-auto">No es "mala suerte" ni "genética". Es un código que nadie te enseñó a leer... hasta ahora.</p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-10">
             <h2 className="text-4xl md:text-5xl font-black leading-tight text-gray-900 dark:text-white">
-              El cuerpo grita lo que <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent decoration-wavy decoration-2">el alma calla</span>.
+              No necesitas ser médico ni gurú para <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent decoration-wavy decoration-2">Sanar de Raíz</span>.
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed border-l-4 border-primary/30 pl-6">
-              Vivimos desconectados. Tomamos una pastilla para silenciar el síntoma, pero ignoramos el mensaje.
-              La <strong>Biodescodificación</strong> nos enseña que cada dolor físico tiene una raíz emocional no resuelta.
-            </p>
-            <ul className="space-y-4">
-              {[
-                "Estrés no gestionado se vuelve tensión.",
-                "Miedo al futuro se vuelve ansiedad.",
-                "Palabras no dichas se vuelven dolor de garganta."
-              ].map((item, i) => (
-                <li key={i} className="flex items-center gap-4 text-gray-700 dark:text-gray-200 font-medium">
-                  <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-sm text-primary">check</span>
-                  </div>
-                  {item}
-                </li>
-              ))}
-            </ul>
+
+            <div className="space-y-8">
+              {/* OPORTUNIDAD 1 */}
+              <div className="flex gap-4">
+                <div className="shrink-0 w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl">📘</div>
+                <div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Descubre el "Diccionario Oculto"</h4>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Olvida los diagnósticos difusos. Traduce al instante qué emoción (miedo, ira, soledad) está encendiendo tu dolor. Ataca el problema donde nace, no solo donde duele.
+                  </p>
+                </div>
+              </div>
+
+              {/* OPORTUNIDAD 2 */}
+              <div className="flex gap-4">
+                <div className="shrink-0 w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-2xl">🤖</div>
+                <div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Tecnología Guiada (Sin Esfuerzo)</h4>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Tu Asistente IA hace el trabajo pesado. Solo dile qué sientes y SanArte trazará la ruta emocional exacta. Claridad total y control en minutos, no en meses de terapia.
+                  </p>
+                </div>
+              </div>
+
+              {/* OPORTUNIDAD 3 */}
+              <div className="flex gap-4">
+                <div className="shrink-0 w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-2xl">🔋</div>
+                <div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">Sanar es Recuperar tu Futuro</h4>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Al liberar la carga emocional, desbloqueas una vitalidad renovada. Deja de permitir que tu pasado dicte tu salud y recupera la energía para tus proyectos y familia.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* --- THE SOLUTION (3 PILLARS) --- */}
-      <section className="py-32 relative">
-        <div className="max-w-7xl mx-auto px-6 text-center mb-20">
-          <span className="inline-block py-1 px-3 rounded-full bg-white/5 border border-white/10 text-primary font-black tracking-widest uppercase text-xs mb-4 backdrop-blur-md">El Método SanArte</span>
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white drop-shadow-lg">Tu camino hacia la plenitud</h2>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
-          {[
-            { icon: "psychology", color: "text-primary", glow: "primary", title: "Entender", desc: "Descubre el conflicto emocional detrás de tu síntoma y su mensaje para ti." },
-            { icon: "self_improvement", color: "text-secondary", glow: "secondary", title: "Sanar", desc: "Meditaciones guiadas y afirmaciones holográficas para reprogramar tu mente." },
-            { icon: "local_florist", color: "text-accent", glow: "accent", title: "Cuidar", desc: "Remedios naturales y medicina cuántica para apoyar a tu Sistema inmune." }
-          ].map((card, i) => (
-            <FuturisticCard key={i} delay={i * 200} glowColor={card.glow as any}>
-              <div className={`w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-glass ring-1 ring-white/10`}>
-                <span className={`material-symbols-outlined text-5xl ${card.color} neo-glow`}>{card.icon}</span>
-              </div>
-              <h3 className="text-3xl font-black mb-4 text-gray-900 dark:text-white group-hover:text-primary transition-colors">{card.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">{card.desc}</p>
-            </FuturisticCard>
-          ))}
-        </div>
-      </section>
-
-      {/* --- CTA FINAL --- */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/10 dark:bg-primary/5"></div>
+      {/* --- CTA FINAL (MAGNETIC) --- */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 dark:bg-primary/5"></div>
         <div className="absolute top-[-50%] left-[-20%] w-[1000px] h-[1000px] bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full blur-[150px] animate-pulse-slow"></div>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center bg-white/40 dark:bg-white/5 backdrop-blur-xl p-12 md:p-20 rounded-[3rem] border border-white/50 dark:border-white/10 shadow-2xl">
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-6">¿Listo para escuchar a tu cuerpo?</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
-            Deja de luchar contra los síntomas. Empieza a entenderlos y transformarlos hoy mismo.
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center bg-white/60 dark:bg-white/5 backdrop-blur-2xl p-12 md:p-24 rounded-[3rem] border border-white/50 dark:border-white/10 shadow-2xl">
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-8 tracking-tight">
+            ¿Listo para dejar de sobrevivir<br />y empezar a <span className="text-primary">Vivir</span>?
+          </h2>
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto font-medium">
+            Tu cuerpo ya te está gritando la respuesta. SanArte es el traductor que estabas esperando.
           </p>
           <button
             onClick={openAuth}
-            className="px-10 py-5 bg-gradient-to-r from-primary to-purple-600 hover:scale-105 text-white text-xl font-black rounded-2xl shadow-xl shadow-primary/40 transition-all w-full md:w-auto"
+            className="group relative inline-flex items-center justify-center gap-4 px-12 py-6 bg-gradient-to-r from-primary to-purple-600 hover:scale-105 text-white text-xl md:text-2xl font-black rounded-2xl shadow-2xl shadow-primary/40 transition-all w-full md:w-auto overflow-hidden"
           >
-            Crear mi Espacio de Sanación
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+            <span className="relative z-10">¡SÍ! Quiero Descodificar Mis Síntomas Ahora</span>
+            <span className="material-symbols-outlined text-3xl relative z-10">lock_open</span>
           </button>
-          <p className="mt-6 text-sm text-gray-500 font-bold opacity-70">
-            Empieza gratis. Sin tarjeta de crédito.
+          <p className="mt-8 text-sm text-gray-500 font-bold opacity-70 tracking-widest uppercase">
+            Únete a +2,400 almas sanando hoy
           </p>
         </div>
       </section>

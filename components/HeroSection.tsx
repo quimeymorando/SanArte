@@ -44,36 +44,30 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onStart }) => {
                 {/* Pill Badge */}
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-100 inline-flex items-center gap-2 px-6 py-2 rounded-full border border-primary/20 bg-white/10 dark:bg-black/20 backdrop-blur-md shadow-glow-primary">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                    <span className="text-xs font-bold text-primary-hover dark:text-primary uppercase tracking-[0.2em]">Sanación Cuántica</span>
+                    <span className="text-xs font-bold text-primary-hover dark:text-primary uppercase tracking-[0.2em]">Nueva Oportunidad</span>
                 </div>
 
-                {/* Main Title */}
-                <h1 className="animate-in fade-in zoom-in duration-1000 delay-200 text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.85] text-gray-900 dark:text-white drop-shadow-2xl">
-                    Sanar es<br />
-                    <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary animate-shimmer bg-[size:200%_auto]">
-                        Futuro.
-                        {/* Glitch underline effect */}
-                        <svg className="absolute -bottom-2 left-0 w-full h-3 text-primary opacity-60" viewBox="0 0 100 10" preserveAspectRatio="none">
-                            <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="none" className="animate-pulse" />
-                        </svg>
-                    </span>
+                {/* Main Title (The Hook) */}
+                <h1 className="animate-in fade-in zoom-in duration-1000 delay-200 text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-tight text-gray-900 dark:text-white drop-shadow-2xl max-w-5xl">
+                    Cómo Entender lo que tu Cuerpo te <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">"Grita"</span> y Eliminar el Dolor Crónico desde la <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary animate-shimmer bg-[size:200%_auto]">Raíz Emocional</span>...
                 </h1>
 
-                {/* Subtitle */}
-                <p className="animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300 text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed font-medium">
-                    Decodifica el lenguaje de tus síntomas y accede a tu <span className="text-primary font-bold">Yo Cuántico</span>.
+                {/* Subtitle (The Promise) */}
+                <p className="animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300 text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl leading-relaxed font-medium">
+                    Sin Fármacos Costosos ni Años de Terapia. La app <span className="text-primary font-bold">SanArte</span> te da el mapa exacto para descodificar el lenguaje oculto de tu cuerpo y dejar de sobrevivir al dolor.
                 </p>
 
                 {/* Magnetic CTA Button */}
-                <div className="animate-in fade-in zoom-in duration-1000 delay-500 mt-6 group relative">
+                <div className="animate-in fade-in zoom-in duration-1000 delay-500 mt-8 group relative">
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-40 group-hover:opacity-100 transition duration-500 group-hover:duration-200"></div>
                     <button
                         onClick={onStart}
-                        className="relative px-12 py-5 bg-white dark:bg-black text-gray-900 dark:text-white text-xl font-black rounded-2xl flex items-center gap-4 transition-transform hover:scale-[1.02] active:scale-95"
+                        className="relative px-12 py-6 bg-white dark:bg-black text-gray-900 dark:text-white text-xl md:text-2xl font-black rounded-2xl flex items-center gap-4 transition-transform hover:scale-[1.02] active:scale-95 shadow-2xl"
                     >
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Iniciar Viaje</span>
-                        <span className="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">¡SÍ! Quiero Descodificar Mis Síntomas</span>
+                        <span className="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform text-3xl">arrow_forward</span>
                     </button>
+                    <p className="mt-4 text-xs font-bold text-gray-500 uppercase tracking-widest opacity-80">Empieza Gratis · Sin Tarjeta de Crédito</p>
                 </div>
 
                 {/* Proof / Stats */}
