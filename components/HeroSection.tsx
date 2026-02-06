@@ -39,7 +39,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onStart }) => {
             </div>
 
             {/* --- CONTENT --- */}
-            <div className="relative z-10 max-w-5xl mx-auto px-6 flex flex-col items-center text-center gap-8">
+            <div className="relative z-10 max-w-5xl mx-auto px-6 flex flex-col items-center text-center gap-8 pt-32">
 
                 {/* Pill Badge */}
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-100 inline-flex items-center gap-2 px-6 py-2 rounded-full border border-primary/20 bg-white/10 dark:bg-black/20 backdrop-blur-md shadow-glow-primary">
