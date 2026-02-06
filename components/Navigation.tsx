@@ -21,6 +21,14 @@ const Navigation: React.FC = () => {
           <span className="text-xl font-heading font-bold text-gray-900 dark:text-white tracking-tight">San<span className="text-primary italic">Arte</span></span>
         </div>
 
+        {/* Center Badge (New Opportunity) */}
+        <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md shadow-glow-primary">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Nueva Oportunidad</span>
+          </div>
+        </div>
+
         <div className="flex items-center gap-8">
           <Link to="/home" className={`flex items-center gap-2 text-sm font-bold transition-colors ${isActive('/home')}`}>
             <span className="material-symbols-outlined text-lg">home</span>

@@ -41,12 +41,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onStart }) => {
             {/* --- CONTENT --- */}
             <div className="relative z-10 max-w-5xl mx-auto px-6 flex flex-col items-center text-center gap-8 pt-32">
 
-                {/* Pill Badge */}
-                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-100 inline-flex items-center gap-2 px-6 py-2 rounded-full border border-primary/20 bg-white/10 dark:bg-black/20 backdrop-blur-md shadow-glow-primary">
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                    <span className="text-xs font-bold text-primary-hover dark:text-primary uppercase tracking-[0.2em]">Nueva Oportunidad</span>
-                </div>
-
                 {/* Main Title (The Hook) */}
                 <h1 className="animate-in fade-in zoom-in duration-1000 delay-200 text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-tight text-gray-900 dark:text-white drop-shadow-2xl max-w-5xl">
                     Cómo Entender lo que tu Cuerpo te <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">"Grita"</span> y Eliminar el Dolor Crónico desde la <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary animate-shimmer bg-[size:200%_auto]">Raíz Emocional</span>...
