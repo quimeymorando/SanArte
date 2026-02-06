@@ -122,6 +122,13 @@ const LandingPage: React.FC = () => {
               </span>
             </div>
           </div>
+
+          {/* Badge (New Opportunity) - Centered in navbar */}
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md shadow-glow-primary">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Nueva Oportunidad</span>
+          </div>
+
           <button
             onClick={openAuth}
             className="px-6 py-2 rounded-full glass-panel border border-white/20 font-black text-sm hover:scale-105 transition-all text-white hover:shadow-glow-primary"
