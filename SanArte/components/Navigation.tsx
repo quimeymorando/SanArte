@@ -25,7 +25,7 @@ const Navigation: React.FC = () => {
         <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md shadow-glow-primary">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-            <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Nueva Oportunidad</span>
+            <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Tu cuerpo habla, escúchalo ✨</span>
           </div>
         </div>
 
