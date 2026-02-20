@@ -1,0 +1,44 @@
+{
+  "mcpServers": {
+    "supabase-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_6ac4085433769d4b5a375a947ca92f9bfe04d3d8"
+      ],
+      "env": {}
+    },
+    "notion-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@notionhq/notion-mcp-server"
+      ],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer \", \"Notion-Version\": \"2022-06-28\"}"
+      },
+      "disabled": true
+    },
+    "notebooklm-mcp-server": {
+      "command": "C:\\Users\\kimim\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "args": [
+        "-m",
+        "notebooklm_mcp.server"
+      ],
+      "env": {}
+    },
+    "stitch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "stitch-mcp"
+      ],
+      "env": {
+        "GOOGLE_CLOUD_PROJECT": "antigravity-stitch-486520",
+        "GOOGLE_APPLICATION_CREDENTIALS": "C:\\Users\\kimim\\AppData\\Roaming\\gcloud\\application_default_credentials.json"
+      }
+    }
+  }
+}

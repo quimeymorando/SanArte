@@ -1,0 +1,262 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Outfit', sans-serif;
+  @apply bg-surface-light text-text-main dark:bg-[#050b0d] dark:text-gray-200;
+  min-height: 100vh;
+  /* iOS Polish: Premuim rendering & Native feel */
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  /* Hide scrollbar for standard webkit */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Material Symbols Polish to prevent FOUT text */
+.material-symbols-outlined {
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  width: 1.5rem;
+  /* Standard icon size to reserve space */
+  height: 1.5rem;
+  overflow: hidden;
+  /* Hide text content until font is ready */
+  color: transparent !important;
+  transition: color 0.2s ease-in;
+}
+
+/* Specific Logo Size Protection */
+nav .material-symbols-outlined {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Reset color once font is applied */
+body.font-loaded .material-symbols-outlined {
+  color: inherit !important;
+}
+
+/* Ensure neon titles show correctly even during load */
+.text-neon-cyan .material-symbols-outlined,
+.material-symbols-outlined.text-neon-cyan {
+  color: transparent !important;
+}
+
+body.font-loaded .text-neon-cyan .material-symbols-outlined,
+body.font-loaded .material-symbols-outlined.text-neon-cyan {
+  color: #00f2ff !important;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prevent iOS Zoom on inputs */
+@media screen and (max-width: 768px) {
+
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Light Mode: Ceramic/Clean Health Vibe */
+body:not(.dark) {
+  background: radial-gradient(circle at 50% 0%, #eefcfd 0%, #f0f4f5 100%);
+}
+
+/* Dark Mode: Deep Space Healing */
+.dark body {
+  background: radial-gradient(circle at 50% -20%, #0f242d 0%, #050b0d 60%);
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(15, 32, 39, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 242, 255, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px 0 rgba(0, 242, 255, 0.1);
+}
+
+.neo-glow {
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+.neon-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.neon-border::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid rgba(0, 242, 255, 0.3);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Scrollbar Modernization */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #00f2ff, #7000ff);
+  border-radius: 10px;
+}
+
+.gold-shimmer {
+  background: linear-gradient(90deg, #d4af37 0%, #f9e295 50%, #d4af37 100%);
+  background-size: 200% auto;
+  animation: shimmer 3s infinite linear;
+}
+
+/* Premium Neon & Text Styles */
+.text-neon-cyan {
+  color: #00f2ff !important;
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.6) !important;
+}
+
+.text-neon-green {
+  color: #0aff60 !important;
+  text-shadow: 0 0 10px rgba(10, 255, 96, 0.6) !important;
+}
+
+.text-neon-fluo {
+  color: #ccff00 !important;
+  text-shadow: 0 0 10px rgba(204, 255, 0, 0.6) !important;
+}
+
+em,
+i {
+  font-style: italic;
+  color: #ffffff !important;
+  /* White text for italics as requested */
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.4) !important;
+  /* Gentle cyan glow */
+}
+
+/* Base Neon Title Style for H1, H2, H3 if they have .neon-title class or generally */
+h1.text-neon-cyan,
+h2.text-neon-cyan,
+h3.text-neon-cyan,
+.font-heading {
+  color: #00f2ff !important;
+  text-shadow: 0 0 12px rgba(0, 242, 255, 0.6) !important;
+}
+
+strong {
+  font-weight: 900;
+  color: inherit;
+  /* Inherit unless specified, or maybe white in dark mode? */
+}
+
+.dark strong {
+  color: #00f2ff !important;
+  text-shadow: 0 0 15px rgba(0, 242, 255, 0.4) !important;
+}
+
+/* Breakout Utility - Fuerza a las secciones a ocupar el 100% del viewport ignorando el contenedor padre (GHL) */
+.breakout {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* Modo Pantalla Completa (Overlay) - Solución definitiva para GHL */
+.ghl-full-screen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+  overflow-y: auto !important;
+  background: white;
+  /* Safe Area Support for iPhone Notch/Home Bar */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.dark .ghl-full-screen {
+  background: #050b0d;
+}
+
+/* Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
