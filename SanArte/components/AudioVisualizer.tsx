@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MarkdownRenderer } from './ui/MarkdownRenderer';
+import { logger } from '../utils/logger';
 
 interface AudioVisualizerProps {
     scriptText: string;
@@ -35,7 +36,7 @@ export const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ scriptText, is
 
             synthesis.speak(utterance);
         } catch (e) {
-            console.error("Audio playback error", e);
+            logger.error("Audio playback error", e);
             // setAudioError(true);
         }
     };

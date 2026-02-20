@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient';
 import { Routine, SymptomDetail } from '../types';
+import { logger } from '../utils/logger';
 import { Database } from '../types_db';
 import { authService } from './authService';
 
@@ -38,7 +39,7 @@ export const toggleRoutine = async (id: string, currentCompleted: boolean): Prom
     .eq('id', id);
 
   if (error) {
-    console.error("Error toggling routine:", error);
+    logger.error("Error toggling routine:", error);
     return { success: false, xpEarned: 0 };
   }
 

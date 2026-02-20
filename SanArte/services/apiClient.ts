@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { logger } from '../utils/logger';
 
 // Configuration interface for the API client
 interface ApiClientConfig {
@@ -40,9 +41,9 @@ class ApiService {
             (error) => {
                 // Handle common errors (401, 403, 500)
                 if (error.response) {
-                    console.error(`API Error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`);
+                    logger.error(`API Error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`);
                 } else {
-                    console.error('Network Error:', error.message);
+                    logger.error('Network Error:', error.message);
                 }
                 return Promise.reject(error);
             }

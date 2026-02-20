@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import { historyService } from '../services/dataService';
 import { SymptomLogEntry } from '../types';
 import { Link } from 'react-router-dom';
@@ -23,7 +24,7 @@ export const JournalPage: React.FC = () => {
             const data = await historyService.getHistory();
             setEntries(data);
         } catch (error) {
-            console.error(error);
+            logger.error(error);
         } finally {
             setLoading(false);
         }
@@ -45,7 +46,7 @@ export const JournalPage: React.FC = () => {
             loadEntries();
         } catch (error) {
             alert('Error al guardar la entrada');
-            console.error(error);
+            logger.error(error);
         } finally {
             setSubmitting(false);
         }

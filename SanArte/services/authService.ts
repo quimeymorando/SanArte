@@ -1,4 +1,5 @@
 import { supabase } from '../supabaseClient';
+import { logger } from '../utils/logger';
 import { UserProfile } from '../types';
 import { Database } from '../types_db';
 
@@ -73,7 +74,7 @@ export const authService = {
     });
 
     if (error) {
-      console.error('Error en login:', error.message);
+      logger.error('Error en login:', error.message);
       throw error;
     }
 
@@ -88,7 +89,7 @@ export const authService = {
   register: async (name: string, email: string, password?: string): Promise<UserProfile | null> => {
     if (!password) {
       password = "temp-password-123";
-      console.warn("Usando contraseña temporal. Actualiza tu UI para pedir contraseña.");
+      logger.warn("Usando contraseña temporal. Actualiza tu UI para pedir contraseña.");
     }
 
     // Explicitly type the options to ensure emailRedirectTo is accepted
@@ -151,7 +152,7 @@ export const authService = {
       },
     });
     if (error) {
-      console.error('Error en login con Google:', error.message);
+      logger.error('Error en login con Google:', error.message);
       throw error;
     }
   },
@@ -229,7 +230,7 @@ export const authService = {
         }
 
         if (error || !profile) {
-          console.error('Error fetching profile:', error);
+          logger.error('Error fetching profile:', error);
           invalidateUserCache();
           return null;
         }
@@ -310,7 +311,7 @@ export const authService = {
         cachedUserAt = Date.now();
         return mappedUser;
       } catch (e) {
-        console.warn('GetUser timeout/error', e);
+        logger.warn('GetUser timeout/error', e);
         invalidateUserCache();
         return null;
       } finally {
@@ -344,7 +345,7 @@ export const authService = {
   },
 
   upgradeToPremium: async (): Promise<boolean> => {
-    console.warn('Client-side premium upgrades are disabled. Use secure payment webhook flow.');
+    logger.warn('Client-side premium upgrades are disabled. Use secure payment webhook flow.');
     return false;
   },
 
@@ -423,7 +424,7 @@ export const authService = {
       .upload(filePath, file);
 
     if (uploadError) {
-      console.error('Error uploading avatar:', uploadError);
+      logger.error('Error uploading avatar:', uploadError);
       return null;
     }
 
@@ -439,7 +440,7 @@ export const authService = {
       .eq('id', user.id);
 
     if (updateError) {
-      console.error('Error updating profile avatar:', updateError);
+      logger.error('Error updating profile avatar:', updateError);
       return null;
     }
 
@@ -457,7 +458,7 @@ export const authService = {
       .update(update)
       .eq('id', user.id);
 
-    if (error) console.error("Error incrementing healing moments:", error);
+    if (error) logger.error("Error incrementing healing moments:", error);
     else invalidateUserCache();
   }
 } as const;

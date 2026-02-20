@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { logger } from '../utils/logger';
 import { useTheme } from '../context/ThemeContext';
 
 interface ProtectedRouteProps {
@@ -36,7 +37,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         const isAuth = await Promise.race([authPromise, timeoutPromise]);
         setIsAuthenticated(isAuth as boolean);
       } catch (error) {
-        console.error("Auth check failed or timed out:", error);
+        logger.error("Auth check failed or timed out:", error);
         setIsAuthenticated(false);
       }
     };

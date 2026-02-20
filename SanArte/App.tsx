@@ -4,9 +4,6 @@ import { authService } from './services/authService';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
-import LandingPage from './pages/LandingPage';
-import PrivacyPage from './pages/PrivacyPage';
-import TermsPage from './pages/TermsPage';
 import { useRoutineNotifications } from './hooks/useRoutineNotifications';
 import ProtectedRoute from './components/ProtectedRoute';
 import { NotificationManager } from './components/NotificationManager';
@@ -21,6 +18,10 @@ import { ConfettiManager } from './components/ConfettiManager';
 
 import { Analytics } from "@vercel/analytics/react"
 
+// All pages lazy-loaded for optimal code splitting
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
 const BentoGrid = lazy(() => import('./features/dashboard/BentoGrid').then(m => ({ default: m.BentoGrid })));
 const SearchPage = lazy(() => import('./pages/HomePages').then(m => ({ default: m.SearchPage })));
 const CommunityPage = lazy(() => import('./pages/CommunityPage').then(m => ({ default: m.CommunityPage })));

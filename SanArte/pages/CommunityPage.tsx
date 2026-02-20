@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { communityService } from '../services/dataService';
+import { logger } from '../utils/logger';
 
 interface Comment {
   id: string;
@@ -66,7 +67,7 @@ export const CommunityPage: React.FC = () => {
 
         setIntentions(mappedData);
       } catch (error) {
-        console.error("Error loading community data:", error);
+        logger.error("Error loading community data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -115,7 +116,7 @@ export const CommunityPage: React.FC = () => {
       setIntentions(mappedData);
 
     } catch (err) {
-      console.error("Error posting intention:", err);
+      logger.error("Error posting intention:", err);
       // Revert on error could be implemented here
       alert("Hubo un error al publicar tu mensaje. Inténtalo de nuevo.");
       setIntentions(intentions.filter(i => i.id !== tempId));
@@ -139,7 +140,7 @@ export const CommunityPage: React.FC = () => {
     try {
       await communityService.deleteComment(commentId);
     } catch (err) {
-      console.error("Error deleting", err);
+      logger.error("Error deleting", err);
       alert("No se pudo eliminar.");
     }
   };
@@ -176,7 +177,7 @@ export const CommunityPage: React.FC = () => {
       );
       // We could refresh here too, but comments are less critical to have real IDs immediately unless editing/deleting
     } catch (err) {
-      console.error("Error posting comment", err);
+      logger.error("Error posting comment", err);
       alert("Error al guardar el comentario.");
     }
   };
@@ -193,7 +194,7 @@ export const CommunityPage: React.FC = () => {
     try {
       await communityService.lightCandle(id);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -209,7 +210,7 @@ export const CommunityPage: React.FC = () => {
     try {
       await communityService.sendLove(id);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
     }
   };
 

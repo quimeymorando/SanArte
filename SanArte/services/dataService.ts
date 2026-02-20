@@ -1,6 +1,7 @@
 
 import { supabase } from '../supabaseClient';
 import { Routine, SymptomLogEntry } from '../types';
+import { logger } from '../utils/logger';
 
 type CommunityTheme = 'healing' | 'gratitude' | 'release' | 'feedback';
 
@@ -13,7 +14,7 @@ export const routineService = {
             .order('created_at', { ascending: true });
 
         if (error) {
-            console.error("Error fetching routines:", error);
+            logger.error("Error fetching routines:", error);
             return [];
         }
         return (data as Routine[]) || [];
@@ -71,7 +72,7 @@ export const communityService = {
             .select('*, comments(*)');
 
         if (error) {
-            console.error(error);
+            logger.error(error);
             return [];
         }
 

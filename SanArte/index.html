@@ -35,11 +35,21 @@
     <!-- Fonts & Icons (preconnect + preload for faster rendering) -->
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <!-- Fonts: Only load weights actually used (400,600,700,900) with display=swap -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Poppins:wght@400;600;700;800&display=swap"
         rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=block"
-        rel="stylesheet" />
+    <!-- Material Symbols: display=swap prevents render blocking -->
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap"
+        rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap"
+            rel="stylesheet" />
+    </noscript>
 
 
 

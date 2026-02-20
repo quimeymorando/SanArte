@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SymptomDetail } from '../types';
 import { getFullSymptomDetails } from '../services/geminiService';
@@ -145,7 +146,7 @@ export const SharedResultPage: React.FC = () => {
                     setData(detail);
                 }
             } catch (error: any) {
-                console.error(error);
+                logger.error(error);
                 setError("No se pudo cargar la información compartida.");
             } finally {
                 setIsLoading(false);

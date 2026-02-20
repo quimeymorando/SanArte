@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import { useTheme } from '../context/ThemeContext';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -29,7 +30,7 @@ export const FavoritesPage: React.FC = () => {
       await historyService.deleteFavoriteById(id);
       setFavorites((prev: Favorite[]) => prev.filter(f => f.id !== id));
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   };
 
@@ -183,7 +184,7 @@ export const HistoryPage: React.FC = () => {
       const data = await historyService.getHistory();
       if (data) setHistoryItems(data);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -194,7 +195,7 @@ export const HistoryPage: React.FC = () => {
       await historyService.deleteLog(id);
       setHistoryItems((prev: SymptomLogEntry[]) => prev.filter(i => i.id !== id));
     } catch (err) {
-      console.error(err);
+      logger.error(err);
     }
   };
 
@@ -269,7 +270,7 @@ export const ProfilePage: React.FC = () => {
           alert('Error al subir imagen. Asegúrate de tener el bucket "avatars" creado en Supabase con acceso público.');
         }
       } catch (error) {
-        console.error(error);
+        logger.error(error);
       } finally {
         setIsUploading(false);
       }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 // import { Share } from '@capacitor/share';
 import { SymptomDetail } from '../types';
@@ -78,10 +79,10 @@ export const SymptomDetailPage: React.FC = () => {
                intensity: 0,
                duration: 'Consulta',
                notes: `Consulta: ${detail.name}`
-            }).catch(console.warn);
+            }).catch(logger.warn);
          }
       } catch (error: any) {
-         console.error("Error fetching details:", error);
+         logger.error("Error fetching details:", error);
          setError(error.message || "No pudimos conectar con la fuente de sabiduría.");
       } finally {
          clearInterval(interval);
@@ -117,7 +118,7 @@ export const SymptomDetailPage: React.FC = () => {
             alert("¡Texto copiado al portapapeles! 📋✨");
          }
       } catch (error) {
-         console.log('Error sharing', error);
+         logger.log('Error sharing', error);
       }
    };
 
@@ -147,7 +148,7 @@ export const SymptomDetailPage: React.FC = () => {
             await (supabase.from('favorites') as any).insert({ user_id: user.id, symptom_name: data.name, description: data.shortDefinition });
             setIsFavorite(true);
          }
-      } catch (e) { console.error(e); }
+      } catch (e) { logger.error(e); }
    };
 
    if (isLoading) {

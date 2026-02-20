@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { logger } from '../utils/logger';
 import { useLocation } from 'react-router-dom';
 import { sendMessageToChat } from '../services/geminiService';
 import { ChatMessage, UserProfile } from '../types';
@@ -53,7 +54,7 @@ const ChatWidget: React.FC = () => {
       const updatedUser = await authService.getUser();
       setUser(updatedUser);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setMessages(prev => [...prev, { id: 'error', role: 'model', text: 'Siento una interferencia en mi conexión. Intentémoslo de nuevo.', timestamp: new Date() }]);
     } finally {
       setIsLoading(false);

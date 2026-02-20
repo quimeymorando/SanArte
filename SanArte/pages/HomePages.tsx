@@ -7,6 +7,7 @@ import { authService } from '../services/authService';
 import { OnboardingTour } from '../components/OnboardingTour';
 import AdBanner from '../components/AdBanner';
 import { SearchResult, UserProfile } from '../types';
+import { logger } from '../utils/logger';
 
 
 export const HomePage: React.FC = () => {
@@ -323,7 +324,7 @@ export const SearchPage: React.FC = () => {
       const data = await searchCatalog(searchTerm);
       setResults(data);
     } catch (error) {
-      console.error("Search failed", error);
+      logger.error("Search failed", error);
     } finally {
       setIsLoading(false);
     }

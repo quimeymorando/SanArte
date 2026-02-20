@@ -6,9 +6,10 @@ import { HeroSection } from '../components/HeroSection';
 import { TheShift } from '../components/TheShift';
 import { OpportunitySection } from '../components/OpportunitySection';
 import { FinalCTA } from '../components/FinalCTA';
+import { logger } from '../utils/logger';
 
 const LandingPage: React.FC = () => {
-  console.log("Rendering LandingPage...");
+  logger.log("Rendering LandingPage...");
 
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -85,7 +86,7 @@ const LandingPage: React.FC = () => {
         navigate('/home');
       }
     } catch (e: any) {
-      console.error(e);
+      logger.error(e);
       let msg = e.message || 'Hubo un error al conectar.';
       if (msg.includes('Invalid login credentials')) msg = 'Correo o contraseña incorrectos.';
       if (msg.includes('User already registered')) msg = 'Este correo ya está registrado. Intenta iniciar sesión.';
@@ -104,7 +105,7 @@ const LandingPage: React.FC = () => {
         setShowAuthModal(true);
       }
     } catch (error) {
-      console.error("Error checking auth:", error);
+      logger.error("Error checking auth:", error);
       setShowAuthModal(true);
     }
   };

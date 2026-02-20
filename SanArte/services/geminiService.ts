@@ -1,5 +1,6 @@
 import { SearchResult, SymptomDetail } from "../types";
 import { supabase } from "../supabaseClient";
+import { logger } from '../utils/logger';
 
 
 // SECURITY: Never expose API keys in client-side code via VITE_* variables.
@@ -23,7 +24,7 @@ async function retryWithBackoff<T>(
     // Don't retry if it's a client authentication error
     if (error.message?.includes("API Key")) throw error;
 
-    console.warn(`Retrying... attempts left: ${retries}. Waiting ${delay}ms`);
+    logger.warn(`Retrying... attempts left: ${retries}. Waiting ${delay}ms`);
     await sleep(delay);
     return retryWithBackoff(fn, retries - 1, delay * factor, factor);
   }
@@ -75,7 +76,7 @@ export const sendMessageToChat = async (history: any[], newMessage: string): Pro
     // Chat generally doesn't need aggressive retries, but a single retry is good
     return await retryWithBackoff(() => callGeminiDirect(messages), 1, 1000);
   } catch (error) {
-    console.error("Chat Error:", error);
+    logger.error("Chat Error:", error);
     return "Siento una interferencia en nuestra conexión. Por favor, respira profundo e intenta escribirme nuevamente.";
   }
 };
@@ -117,12 +118,12 @@ export const searchSymptomsWithAI = async (query: string): Promise<SearchResult[
     const results = JSON.parse(text);
 
     if (results.length > 0) {
-      supabase.from('search_cache').insert({ query: cacheKey, results }).then(() => console.log("Cached"));
+      supabase.from('search_cache').insert({ query: cacheKey, results }).then(() => logger.log("Cached"));
     }
     return results;
 
   } catch (error: any) {
-    console.error("Search Fallback:", error);
+    logger.error("Search Fallback:", error);
     const errorMsg = error?.message || "Error de conexión";
     // Search CAN fallback safely because it's a list
     return FALLBACK_SYMPTOMS.map((item, index) =>
@@ -173,14 +174,14 @@ const createMaestroPrompt = (symptomName: string) => `
 
 export const getFullSymptomDetails = async (symptomName: string): Promise<SymptomDetail> => {
   const slug = symptomName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  console.log("🔍 Buscando:", symptomName);
+  logger.log("🔍 Buscando:", symptomName);
 
   // 1. CHECK CATALOG
   try {
     const { data: catalogEntry } = await supabase.from('symptom_catalog').select('content').eq('slug', slug).single();
     const catalogContent = catalogEntry?.content as Partial<SymptomDetail> | undefined;
     if (catalogContent?.zona_detalle) {
-      console.log("✅ Catálogo (Maestro)");
+      logger.log("✅ Catálogo (Maestro)");
       return catalogContent as SymptomDetail;
     }
   } catch (e) { }
@@ -194,17 +195,17 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
     const isGenericFallback = cachedData?.shortDefinition === "Tu cuerpo te habla a través de este síntoma.";
 
     if (cachedData?.zona_detalle && !isGenericFallback) {
-      console.log("✅ Caché (Maestro)");
+      logger.log("✅ Caché (Maestro)");
       return cachedData as SymptomDetail;
     }
 
     if (isGenericFallback) {
-      console.log("⚠️ Caché Tóxico detectado (Generic Fallback). Regenerando...");
+      logger.log("⚠️ Caché Tóxico detectado (Generic Fallback). Regenerando...");
     }
   } catch (e) { }
 
   // 3. GENERATE (NO SILENT FALLBACK)
-  console.log("✨ Generando con Gemini...");
+  logger.log("✨ Generando con Gemini...");
   // Aquí YA NO hay try-catch envolvente para devolver basura. 
   // Si falla, el error debe llegar a la UI.
 
@@ -216,7 +217,7 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
 
   // Save
   // Save using UPSERT to overwrite any toxic cache
-  supabase.from('symptom_cache').upsert({ slug, name: symptomName, data: result }, { onConflict: 'slug' }).then(({ error }) => { if (error) console.error(error) });
+  supabase.from('symptom_cache').upsert({ slug, name: symptomName, data: result }, { onConflict: 'slug' }).then(({ error }) => { if (error) logger.error(error) });
 
   return result;
 };
