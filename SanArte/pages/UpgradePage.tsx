@@ -1,17 +1,24 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { trackMonetizationEvent } from '../services/monetizationService';
 
 // Lemon Squeezy Checkout URLs — Replace with your real ones
 const CHECKOUT_URLS = {
-    monthly: 'https://sanarte.lemonsqueezy.com/checkout/buy/cdc04c6b-be2e-4486-88e6-bbf61cfc945e',
-    annual: 'https://sanarte.lemonsqueezy.com/checkout/buy/ANNUAL_PRODUCT_ID',  // ← REEMPLAZAR
-    mecenas: 'https://sanarte.lemonsqueezy.com/checkout/buy/MECENAS_PRODUCT_ID', // ← REEMPLAZAR
+    monthly: import.meta.env.VITE_LS_CHECKOUT_MONTHLY || 'https://sanarte.lemonsqueezy.com/checkout/buy/cdc04c6b-be2e-4486-88e6-bbf61cfc945e',
+    annual: import.meta.env.VITE_LS_CHECKOUT_ANNUAL || '',
+    mecenas: import.meta.env.VITE_LS_CHECKOUT_MECENAS || '',
 };
+
+const isValidCheckout = (url: string): boolean => /^https:\/\/.+\.lemonsqueezy\.com\/checkout\/buy\/.+/.test(url);
 
 const UpgradePage: React.FC = () => {
     const navigate = useNavigate();
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+
+    React.useEffect(() => {
+        trackMonetizationEvent('paywall_view', { source: 'upgrade_page' });
+    }, []);
 
     const pricing = {
         monthly: { price: '$3', period: '/mes', total: '$36/año', savings: '' },
@@ -21,12 +28,29 @@ const UpgradePage: React.FC = () => {
     const current = pricing[billingCycle];
 
     const handleSubscribe = () => {
-        window.open(CHECKOUT_URLS[billingCycle], '_blank');
+        const url = CHECKOUT_URLS[billingCycle];
+        if (!isValidCheckout(url)) {
+            window.alert('Este plan aún no está configurado. Mientras tanto puedes usar el plan mensual.');
+            return;
+        }
+        trackMonetizationEvent('checkout_click', {
+            source: 'upgrade_page',
+            billing_cycle: billingCycle
+        });
+        window.open(url, '_blank', 'noopener,noreferrer');
     };
 
     const handleMecenas = () => {
-        window.open(CHECKOUT_URLS.mecenas, '_blank');
+        if (!isValidCheckout(CHECKOUT_URLS.mecenas)) {
+            window.alert('La opción Mecenas aún no está configurada.');
+            return;
+        }
+        trackMonetizationEvent('donation_click', { source: 'upgrade_page' });
+        window.open(CHECKOUT_URLS.mecenas, '_blank', 'noopener,noreferrer');
     };
+
+    const annualEnabled = isValidCheckout(CHECKOUT_URLS.annual);
+    const mecenasEnabled = isValidCheckout(CHECKOUT_URLS.mecenas);
 
     return (
         <div className="relative min-h-screen bg-[#050b0d] text-gray-200 py-20 px-6 overflow-hidden">
@@ -67,6 +91,7 @@ const UpgradePage: React.FC = () => {
                     </button>
                     <button
                         onClick={() => setBillingCycle('annual')}
+                        disabled={!annualEnabled}
                         className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all relative ${billingCycle === 'annual' ? 'bg-white/10 text-white border border-white/20' : 'text-gray-500 hover:text-gray-300'}`}
                     >
                         Anual
@@ -197,6 +222,7 @@ const UpgradePage: React.FC = () => {
                             </li>
                         </ul>
                         <button
+                            disabled={!mecenasEnabled}
                             className="w-full py-4 text-purple-400 font-bold rounded-2xl bg-purple-500/10 border border-purple-500/10 hover:bg-purple-500/20 hover:border-purple-500/30 transition-all active:scale-95"
                             onClick={handleMecenas}
                         >

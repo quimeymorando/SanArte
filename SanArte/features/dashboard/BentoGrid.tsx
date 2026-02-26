@@ -162,11 +162,11 @@ const BreathingWidget = () => {
 
     return (
         <div
-            className={`w-full mb-5 rounded-[2rem] relative overflow-hidden transition-all duration-700 border border-white/5 ${isActive
+            className={`w-full mb-5 rounded-[2rem] relative overflow-hidden transition-all duration-700 border border-white/5 cursor-pointer ${isActive
                 ? 'h-72 bg-gradient-to-br from-[#0a0a20] via-[#0d1520] to-[#080f16]'
-                : 'h-24 bg-[#0a1114]/60 backdrop-blur-xl cursor-pointer hover:border-emerald-500/20'
+                : 'h-24 bg-[#0a1114]/60 backdrop-blur-xl hover:border-emerald-500/20'
                 }`}
-            onClick={!isActive ? startBreathing : undefined}
+            onClick={!isActive ? startBreathing : stopBreathing}
         >
             {/* Ambient glow when active */}
             {isActive && (
@@ -190,15 +190,21 @@ const BreathingWidget = () => {
                                 <p className="text-emerald-300/60 text-[10px] font-semibold uppercase tracking-wider">Técnica 4-7-8 anti-ansiedad</p>
                             </div>
                         </div>
-                        <div className="size-10 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-300 border border-emerald-500/20">
+                        <div className="size-10 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-300 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
                             <span className="material-symbols-outlined text-xl">play_arrow</span>
                         </div>
                     </>
                 ) : (
                     /* ── ACTIVE STATE ── */
-                    <div className="w-full flex flex-col items-center justify-center gap-4">
+                    <div className="w-full flex flex-col items-center justify-center gap-4 h-full relative">
+                        {/* Status top right hint */}
+                        <div className="absolute top-0 right-0 opacity-40 flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-widest font-bold">
+                            <span className="material-symbols-outlined text-[12px]">touch_app</span>
+                            Tocar para detener
+                        </div>
+
                         {/* Breathing Circle */}
-                        <div className="relative flex items-center justify-center">
+                        <div className="relative flex items-center justify-center mt-4">
                             {/* Outer ring pulse */}
                             <div className={`absolute size-28 rounded-full border-2 ${config?.ringColor} transition-all duration-[2000ms] ease-in-out ${config?.scale} opacity-40`}></div>
                             {/* Inner circle */}
@@ -210,26 +216,20 @@ const BreathingWidget = () => {
                         </div>
 
                         {/* Phase Label */}
-                        <div className="text-center">
+                        <div className="text-center mt-2">
                             <h3 className={`text-xl font-black ${config?.color} transition-colors duration-500 mb-0.5`}>
                                 {config?.label}
                             </h3>
                             <p className="text-white/40 text-xs font-medium">{config?.sub}</p>
                         </div>
 
-                        {/* Cycle counter + Close */}
-                        <div className="flex items-center gap-4">
-                            {cycles > 0 && (
-                                <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
+                        {/* Cycle counter */}
+                        <div className="mt-auto pt-2">
+                            {cycles > 0 ? (
+                                <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full">
                                     Ciclo {cycles}
                                 </span>
-                            )}
-                            <button
-                                onClick={(e) => { e.stopPropagation(); stopBreathing(); }}
-                                className="text-white/30 hover:text-white/60 transition-colors"
-                            >
-                                <span className="material-symbols-outlined text-lg">close</span>
-                            </button>
+                            ) : <span className="h-6"></span>}
                         </div>
                     </div>
                 )}
@@ -305,6 +305,7 @@ export const BentoGrid = () => {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [streak, setStreak] = useState(0);
     const [greeting, setGreeting] = useState('');
+    const dashboardAdSlot = import.meta.env.VITE_ADSENSE_SLOT_DASHBOARD_BANNER || '';
 
     useEffect(() => {
         const load = async () => {
@@ -362,7 +363,7 @@ export const BentoGrid = () => {
                 />
 
                 {/* Ad Slot */}
-                <SmartAd format="banner" />
+                <SmartAd format="banner" slotId={dashboardAdSlot} />
 
                 <NavCard
                     title="Diario"

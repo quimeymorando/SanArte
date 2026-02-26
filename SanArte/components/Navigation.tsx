@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
+import { UserProfile } from '../types';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [user, setUser] = useState<UserProfile | null>(null);
   const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    authService.getUser().then(setUser);
+  }, []);
 
   // Don't show navigation on landing page
   if (location.pathname === '/') return null;
@@ -21,6 +28,18 @@ const Navigation: React.FC = () => {
 
   const MobileLink = ({ to, emoji, label }: { to: string, emoji: string, label: string }) => {
     const active = isActive(to);
+
+    if (to === '/profile' && user?.avatar) {
+      return (
+        <Link to={to} className="flex flex-col items-center gap-1 relative group w-16">
+          <div className={`size-10 rounded-full flex items-center justify-center transition-all duration-300 bg-cover bg-center ${active ? 'border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)] -translate-y-1' : 'border border-white/20 group-hover:border-white/50'}`} style={{ backgroundImage: `url('${user.avatar}')` }}>
+          </div>
+          <span className={`text-[9px] font-bold uppercase tracking-wider transition-colors ${active ? 'text-cyan-400' : 'text-white/40 group-hover:text-white/70'}`}>{label}</span>
+          {active && <div className="absolute -bottom-2 w-1 h-1 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]"></div>}
+        </Link>
+      );
+    }
+
     return (
       <Link to={to} className="flex flex-col items-center gap-1 relative group w-16">
         <div className={`size-10 rounded-2xl flex items-center justify-center transition-all duration-300 ${active ? 'bg-cyan-500/15 border border-cyan-400/30 shadow-[0_0_15px_rgba(34,211,238,0.2)] -translate-y-1' : 'bg-white/5 border border-white/5 group-hover:bg-white/10'}`}>
@@ -43,8 +62,8 @@ const Navigation: React.FC = () => {
           <span className="text-lg md:text-xl font-heading font-black text-white tracking-tight hidden sm:block">San<span className="text-cyan-400 italic">Arte</span></span>
         </div>
 
-        {/* Center Emotional Badge */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex w-max">
+        {/* Center Emotional Badge (Hidden on tablet/small-desktop to prevent overlapping with links) */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex md:hidden xl:flex w-max">
           <div className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 rounded-full border border-cyan-400/20 bg-cyan-500/10 backdrop-blur-md shadow-[0_0_15px_rgba(34,211,238,0.15)]">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
             <span className="text-[9px] md:text-[10px] font-black text-cyan-300 uppercase tracking-[0.15em] md:tracking-[0.2em]">Tu cuerpo habla, escúchalo ✨</span>
@@ -59,9 +78,13 @@ const Navigation: React.FC = () => {
           <DesktopLink to="/journal" icon="book_2" label="Diario" />
 
           <Link to="/profile" className={`flex items-center gap-2 text-sm font-bold transition-all duration-300 ${isActive('/profile') ? 'text-cyan-400' : 'text-gray-500 hover:text-cyan-300'}`}>
-            <div className={`size-8 rounded-full flex items-center justify-center transition-all ${isActive('/profile') ? 'bg-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.3)] border border-cyan-400/30' : 'bg-white/5 border border-white/5'}`}>
-              <span className="material-symbols-outlined text-lg">person</span>
-            </div>
+            {user?.avatar ? (
+              <div className={`size-8 rounded-full bg-cover bg-center transition-all ${isActive('/profile') ? 'shadow-[0_0_10px_rgba(34,211,238,0.3)] border border-cyan-400/30' : 'border border-white/20'}`} style={{ backgroundImage: `url('${user.avatar}')` }}></div>
+            ) : (
+              <div className={`size-8 rounded-full flex items-center justify-center transition-all ${isActive('/profile') ? 'bg-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.3)] border border-cyan-400/30' : 'bg-white/5 border border-white/5'}`}>
+                <span className="material-symbols-outlined text-lg">person</span>
+              </div>
+            )}
             Perfil
           </Link>
         </div>

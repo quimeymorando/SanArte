@@ -249,22 +249,25 @@ export const CommunityPage: React.FC = () => {
   return (
     <div className="flex-1 w-full min-h-screen pb-24 pt-32 bg-gradient-to-b from-indigo-50/50 to-white dark:from-[#1a2c32] dark:to-[#101e22]">
       {/* Header */}
-      <div className="relative overflow-hidden bg-primary/10 dark:bg-primary/5 py-12 px-6 text-center">
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
-        <div className="relative z-10">
-          <span className="material-symbols-outlined text-5xl text-primary mb-2">diversity_1</span>
-          <h1 className="font-heading text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">Comunidad SanArte</h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-xl mx-auto text-lg leading-relaxed">
-            Bienvenid@ a la Comunidad. Este es un espacio sagrado para agradecer, soltar cargas, compartir tu proceso y contarnos si esta herramienta está siendo luz en tu camino.
+      <div className="relative overflow-hidden py-16 px-6 text-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="size-20 rounded-[2rem] bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/30 flex items-center justify-center text-4xl shadow-[0_0_30px_rgba(34,211,238,0.2)] mb-6 animate-pulse">
+            ✨
+          </div>
+          <h1 className="font-heading text-4xl md:text-5xl font-black text-white mb-4 tracking-tight drop-shadow-md">Tribu SanArte</h1>
+          <p className="text-white/60 max-w-xl mx-auto text-lg leading-relaxed font-medium">
+            Un espacio sagrado para agradecer, soltar y acompañarnos en el proceso de evolucionar. Tu luz también sana a otros.
           </p>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 -mt-6 relative z-20">
         {/* Input Box */}
-        <div className="bg-white dark:bg-surface-dark rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700">
-          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
-            Comparte tu luz con la comunidad:
+        <div className="bg-[#0a1114]/80 backdrop-blur-2xl rounded-[2.5rem] p-6 md:p-8 shadow-2xl border border-white/10 group hover:border-primary/30 transition-all duration-500 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-primary/10 transition-colors duration-700"></div>
+          <label className="block text-base font-black text-white mb-5 flex items-center gap-2 relative z-10">
+            <span className="text-xl">✍️</span> Comparte tu luz con la tribu:
           </label>
 
           {/* Theme Selector */}
@@ -273,9 +276,9 @@ export const CommunityPage: React.FC = () => {
               <button
                 key={theme}
                 onClick={() => setSelectedTheme(theme as any)}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${selectedTheme === theme
-                  ? 'bg-primary text-white border-primary'
-                  : 'bg-gray-50 dark:bg-white/5 text-gray-500 border-gray-200 dark:border-gray-700 hover:border-primary'
+                className={`flex items-center gap-2 px-4 py-2 rounded-[1rem] text-xs font-black transition-all border relative z-10 ${selectedTheme === theme
+                  ? 'bg-primary/10 text-primary border-primary/50 shadow-[0_0_15px_rgba(34,211,238,0.2)]'
+                  : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20 hover:text-white/80'
                   }`}
               >
                 <span className="material-symbols-outlined text-sm">{getThemeIcon(theme)}</span>
@@ -287,25 +290,24 @@ export const CommunityPage: React.FC = () => {
           <textarea
             value={newIntention}
             onChange={(e) => setNewIntention(e.target.value)}
-            className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none"
-            rows={3}
+            className="w-full relative z-10 bg-black/40 border border-white/5 rounded-[1.5rem] p-5 text-white placeholder-white/20 focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none text-base mt-2"
+            rows={4}
             placeholder={
               selectedTheme === 'feedback' ? "Cuéntanos, ¿cómo te ha ayudado SanArte hoy?" :
-                selectedTheme === 'gratitude' ? "Hoy agradezco por..." :
-                  "Escribe tu intención o mensaje aquí..."
+                selectedTheme === 'gratitude' ? "Hoy agradezco profundamente por..." :
+                  "Escribe tu intención médica o mensaje aquí..."
             }
           />
           <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
 
-            {/* Identity Toggle */}
             {/* Identity Toggle - Improved UI */}
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Publicando como:</span>
+            <div className="flex items-center gap-3 relative z-10">
+              <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Autor:</span>
               <button
                 onClick={() => setShowName(!showName)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black transition-all border ${showName
-                  ? 'bg-primary/10 text-primary border-primary shine-effect'
-                  : 'bg-gray-100 dark:bg-white/5 text-gray-500 border-gray-200 dark:border-gray-700'
+                className={`flex items-center gap-2 px-4 py-2 rounded-[1rem] text-xs font-black transition-all border ${showName
+                  ? 'bg-primary/20 text-primary border-primary/30 shadow-[0_0_10px_rgba(34,211,238,0.2)]'
+                  : 'bg-white/5 text-white/40 border-white/10 hover:border-white/20'
                   }`}
               >
                 {showName ? (
@@ -325,42 +327,44 @@ export const CommunityPage: React.FC = () => {
             <button
               onClick={handlePost}
               disabled={!newIntention.trim()}
-              className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-6 py-2 rounded-full font-bold shadow-md transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="relative z-10 w-full sm:w-auto overflow-hidden group bg-gradient-to-r from-primary to-cyan-400 text-white px-8 py-3 rounded-[1.2rem] font-black tracking-widest uppercase text-xs shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>Publicar</span>
-              <span className="material-symbols-outlined text-sm">send</span>
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+              <span className="relative z-10">Publicar Luz</span>
+              <span className="material-symbols-outlined text-sm relative z-10 group-hover:translate-x-1 transition-transform">send</span>
             </button>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 my-8">
-          <button onClick={() => setActiveTab('all')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === 'all' ? 'bg-gray-800 text-white dark:bg-white dark:text-gray-900' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'}`}>Todos</button>
-          <button onClick={() => setActiveTab('healing')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === 'healing' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'}`}>Sanación</button>
-          <button onClick={() => setActiveTab('gratitude')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === 'gratitude' ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-200' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'}`}>Gratitud</button>
-          <button onClick={() => setActiveTab('feedback')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${activeTab === 'feedback' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10'}`}>Testimonios</button>
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 my-10">
+          <button onClick={() => setActiveTab('all')} className={`px-5 py-2 rounded-[1rem] text-xs font-black uppercase tracking-wider transition-all border ${activeTab === 'all' ? 'bg-white text-gray-900 border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'bg-white/5 text-white/50 border-white/5 hover:border-white/20'}`}>Todos</button>
+          <button onClick={() => setActiveTab('healing')} className={`px-5 py-2 rounded-[1rem] text-xs font-black uppercase tracking-wider transition-all border ${activeTab === 'healing' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'bg-white/5 text-white/50 border-white/5 hover:border-white/20'}`}>Sanación</button>
+          <button onClick={() => setActiveTab('gratitude')} className={`px-5 py-2 rounded-[1rem] text-xs font-black uppercase tracking-wider transition-all border ${activeTab === 'gratitude' ? 'bg-pink-500/10 text-pink-400 border-pink-500/30 shadow-[0_0_15px_rgba(236,72,153,0.2)]' : 'bg-white/5 text-white/50 border-white/5 hover:border-white/20'}`}>Gratitud</button>
+          <button onClick={() => setActiveTab('feedback')} className={`px-5 py-2 rounded-[1rem] text-xs font-black uppercase tracking-wider transition-all border ${activeTab === 'feedback' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : 'bg-white/5 text-white/50 border-white/5 hover:border-white/20'}`}>Testimonios</button>
         </div>
 
         {/* Feed */}
         <div className="flex flex-col gap-4">
           {filteredIntentions.map((item) => (
-            <div key={item.id} className="bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2.5 rounded-full dark:bg-white/5 ${item.theme === 'healing' ? 'bg-blue-50 text-blue-500' :
-                    item.theme === 'gratitude' ? 'bg-pink-50 text-pink-500' :
-                      item.theme === 'feedback' ? 'bg-amber-50 text-amber-500' :
-                        'bg-gray-100 text-gray-500'
+            <div key={item.id} className="bg-[#0a1114]/80 backdrop-blur-xl p-7 rounded-[2.5rem] shadow-xl border border-white/5 hover:border-white/10 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-white/10 transition-colors duration-700"></div>
+              <div className="flex justify-between items-start mb-4 relative z-10">
+                <div className="flex items-center gap-4">
+                  <div className={`size-12 rounded-[1.2rem] flex items-center justify-center border ${item.theme === 'healing' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                    item.theme === 'gratitude' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' :
+                      item.theme === 'feedback' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                        'bg-white/5 text-white/50 border-white/10'
                     }`}>
-                    <span className="material-symbols-outlined text-xl">
+                    <span className="material-symbols-outlined text-2xl font-black">
                       {getThemeIcon(item.theme)}
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className={`text-sm font-black ${item.authorName ? 'text-primary' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <span className={`text-base font-black ${item.authorName ? 'text-white' : 'text-white/50'}`}>
                       {item.authorName || 'Alma Anónima'}
                     </span>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-gray-300">
+                    <span className="text-[10px] uppercase font-black tracking-[0.2em] text-white/30">
                       {getThemeLabel(item.theme)}
                     </span>
                   </div>
@@ -370,13 +374,11 @@ export const CommunityPage: React.FC = () => {
                 </span>
               </div>
 
-              <p className="text-lg text-gray-800 dark:text-gray-200 font-medium leading-relaxed mb-6 pl-1 pt-2">
+              <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed mb-8 relative z-10">
                 "{item.text}"
               </p>
 
-
-
-              <div className="flex items-center gap-6 pt-4 border-t border-gray-50 dark:border-gray-700/50">
+              <div className="flex items-center gap-6 pt-5 border-t border-white/5 relative z-10">
                 {/* Candle Button */}
                 <button
                   onClick={() => lightCandle(item.id)}
@@ -428,43 +430,44 @@ export const CommunityPage: React.FC = () => {
 
               {/* Comments Section */}
               {activeCommentId === item.id && (
-                <div className="mt-4 pt-4 border-t border-dashed border-gray-100 dark:border-gray-800 animate-in slide-in-from-top-2">
+                <div className="mt-6 pt-6 border-t border-white/5 animate-in slide-in-from-top-2 relative z-10">
                   {/* Existing Comments */}
                   {item.comments.length > 0 && (
-                    <div className="space-y-3 mb-4 max-h-60 overflow-y-auto no-scrollbar">
+                    <div className="space-y-3 mb-5 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                       {item.comments.map(comment => (
-                        <div key={comment.id} className="bg-gray-50 dark:bg-white/5 p-3 rounded-2xl text-sm">
-                          <div className="flex justify-between items-start mb-1">
-                            <span className={`text-xs font-bold ${comment.authorName ? 'text-primary' : 'text-gray-500'}`}>
+                        <div key={comment.id} className="bg-black/20 p-4 rounded-[1.2rem] text-sm border border-white/5 relative overflow-hidden group/comment">
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 blur-[20px] rounded-full pointer-events-none group-hover/comment:bg-primary/10 transition-colors duration-500"></div>
+                          <div className="flex justify-between items-start mb-2 relative z-10">
+                            <span className={`text-xs font-black uppercase tracking-wider ${comment.authorName ? 'text-primary' : 'text-white/40'}`}>
                               {comment.authorName || 'Alma Anónima'}
                             </span>
                             {/* Delete Button (Only for owner or admin) */}
                             {user && (user.role === 'admin' || comment.userId === user.id || item.isUser) && (
-                              <button onClick={() => handleDeleteComment(item.id, comment.id)} className="text-gray-300 hover:text-red-500 transition-colors p-1" title={user.role === 'admin' ? "Eliminar (Admin)" : "Eliminar"}>
+                              <button onClick={() => handleDeleteComment(item.id, comment.id)} className="text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all p-1.5 rounded-lg" title={user.role === 'admin' ? "Eliminar (Admin)" : "Eliminar"}>
                                 <span className={`material-symbols-outlined text-[16px] font-bold ${user.role === 'admin' ? 'text-red-300' : ''}`}>close</span>
                               </button>
                             )}
                           </div>
-                          <p className="text-gray-700 dark:text-gray-300">{comment.text}</p>
+                          <p className="text-white/80 leading-relaxed relative z-10">{comment.text}</p>
                         </div>
                       ))}
                     </div>
                   )}
 
                   {/* New Comment Input */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 bg-black/40 border border-white/10 rounded-[1.2rem] p-1 pr-2 relative z-10 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                     <input
                       type="text"
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleComment(item.id)}
                       placeholder="Escribe un mensaje de apoyo..."
-                      className="flex-1 bg-gray-50 dark:bg-black/20 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/30"
+                      className="flex-1 bg-transparent border-none px-4 py-3 text-sm text-white placeholder-white/30 focus:ring-0"
                     />
                     <button
                       onClick={() => handleComment(item.id)}
                       disabled={!newComment.trim()}
-                      className="size-8 bg-primary text-white rounded-lg flex items-center justify-center shadow-md active:scale-95 disabled:opacity-50"
+                      className="size-10 bg-gradient-to-br from-primary to-cyan-400 text-white rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.3)] hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] active:scale-95 disabled:opacity-50 disabled:shadow-none transition-all duration-300"
                     >
                       <span className="material-symbols-outlined text-sm">send</span>
                     </button>
@@ -482,12 +485,12 @@ export const CommunityPage: React.FC = () => {
           ))}
 
           {filteredIntentions.length === 0 && (
-            <div className="text-center py-16 px-6 animate-in fade-in zoom-in duration-700">
-              <div className="size-24 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="material-symbols-outlined text-4xl text-primary/40">auto_awesome</span>
+            <div className="text-center py-20 px-6 animate-in fade-in zoom-in duration-700 bg-[#0a1114]/60 backdrop-blur-xl rounded-[2.5rem] border border-white/5">
+              <div className="size-24 bg-gradient-to-br from-primary/10 to-purple-500/10 border border-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,211,238,0.1)]">
+                <span className="material-symbols-outlined text-4xl text-primary animate-pulse">auto_awesome</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Sé la primera chispa</h3>
-              <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
+              <h3 className="text-2xl font-black text-white mb-3">Sé la primera chispa</h3>
+              <p className="text-white/50 max-w-sm mx-auto leading-relaxed font-medium">
                 Este espacio está esperando tu luz. Comparte tu intención, sanación o gratitud y comienza el movimiento.
               </p>
             </div>

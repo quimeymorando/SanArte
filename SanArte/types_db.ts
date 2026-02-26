@@ -278,7 +278,16 @@ export interface Database {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      increment_field: {
+        Args: {
+          row_id: string
+          table_name: string
+          field_name: string
+        }
+        Returns: number
+      }
+    }
     Enums: Record<string, never>
     CompositeTypes: Record<string, never>
   }

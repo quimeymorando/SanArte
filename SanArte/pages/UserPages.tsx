@@ -36,20 +36,23 @@ export const FavoritesPage: React.FC = () => {
 
   return (
     <div className="flex-1 w-full max-w-7xl mx-auto px-6 py-12 pt-32 pb-24">
-      <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-8 tracking-tight">Mis Favoritos 💖</h2>
+      <h2 className="text-3xl font-black text-white mb-8 tracking-tight flex items-center gap-3">
+        <span className="text-3xl drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]">💖</span> Mis Favoritos
+      </h2>
       {favorites.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 dark:bg-surface-dark rounded-3xl border border-dashed border-gray-200 dark:border-gray-800">
-          <p className="text-gray-500">Aún no hay favoritos.</p>
+        <div className="text-center py-20 bg-[#0a1114]/60 backdrop-blur-xl rounded-[2.5rem] border border-white/5 border-dashed">
+          <p className="text-white/40 font-bold">Aún no tienes síntomas en tus favoritos.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((fav: Favorite, index: number) => (
-            <div key={index} onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(fav.symptom_name)}`)} className="relative bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-lg border border-gray-50 dark:border-gray-800 cursor-pointer hover:border-primary/30 transition-all group">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 pr-10">{fav.symptom_name}</h3>
-              <p className="text-sm text-gray-500 line-clamp-3">{fav.description}</p>
+            <div key={index} onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(fav.symptom_name)}`)} className="relative bg-[#0a1114]/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/5 cursor-pointer hover:border-primary/30 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(34,211,238,0.1)] hover:-translate-y-1 overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-primary/10 transition-colors duration-700"></div>
+              <h3 className="text-xl font-black text-white mb-2 pr-10 relative z-10">{fav.symptom_name}</h3>
+              <p className="text-sm text-white/50 line-clamp-3 relative z-10">{fav.description}</p>
               <button
                 onClick={(e: React.MouseEvent) => handleDelete(fav.id, e)}
-                className="absolute top-4 right-4 z-50 p-2 bg-red-50 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-md"
+                className="absolute top-4 right-4 z-50 p-2 bg-red-500/10 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-all duration-300"
                 title="Eliminar de favoritos"
               >
                 <span className="material-symbols-outlined text-[20px] font-bold">close</span>
@@ -120,9 +123,9 @@ export const RoutinesPage: React.FC = () => {
         </div>
       )}
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-gray-900 dark:text-white">Mis Rutinas Diarias 📅</h1>
-        <p className="text-gray-500 mt-2">Pequeños pasos para grandes cambios.</p>
+      <div className="mb-10">
+        <h1 className="text-3xl font-black text-white flex items-center gap-3"><span className="text-3xl drop-shadow-[0_0_15px_rgba(245,158,11,0.5)]">📅</span> Mis Rutinas Diarias</h1>
+        <p className="text-white/50 mt-2 font-medium">Pequeños pasos para grandes cambios.</p>
       </div>
 
       <div className="space-y-4">
@@ -130,40 +133,43 @@ export const RoutinesPage: React.FC = () => {
           <div
             key={routine.id}
             onClick={() => handleToggle(routine.id)}
-            className={`group flex items-center gap-4 p-5 rounded-3xl transition-all cursor-pointer border ${routine.completed
-              ? 'bg-gray-50 dark:bg-white/5 border-transparent opacity-60'
-              : 'bg-white dark:bg-surface-dark border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:border-primary/20'
+            className={`group relative overflow-hidden flex items-center gap-4 p-5 rounded-[2rem] transition-all duration-300 cursor-pointer border ${routine.completed
+              ? 'bg-white/5 border-white/5 opacity-50 grayscale'
+              : 'bg-[#0a1114]/80 backdrop-blur-xl border-white/10 shadow-lg hover:shadow-[0_0_30px_rgba(34,211,238,0.1)] hover:border-primary/30 hover:-translate-y-1'
               }`}
           >
-            <div className={`size-12 rounded-2xl flex items-center justify-center text-2xl transition-colors ${routine.completed
-              ? 'bg-green-100 text-green-600'
-              : 'bg-primary/10 text-primary'
+            {/* Subtle highlight */}
+            {!routine.completed && <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[30px] rounded-full pointer-events-none group-hover:bg-primary/10 transition-colors duration-500"></div>}
+
+            <div className={`relative z-10 size-14 rounded-[1.2rem] flex items-center justify-center text-2xl transition-all duration-300 ${routine.completed
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20'
+              : 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(34,211,238,0.2)]'
               }`}>
-              <span className="material-symbols-outlined">{routine.completed ? 'check' : getIcon(routine.category)}</span>
+              <span className="material-symbols-outlined font-black">{routine.completed ? 'check_circle' : getIcon(routine.category)}</span>
             </div>
 
-            <div className="flex-1">
-              <h3 className={`font-bold text-lg transition-colors ${routine.completed ? 'text-gray-500 line-through' : 'text-gray-900 dark:text-white'}`}>
+            <div className="flex-1 relative z-10">
+              <h3 className={`font-black tracking-wide text-lg transition-colors ${routine.completed ? 'text-white/40 line-through' : 'text-white'}`}>
                 {routine.text}
               </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-lg">{routine.time}</span>
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className={`text-xs font-bold px-2.5 py-1 ${routine.completed ? 'bg-white/5 text-white/30' : 'bg-white/10 text-white/60'} rounded-lg`}>{routine.time}</span>
                 {routine.source && (
-                  <span className="text-[10px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded-lg uppercase tracking-wide">
+                  <span className={`text-[9px] font-black px-2.5 py-1 uppercase tracking-widest ${routine.completed ? 'bg-white/5 text-white/30' : 'bg-primary/10 text-primary'} rounded-lg`}>
                     {routine.source}
                   </span>
                 )}
               </div>
             </div>
 
-            <button onClick={(e: React.MouseEvent) => handleDelete(routine.id, e)} className="p-2 text-gray-300 hover:text-red-400 transition-all">
+            <button onClick={(e: React.MouseEvent) => handleDelete(routine.id, e)} className="relative z-10 p-3 text-white/20 hover:bg-red-500/10 hover:text-red-400 rounded-2xl transition-all duration-300">
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>
         ))}
 
         {routines.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-white/40 font-bold bg-[#0a1114]/60 backdrop-blur-xl border border-white/5 rounded-[2.5rem] border-dashed">
             No tienes rutinas activas. Busca un síntoma para agregar recomendaciones.
           </div>
         )}
@@ -201,30 +207,31 @@ export const HistoryPage: React.FC = () => {
 
   return (
     <div className="flex-1 w-full max-w-4xl mx-auto px-6 py-12 pt-32 pb-24">
-      <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-8">Tu Historial 🕰️</h1>
+      <h1 className="text-3xl font-black text-white mb-10 flex items-center gap-3"><span className="text-3xl drop-shadow-[0_0_15px_rgba(156,163,175,0.5)]">🕰️</span> Tu Historial</h1>
       <div className="space-y-4">
-        {historyItems.length === 0 ? <p className="text-gray-500">Sin registros.</p> : historyItems.map((item: SymptomLogEntry) => {
+        {historyItems.length === 0 ? <p className="text-center py-20 bg-[#0a1114]/60 backdrop-blur-xl rounded-[2.5rem] border border-white/5 border-dashed text-white/40 font-bold">Aún no hay registros en tu historial.</p> : historyItems.map((item: SymptomLogEntry) => {
           const symptomName = item.notes?.replace('Síntoma: ', '').replace('Búsqueda: ', '').trim();
           return (
             <div
               key={item.id}
               onClick={() => symptomName ? navigate(`/symptom-detail?q=${encodeURIComponent(symptomName)}`) : null}
-              className={`bg-white dark:bg-surface-dark p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all ${symptomName ? 'cursor-pointer hover:border-primary/40 hover:shadow-md active:scale-[0.98]' : ''}`}
+              className={`relative overflow-hidden bg-[#0a1114]/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/5 transition-all duration-300 group ${symptomName ? 'cursor-pointer hover:border-primary/40 hover:shadow-[0_0_30px_rgba(34,211,238,0.1)] active:scale-[0.98]' : ''}`}
             >
-              <div className="flex justify-between mb-2">
-                <span className="text-xs font-bold text-gray-400">{new Date(item.date).toLocaleDateString()}</span>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold ${item.intensity > 0 ? 'text-primary' : 'text-gray-400 uppercase tracking-widest'}`}>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-primary/10 transition-colors duration-700"></div>
+              <div className="flex justify-between mb-3 relative z-10">
+                <span className="text-xs font-bold text-white/40 tracking-wider">{new Date(item.date).toLocaleDateString()}</span>
+                <div className="flex items-center gap-3">
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg ${item.intensity > 0 ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-white/5 text-white/50 border border-white/10'}`}>
                     {item.intensity > 0 ? `Intensidad ${item.intensity}` : '👁️ Visualizado'}
                   </span>
-                  <button onClick={(e: React.MouseEvent) => handleDelete(item.id, e)} className="text-gray-300 hover:text-red-400 transition-colors p-1">
-                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                  <button onClick={(e: React.MouseEvent) => handleDelete(item.id, e)} className="text-white/20 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-xl transition-all duration-300">
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
                   </button>
                 </div>
               </div>
-              <p className="text-gray-800 dark:text-gray-200 font-medium">
+              <p className="text-white font-medium text-lg relative z-10">
                 {item.notes}
-                {symptomName && <span className="material-symbols-outlined inline-block align-middle ml-2 text-primary opacity-50 text-sm">arrow_forward</span>}
+                {symptomName && <span className="material-symbols-outlined inline-block align-middle ml-2 text-primary opacity-50 text-sm group-hover:translate-x-1 group-hover:opacity-100 transition-all">arrow_forward</span>}
               </p>
             </div>
           );
@@ -311,10 +318,10 @@ export const ProfilePage: React.FC = () => {
   const userBadges = user.badges || [];
 
   const allBadges = [
-    { name: "Despertar", icon: "check_circle", color: "bg-cyan-900/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.3)]" },
-    { name: "Constancia", icon: "local_fire_department", color: "bg-orange-900/20 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(251,146,60,0.3)]" },
-    { name: "Sabiduría", icon: "psychology", color: "bg-purple-900/20 text-purple-400 border border-purple-500/30 shadow-[0_0_15px_rgba(192,132,252,0.3)]" },
-    { name: "Alquimista", icon: "science", color: "bg-emerald-900/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(52,211,153,0.3)]" },
+    { name: "Despertar", emoji: "👁️", color: "bg-cyan-900/30 text-cyan-300 border border-cyan-400/50 shadow-[0_0_20px_rgba(34,211,238,0.4)]" },
+    { name: "Constancia", emoji: "🔥", color: "bg-orange-900/30 text-orange-400 border border-orange-500/50 shadow-[0_0_20px_rgba(251,146,60,0.4)]" },
+    { name: "Sabiduría", emoji: "🦉", color: "bg-purple-900/30 text-purple-400 border border-purple-500/50 shadow-[0_0_20px_rgba(192,132,252,0.4)]" },
+    { name: "Alquimista", emoji: "⚗️", color: "bg-emerald-900/30 text-emerald-400 border border-emerald-500/50 shadow-[0_0_20px_rgba(52,211,153,0.4)]" },
   ];
 
   const benefits = [
@@ -404,22 +411,29 @@ export const ProfilePage: React.FC = () => {
 
       {/* 3. CONSTELLATION (BADGES) */}
       <div className="mb-12">
-        <h3 className="text-lg font-black text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-          <span className="material-symbols-outlined text-purple-500">stars</span>
+        <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2">
+          <span className="text-2xl animate-pulse">🌌</span>
           Constelación de Logros
         </h3>
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+        <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x px-2 -mx-2">
           {allBadges.map((badge, idx) => {
             const isUnlocked = userBadges.includes(badge.name);
             return (
-              <div key={idx} className={`min-w-[100px] flex flex-col items-center gap-2 transition-all duration-500 ${isUnlocked ? 'opacity-100 scale-100' : 'opacity-40 grayscale scale-95'}`}>
-                <div className={`size-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg transition-all duration-300 ${isUnlocked ? badge.color : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
-                  <span className="material-symbols-outlined text-[32px]">{badge.icon}</span>
+              <div key={idx} className={`snap-center min-w-[110px] flex flex-col items-center gap-3 transition-all duration-500 ${isUnlocked ? 'opacity-100 scale-100 hover:scale-105 hover:-translate-y-1' : 'opacity-30 grayscale scale-95'}`}>
+                <div className={`relative size-20 rounded-[1.5rem] flex items-center justify-center text-4xl shadow-xl transition-all duration-500 overflow-hidden border ${isUnlocked ? badge.color + ' animate-in fade-in zoom-in' : 'bg-white/5 border-white/10 text-white/20'}`}>
+                  {isUnlocked && <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-50"></div>}
+                  <span className={`relative z-10 ${!isUnlocked && 'opacity-20'}`}>{badge.emoji}</span>
                 </div>
-                <span className="text-xs font-bold text-gray-600 dark:text-gray-400 text-center max-w-[80px] leading-tight">
-                  {badge.name}
-                </span>
-                {!isUnlocked && <span className="text-[9px] text-gray-300 uppercase tracking-widest">Locked</span>}
+                <div className="flex flex-col items-center gap-1">
+                  <span className={`text-xs font-black tracking-wide text-center leading-tight ${isUnlocked ? 'text-white' : 'text-white/40'}`}>
+                    {badge.name}
+                  </span>
+                  {!isUnlocked ? (
+                    <span className="text-[9px] text-white/30 uppercase tracking-[0.2em] font-bold bg-white/5 px-2 py-0.5 rounded-md">Locked</span>
+                  ) : (
+                    <span className="text-[9px] text-emerald-400 uppercase tracking-[0.2em] font-bold bg-emerald-400/10 px-2 py-0.5 rounded-md animate-pulse">Earned</span>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -428,60 +442,63 @@ export const ProfilePage: React.FC = () => {
 
       {/* 4. SUBSCRIPTION MANAGEMENT */}
       <div className="mb-12" ref={subscriptionRef}>
-        <h3 className="text-lg font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-amber-400">workspace_premium</span>
+        <h3 className="text-lg font-black text-white mb-4 flex items-center gap-2">
+          <span className="text-2xl drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">💳</span>
           Tu Suscripción
         </h3>
         <ManageSubscription isPremium={user.isPremium} userEmail={user.email} />
         {!user.isPremium && (
           <button
             onClick={() => navigate('/upgrade')}
-            className="w-full mt-3 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="relative overflow-hidden w-full mt-4 h-14 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black uppercase tracking-[0.2em] text-xs shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
           >
-            <span className="material-symbols-outlined">diamond</span>
-            Ver Planes Premium
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+            <span className="text-lg relative z-10 transition-transform group-hover:scale-110">👑</span>
+            <span className="relative z-10">Conocer Beneficios</span>
           </button>
         )}
       </div>
 
       {/* 5. HARMONY MENU (SETTINGS) */}
-      <div className="bg-white dark:bg-surface-dark rounded-[2.5rem] p-2 shadow-sm border border-gray-100 dark:border-gray-800">
-
+      <div className="bg-[#0a1114]/60 backdrop-blur-xl rounded-[2.5rem] p-3 shadow-xl border border-white/5 mt-8 mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[50px] rounded-full pointer-events-none"></div>
 
         <button
           onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-          className="w-full flex items-center justify-between p-4 px-6 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl transition-colors group"
+          className="w-full flex items-center justify-between p-4 px-5 hover:bg-white/5 rounded-[1.5rem] transition-colors group relative z-10"
         >
           <div className="flex items-center gap-4">
-            <div className={`size-10 rounded-full flex items-center justify-center transition-colors ${notificationsEnabled ? 'bg-primary/10 text-primary' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
-              <span className="material-symbols-outlined">{notificationsEnabled ? 'notifications_active' : 'notifications_off'}</span>
+            <div className={`size-12 rounded-[1rem] flex items-center justify-center text-2xl transition-colors border ${notificationsEnabled ? 'bg-primary/20 border-primary/30 shadow-[0_0_15px_rgba(34,211,238,0.2)]' : 'bg-white/5 border-white/10 grayscale opacity-50'}`}>
+              {notificationsEnabled ? '🔔' : '🔕'}
             </div>
             <div className="text-left">
-              <span className="block font-bold text-gray-700 dark:text-gray-200">Notificaciones</span>
-              <span className="text-xs text-gray-400">{notificationsEnabled ? 'Activadas' : 'Silencio'}</span>
+              <span className="block font-bold text-white text-base">Notificaciones</span>
+              <span className="text-xs text-white/50">{notificationsEnabled ? 'Recordatorios diarios ON' : 'Pausadas'}</span>
             </div>
           </div>
-          <span className={`material-symbols-outlined text-4xl ${notificationsEnabled ? 'text-primary' : 'text-gray-300'}`}>
-            {notificationsEnabled ? 'toggle_on' : 'toggle_off'}
-          </span>
+          <div className={`w-12 h-6 rounded-full p-1 transition-colors ${notificationsEnabled ? 'bg-primary/50' : 'bg-white/10'}`}>
+            <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${notificationsEnabled ? 'translate-x-6 shadow-[0_0_10px_white]' : 'translate-x-0'}`}></div>
+          </div>
         </button>
 
-
-
-        <div className="h-px bg-gray-100 dark:bg-gray-800 mx-4 my-2"></div>
+        <div className="h-px bg-white/10 mx-6 my-3 relative z-10"></div>
 
         <button
           onClick={() => { authService.logout(); navigate('/'); }}
-          className="w-full flex items-center justify-between p-4 px-6 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-2xl transition-colors group"
+          className="w-full flex items-center justify-between p-4 px-5 hover:bg-red-500/10 rounded-[1.5rem] transition-colors group relative z-10 border border-transparent hover:border-red-500/20"
         >
           <div className="flex items-center gap-4">
-            <div className="size-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-400 group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
-              <span className="material-symbols-outlined">logout</span>
+            <div className="size-12 rounded-[1rem] bg-red-500/10 border border-red-500/20 flex items-center justify-center text-2xl group-hover:bg-red-500/20 group-hover:scale-105 transition-all shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+              🚪
             </div>
-            <span className="font-bold text-red-500">Cerrar Sesión</span>
+            <div className="text-left">
+              <span className="block font-bold text-red-500 text-base">Cerrar Sesión</span>
+              <span className="text-xs text-red-400/50">Hasta la próxima sanación</span>
+            </div>
           </div>
+          <span className="material-symbols-outlined text-red-500/50 group-hover:text-red-500 group-hover:translate-x-1 transition-all">chevron_right</span>
         </button>
-      </div >
+      </div>
 
 
 

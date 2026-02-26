@@ -109,7 +109,7 @@ export const HomePage: React.FC = () => {
   const levelTitle = user?.level === 1 ? "Semilla Despierta" : user?.level === 2 ? "Brote de Luz" : "Loto en Expansión";
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col pb-32 bg-[#fcfdfe] dark:bg-background-dark">
+    <div className="relative flex min-h-screen w-full flex-col pb-32 bg-[#0a1114]">
       {/* Onboarding Tour */}
       {showOnboarding && <OnboardingTour onComplete={completeOnboarding} />}
 
@@ -122,27 +122,27 @@ export const HomePage: React.FC = () => {
       </button>
 
       {/* Mobile Navigation Bar (TOP HEADER) */}
-      <div className="md:hidden fixed top-0 left-0 w-full bg-white/90 dark:bg-[#1a2c32]/95 backdrop-blur-lg border-b border-gray-100 dark:border-gray-800 z-50 shadow-sm transition-all duration-300">
+      <div className="md:hidden fixed top-0 left-0 w-full bg-[#0a1114]/80 backdrop-blur-xl border-b border-white/5 z-50 shadow-sm transition-all duration-300">
         <div className="flex flex-col max-w-[1200px] mx-auto w-full">
-          <div className="flex items-center justify-between px-5 py-3">
+          <div className="flex items-center justify-between px-5 py-3 relative z-10">
             <div className="flex items-center gap-3">
-              <div className="size-9 bg-primary/10 rounded-xl flex items-center justify-center text-primary shadow-inner">
+              <div className="size-9 bg-primary/20 border border-primary/30 rounded-xl flex items-center justify-center text-primary shadow-[0_0_15px_rgba(34,211,238,0.2)]">
                 <span className="material-symbols-outlined text-xl">spa</span>
               </div>
               <div>
-                <h2 className="text-[#0d181c] dark:text-white text-base font-black tracking-tight leading-none">SanArte</h2>
-                <p className="text-[8px] uppercase tracking-[0.2em] font-black text-primary/60 mt-0.5">{levelTitle}</p>
+                <h2 className="text-white text-base font-black tracking-tight leading-none">SanArte</h2>
+                <p className="text-[8px] uppercase tracking-[0.2em] font-black text-primary/80 mt-0.5">{levelTitle}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex flex-col items-end gap-1 mr-2">
-                <div className="flex items-center gap-1 text-[10px] font-black text-orange-500 uppercase">
+                <div className="flex items-center gap-1 text-[10px] font-black text-orange-400 uppercase">
                   <span className="material-symbols-outlined text-sm">local_fire_department</span>
                   <span>{streak} días</span>
                 </div>
-                <div className="w-24 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-primary to-purple-500" style={{ width: `${levelProgress}%` }}></div>
+                <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-primary to-purple-500 shadow-[0_0_10px_rgba(34,211,238,0.5)]" style={{ width: `${levelProgress}%` }}></div>
                 </div>
               </div>
               <div
@@ -163,62 +163,64 @@ export const HomePage: React.FC = () => {
             </div>
           </div>
           {/* Mobile Level Progress Bar */}
-          <div className="sm:hidden h-1 w-full bg-gray-100 dark:bg-gray-800">
-            <div className="h-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-1000" style={{ width: `${levelProgress}%` }}></div>
+          <div className="sm:hidden h-1 w-full bg-white/5 relative z-10">
+            <div className="h-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-1000 shadow-[0_0_10px_rgba(34,211,238,0.5)]" style={{ width: `${levelProgress}%` }}></div>
           </div>
         </div>
       </div>
 
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-5 py-6 pt-32 md:pt-36">
-        <div className="mb-6 flex justify-between items-end">
+        <div className="mb-6 flex justify-between items-end relative z-10">
           <div className="flex flex-col gap-1">
 
-            <h1 className="text-[#0d181c] dark:text-white text-2xl md:text-3xl font-black leading-tight tracking-tight text-neon-cyan">
+            <h1 className="text-white text-2xl md:text-3xl font-black leading-tight tracking-tight drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">
               Hola, {user?.name ? user.name.split(' ')[0] : 'Sanador/a'} 🌿
             </h1>
-            <p className="text-gray-500 dark:text-text-sub text-sm">
+            <p className="text-white/60 text-sm font-medium">
               ¿Qué parte de tu alma desea expresarse hoy?
             </p>
           </div>
         </div>
 
         {/* AD BANNER */}
-        <AdBanner />
+        <div className="relative z-10">
+          <AdBanner />
+        </div>
 
-        <form onSubmit={handleHomeSearch} className="mb-8 group relative w-full">
+        <form onSubmit={handleHomeSearch} className="mb-10 group relative w-full z-10">
           <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-            <span className="material-symbols-outlined text-gray-400 group-focus-within:text-primary transition-colors text-xl">search</span>
+            <span className="material-symbols-outlined text-white/40 group-focus-within:text-primary transition-colors text-xl">search</span>
           </div>
           <input
             type="text"
             value={homeSearchQuery}
             onChange={(e) => setHomeSearchQuery(e.target.value)}
-            placeholder="¿Qué siente tu cuerpo?"
-            className="w-full h-14 pl-12 pr-28 rounded-2xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 shadow-lg shadow-gray-200/50 dark:shadow-none text-base placeholder-gray-400 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+            placeholder="Ej: Ansiedad, Dolor de cabeza, Miedo..."
+            className="w-full h-14 pl-12 pr-28 rounded-[1.5rem] bg-[#0a1114]/60 backdrop-blur-xl border border-white/5 shadow-lg shadow-black/20 text-base text-white placeholder-white/20 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all outline-none font-medium"
           />
-          <button type="submit" className="absolute right-2 top-2 bottom-2 bg-primary text-white hover:bg-primary-hover px-6 rounded-xl font-bold uppercase tracking-wider text-[10px] shadow-sm transition-all flex items-center justify-center active:scale-95">
+          <button type="submit" className="absolute right-2 top-2 bottom-2 bg-gradient-to-r from-primary to-cyan-500 text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] px-6 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-sm transition-all duration-300 flex items-center justify-center active:scale-95 group/btn">
             Buscar
           </button>
         </form>
 
         {/* BREATHE SOS - Moved Below Search */}
-        <div className={`mb-8 w-full rounded-[2rem] p-6 shadow-xl transition-all duration-700 relative overflow-hidden group ${isBreathing ? 'bg-indigo-600 h-[280px]' : 'bg-gradient-to-br from-[#10b981] to-[#059669] h-auto'}`}>
-          <div className="absolute top-0 right-0 w-56 h-56 bg-white/10 rounded-full blur-[80px] -mr-16 -mt-16 pointer-events-none group-hover:scale-110 transition-transform duration-1000"></div>
+        <div className={`mb-10 w-full rounded-[2rem] p-6 shadow-2xl transition-all duration-700 relative overflow-hidden group border border-white/5 backdrop-blur-xl ${isBreathing ? 'bg-[#0a1114]/90 h-[280px]' : 'bg-[#0a1114]/60 h-auto hover:border-white/10'}`}>
+          <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] -mr-16 -mt-16 pointer-events-none transition-all duration-1000 ${isBreathing ? 'bg-indigo-500/20 scale-150 relative z-0' : 'bg-emerald-500/10 group-hover:bg-emerald-500/20'}`}></div>
 
           {!isBreathing ? (
             <div className="flex items-center justify-between relative z-10">
               <div className="flex gap-4 items-center">
-                <div className="size-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/30 text-white">
-                  <span className="material-symbols-outlined text-2xl">air</span>
+                <div className="size-14 bg-white/5 rounded-[1.2rem] border border-white/10 flex items-center justify-center backdrop-blur-md text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                  <span className="material-symbols-outlined text-[28px]">air</span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-white mb-0.5 text-neon-green">Pausa Sagrada</h3>
-                  <p className="text-white/80 text-xs font-medium max-w-[200px] leading-tight">Técnica de respiración para ataques de pánico o ansiedad. Toca el botón y reinicia tu sistema parasimpático.</p>
+                  <h3 className="text-lg font-black text-white mb-0.5 drop-shadow-md">Pausa Sagrada</h3>
+                  <p className="text-white/50 text-xs font-medium max-w-[200px] leading-tight">Técnica para la ansiedad. Toca el botón y reinicia tu centro.</p>
                 </div>
               </div>
               <button
                 onClick={() => { setIsBreathing(true); setBreathCount(4); setBreathPhase('inhale'); }}
-                className="bg-white text-emerald-700 px-5 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-emerald-50 transition-all active:scale-95 shadow-lg"
+                className="bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/50 text-emerald-400 px-5 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all duration-300 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]"
               >
                 Respirar
               </button>
@@ -249,31 +251,33 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* 2x2 Grid - Polished */}
-        <div className="grid grid-cols-2 gap-3 mb-10">
+        <div className="grid grid-cols-2 gap-4 mb-10 relative z-10">
           {[
-            { id: 'community', name: 'Comunidad', emoji: '🤝', color: 'bg-pink-50 text-pink-500 border-pink-100', xp: '+10 Luz' },
-            { id: 'favorites', name: 'Favoritos', emoji: '💖', color: 'bg-rose-50 text-rose-500 border-rose-100', xp: 'Ver listado' },
-            { id: 'routines', name: 'Rutinas', emoji: '📅', color: 'bg-orange-50 text-orange-500 border-orange-100', xp: '+50 Luz' },
-            { id: 'journal', name: 'Diario', emoji: '📖', color: 'bg-cyan-50 text-cyan-500 border-cyan-100', xp: 'Tu sanación' },
+            { id: 'community', name: 'Comunidad', emoji: '🤝', badge: 'bg-primary/20 text-primary border-primary/30', xp: '+10 Luz' },
+            { id: 'favorites', name: 'Favoritos', emoji: '💖', badge: 'bg-pink-500/20 text-pink-400 border-pink-500/30', xp: 'Ver listado' },
+            { id: 'routines', name: 'Rutinas', emoji: '📅', badge: 'bg-orange-500/20 text-orange-400 border-orange-500/30', xp: '+50 Luz' },
+            { id: 'journal', name: 'Diario', emoji: '📖', badge: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30', xp: 'Tu sanación' },
           ].map(item => (
             <div
               key={item.id}
               onClick={() => navigate(`/${item.id}`)}
-              className={`bg-white dark:bg-surface-dark p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer hover:border-primary/20 group relative overflow-hidden h-32`}
+              className={`bg-[#0a1114]/60 backdrop-blur-xl p-5 rounded-[2rem] shadow-lg border border-white/5 flex flex-col items-center justify-center gap-3 active:scale-95 transition-all duration-300 cursor-pointer hover:border-white/20 group relative overflow-hidden h-36`}
             >
-              <div className={`size-10 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform ${item.color}`}>
+              <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-full blur-[20px] -mr-8 -mt-8 pointer-events-none group-hover:bg-primary/10 transition-colors duration-500"></div>
+
+              <div className={`size-12 rounded-[1.2rem] flex items-center justify-center text-2xl group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-500 border ${item.badge} shadow-lg`}>
                 {item.emoji}
               </div>
               <div className="text-center">
-                <span className="block text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-tight">{item.name}</span>
-                <span className="block text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{item.xp}</span>
+                <span className="block text-sm font-black text-white group-hover:text-primary transition-colors duration-300">{item.name}</span>
+                <span className="block text-[9px] font-bold text-white/40 uppercase tracking-widest mt-1 group-hover:text-white/60 transition-colors">{item.xp}</span>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="text-center px-8 py-4">
-          <p className="text-sm font-serif italic text-gray-400 dark:text-gray-600">"Toda sanación física comienza en la quietud de la mente."</p>
+        <div className="text-center px-8 py-6 bg-white/5 rounded-[2rem] border border-white/5 backdrop-blur-xl relative z-10">
+          <p className="text-sm font-serif italic text-white/60 drop-shadow-sm">"Toda sanación física comienza en la quietud de la mente."</p>
         </div>
 
       </main>
@@ -331,19 +335,19 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 w-full pb-24 min-h-screen bg-[#fcfdfe] dark:bg-background-dark md:pt-20">
-      <div className="sticky top-0 z-20 bg-white/90 dark:bg-background-dark/90 backdrop-blur-xl pt-4 pb-4 px-6 border-b border-gray-100 dark:border-gray-800 md:static md:bg-transparent md:border-none md:p-0 md:mb-8">
+    <div className="flex-1 w-full pb-24 min-h-screen bg-[#0a1114] md:pt-20">
+      <div className="sticky top-0 z-20 bg-[#0a1114]/80 backdrop-blur-xl pt-4 pb-4 px-6 border-b border-white/5 md:static md:bg-transparent md:border-none md:p-0 md:mb-8 transition-all">
         <div className="max-w-2xl mx-auto flex items-center gap-4">
-          <button onClick={() => navigate('/home')} className="size-12 rounded-2xl bg-gray-50 dark:bg-surface-dark flex items-center justify-center text-gray-400 hover:text-primary transition-colors md:hidden">
+          <button onClick={() => navigate('/home')} className="size-12 rounded-[1.2rem] bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all duration-300 md:hidden shadow-lg">
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div ref={searchContainerRef} className="relative flex-1 group">
             <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-              <span className="material-symbols-outlined text-gray-400 text-xl">search</span>
+              <span className="material-symbols-outlined text-white/30 group-focus-within:text-primary transition-colors text-xl">search</span>
             </div>
             <input
-              className="w-full h-14 pl-12 pr-12 rounded-2xl border-none bg-gray-50 dark:bg-surface-dark text-lg placeholder-gray-400 focus:ring-4 focus:ring-primary/10 transition-all outline-none"
-              placeholder="¿Qué te duele?"
+              className="w-full h-14 pl-12 pr-12 rounded-[1.5rem] bg-[#0a1114]/60 backdrop-blur-xl border border-white/5 shadow-lg shadow-black/20 text-white placeholder-white/20 focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all outline-none font-medium"
+              placeholder="Ej: Tristeza, Dolor lumbar, Ansiedad..."
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -362,21 +366,23 @@ export const SearchPage: React.FC = () => {
             <div className="relative w-48 h-48 flex items-center justify-center mb-16">
               <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
               <div className="absolute inset-6 border border-purple-400/20 rounded-full animate-[spin_7s_linear_infinite_reverse]"></div>
-              <div className="relative w-6 h-6 bg-primary rounded-full shadow-[0_0_30px_#0db9f2] animate-pulse"></div>
+              <div className="relative size-10 bg-primary/20 border border-primary/50 text-primary flex items-center justify-center rounded-full shadow-[0_0_30px_#0db9f2] animate-pulse">
+                <span className="material-symbols-outlined text-2xl">magic_button</span>
+              </div>
             </div>
-            <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-6 font-heading tracking-tight">Sintonizando...</h3>
-            <p className="text-primary font-bold italic h-8">{phrases[phraseIndex]}</p>
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Sintonizando...</h3>
+            <p className="text-primary/80 font-bold italic h-8 tracking-wide drop-shadow-md">{phrases[phraseIndex]}</p>
           </div>
         )}
 
 
         {!isLoading && results.length === 0 && hasSearched && (
-          <div className="text-center py-20 animate-in fade-in zoom-in duration-500">
-            <div className="text-6xl mb-4">🌪️</div>
-            <h3 className="text-2xl font-black text-gray-800 dark:text-gray-200 mb-2">La energía está difusa...</h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+          <div className="text-center py-20 animate-in fade-in zoom-in duration-500 bg-[#0a1114]/60 backdrop-blur-xl rounded-[2.5rem] border border-white/5 border-dashed relative overflow-hidden group">
+            <div className="text-6xl mb-6 opacity-80 group-hover:scale-110 transition-transform duration-500">🌪️</div>
+            <h3 className="text-2xl font-black text-white mb-3">La energía está difusa...</h3>
+            <p className="text-white/50 max-w-md mx-auto font-medium">
               No encontramos un síntoma exacto con ese nombre. <br />
-              Intenta usar palabras más simples como "Cabeza", "Estómago" o "Miedo".
+              Intenta usar palabras simples como "Cabeza", "Estómago" o "Miedo".
             </p>
           </div>
         )}
@@ -388,25 +394,13 @@ export const SearchPage: React.FC = () => {
 
             {/* Fallback Warning - Only shows when offline/fallback data is used */}
             {results[0] && results[0].isFallback && (
-              <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/50 p-4 rounded-2xl flex items-start gap-3 mb-2 animate-in fade-in slide-in-from-top-2">
-                <span className="material-symbols-outlined text-orange-500 mt-0.5">wifi_off</span>
-                <div>
-                  <h4 className="font-bold text-orange-800 dark:text-orange-200 text-sm">Conexión Débil con la Fuente</h4>
-                  <p className="text-orange-600 dark:text-orange-300 text-xs mt-1">
-                    No pudimos conectar con la Inteligencia Artificial. Mostrando resultados básicos de emergencia. Por favor verifica tu conexión o configuración.
+              <div className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-[2rem] flex items-start gap-4 mb-4 animate-in fade-in slide-in-from-top-2 backdrop-blur-xl">
+                <span className="material-symbols-outlined text-orange-400 text-2xl drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]">wifi_off</span>
+                <div className="flex-1">
+                  <h4 className="font-black text-orange-400 text-sm tracking-wider uppercase mb-1">Conexión Débil</h4>
+                  <p className="text-orange-200/60 text-xs font-medium leading-relaxed">
+                    Mostrando resultados básicos de emergencia. La conexión con la Inteligencia Artificial está pausada.
                   </p>
-
-                  {typeof results[0].errorMessage === 'string' && (
-                    <details className="mt-2 group/details">
-                      <summary className="text-[10px] font-bold text-orange-500 cursor-pointer hover:underline select-none list-none flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[12px] group-open/details:rotate-90 transition-transform">chevron_right</span>
-                        Ver detalle técnico del error
-                      </summary>
-                      <pre className="mt-2 p-2 bg-orange-100 dark:bg-orange-950/50 rounded-lg text-[10px] text-orange-800 dark:text-orange-200 overflow-x-auto whitespace-pre-wrap font-mono border border-orange-200 dark:border-orange-900">
-                        {results[0].errorMessage}
-                      </pre>
-                    </details>
-                  )}
                 </div>
               </div>
             )}
@@ -417,23 +411,25 @@ export const SearchPage: React.FC = () => {
                 <div
                   key={index}
                   onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(result.name || '')}`)}
-                  className="group bg-white dark:bg-surface-dark p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm transition-all cursor-pointer hover:border-primary/40 hover:-translate-y-1 relative overflow-hidden"
+                  className="group bg-[#0a1114]/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white/5 shadow-lg transition-all duration-300 cursor-pointer hover:border-primary/40 hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined text-primary text-xl">arrow_forward</span>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-primary/10 transition-colors duration-700"></div>
+
+                  <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-4 group-hover:translate-x-0">
+                    <span className="material-symbols-outlined text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)] text-xl">arrow_forward</span>
                   </div>
 
-                  <div className="mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/80 mb-1 block">
+                  <div className="mb-3 relative z-10">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-primary/80 mb-1 block">
                       {result.category || 'General'}
                     </span>
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white capitalize leading-tight">
+                    <h3 className="font-black text-xl text-white capitalize leading-tight group-hover:text-primary transition-colors">
                       {result.name || 'Sin nombre'}
                     </h3>
                   </div>
 
-                  <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed line-clamp-3">
-                    {result.emotionalMeaning || 'Sin descripción disponible.'}
+                  <p className="text-white/60 text-sm leading-relaxed line-clamp-2 md:line-clamp-3 relative z-10 font-medium h-10 md:h-14">
+                    {result.emotionalMeaning || 'Explora el significado emocional oculto detrás de esto.'}
                   </p>
                 </div>
               )

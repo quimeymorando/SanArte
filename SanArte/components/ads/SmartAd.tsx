@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsPremium } from './useIsPremium';
 import AdSenseSlot from './AdSenseSlot';
+import { trackMonetizationEvent } from '../../services/monetizationService';
 
 interface SmartAdProps {
     /** AdSense slot ID for real ads */
@@ -36,6 +37,18 @@ const SmartAd: React.FC<SmartAdProps> = ({
         setShowHouseAd(impression === 0 || !slotId);
     }, [houseAdFrequency, slotId]);
 
+    useEffect(() => {
+        if (isPremium) return;
+        if (showHouseAd) {
+            trackMonetizationEvent('ad_impression_house', { placement: 'smart_ad' });
+            return;
+        }
+        trackMonetizationEvent('ad_impression_network', {
+            placement: 'smart_ad',
+            slot_id: slotId || 'missing'
+        });
+    }, [isPremium, showHouseAd, slotId]);
+
     // Premium users don't see ads at all
     if (isPremium) return null;
 
@@ -44,7 +57,10 @@ const SmartAd: React.FC<SmartAdProps> = ({
         return (
             <div
                 className={`w-full bg-[#0a1114]/60 backdrop-blur-md border border-white/5 hover:border-amber-500/20 rounded-2xl p-4 my-4 relative overflow-hidden group cursor-pointer transition-all ${className}`}
-                onClick={() => navigate('/profile?upgrade=true')}
+                onClick={() => {
+                    trackMonetizationEvent('ad_click_house', { placement: 'smart_ad' });
+                    navigate('/profile?upgrade=true');
+                }}
             >
                 {/* Subtle shimmer */}
                 <div className="absolute inset-0 translate-x-[-100%] group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none" />

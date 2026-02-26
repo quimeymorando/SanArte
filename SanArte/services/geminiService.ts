@@ -35,10 +35,13 @@ const callGeminiDirect = async (messages: any[], jsonMode: boolean = false) => {
   const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
 
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+
     const response = await fetch('/api/gemini', {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
       },
       body: JSON.stringify({ messages, jsonMode }),
       signal: controller.signal

@@ -71,6 +71,7 @@ Si algo falla, comparte:
 Configura en el proyecto de Vercel:
 
 - `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `LEMON_SQUEEZY_WEBHOOK_SECRET`
 - `GEMINI_API_KEY`
