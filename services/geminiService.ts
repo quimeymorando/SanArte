@@ -3,6 +3,8 @@ import { supabase } from "../supabaseClient";
 import { logger } from "../utils/logger";
 import { symptomsList } from "./symptomsList";
 
+const METHODOLOGY_VERSION = "depth-v2";
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function retryWithBackoff<T>(
@@ -293,9 +295,9 @@ const DETAIL_HEADINGS: Record<DetailTextField, string> = {
 };
 
 const DETAIL_MIN_LENGTH: Record<DetailTextField, number> = {
-  zona_detalle: 230,
-  emociones_detalle: 380,
-  ejercicio_conexion: 220,
+  zona_detalle: 320,
+  emociones_detalle: 720,
+  ejercicio_conexion: 260,
   alternativas_fisicas: 180,
   aromaterapia_sahumerios: 150,
   remedios_naturales: 150,
@@ -306,16 +308,41 @@ const DETAIL_MIN_LENGTH: Record<DetailTextField, number> = {
   rutina_integral: 180,
 };
 
+const LEGACY_RESPONSE_MARKERS = [
+  "📍 Zona Corporal",
+  "🧠 No es solo físico",
+  "🫧 El Encuentro",
+  "⏱️ Ritual (15 min)",
+  "🔥 Tríada Emocional"
+];
+
+const containsLegacyMarker = (text: string): boolean => {
+  return LEGACY_RESPONSE_MARKERS.some((marker) => text.includes(marker));
+};
+
+const hasPlaceholderArtifacts = (text: string): boolean => /\[[^\]]+\]/.test(text);
+
+const payloadLooksLegacy = (payload: Partial<SymptomDetail>): boolean => {
+  const fieldsToCheck = [
+    String(payload.zona_detalle || ""),
+    String(payload.emociones_detalle || ""),
+    String(payload.ejercicio_conexion || ""),
+    String(payload.rutina_integral || "")
+  ];
+
+  return fieldsToCheck.some((text) => containsLegacyMarker(text));
+};
+
 const buildFallbackByField = (field: DetailTextField, symptomName: string): string => {
   const symptom = symptomName.toLowerCase();
 
   switch (field) {
     case "zona_detalle":
-      return "Esta zona suele hablar de como te moves por la vida, que carga sostenes y que limite interno estas pidiendo respetar. Cuando se altera, aparece una invitacion a revisar ritmo, exigencia y direccion.";
+      return `El ${symptom} no habla solo del organo: habla del modo en que estas caminando tu vida por dentro. Cuando esta zona se altera, suele aparecer un mensaje de freno, de reorganizacion y de limite emocional que no estaba siendo escuchado.\n\n🦵 **Lectura del lado corporal**\n* **Lado derecho:** tendencia a exigirte en lo laboral, en la accion y en el deber.\n* **Lado izquierdo:** tension en lo afectivo, lo receptivo y la historia emocional.\n\nEste sintoma te pregunta con mucha claridad: ¿estas avanzando por fidelidad a tu verdad o por miedo a fallar?`;
     case "emociones_detalle":
-      return "Tu cuerpo no te castiga: te protege cuando tu energia ya no alcanza para sostener el modo actual. Mira si hay autoexigencia, miedo al juicio, lealtades familiares o una tristeza que venis acumulando en silencio.";
+      return `Tu cuerpo no te castiga: te protege cuando detecta que seguis empujando un ritmo que te lastima. En este sintoma suele haber una mezcla de saturacion, autoexigencia y necesidad de control, con una emocion de fondo que no encontro un canal seguro para expresarse.\n\n💔 **Lectura de fondo**\nMucho de lo que duele no es lo que paso, sino lo que callaste para poder seguir. Tu sistema nervioso se pone en alerta cuando siente que no hay permiso para descansar, pedir ayuda o mostrar fragilidad.\n\n🔍 **Posibles conflictos emocionales**\n* Miedo a decepcionar si bajas el ritmo.\n* Rabia contenida por sostener mas de lo que corresponde.\n* Culpa al priorizar tus necesidades.\n* Tristeza acumulada que no llego al llanto.\n* Sensacion de estar en modo supervivencia, no en modo vida.\n\nLa clave no es forzarte a ser fuerte: es construir un ritmo mas humano, con pausas reales y limites claros.`;
     case "ejercicio_conexion":
-      return "Preguntate: ¿que parte de mi vida estoy empujando por miedo? ¿que necesidad mia vengo postergando? ¿que me daria permiso para avanzar con mas humanidad y menos culpa?";
+      return "Tomate tres respiraciones profundas y hace estas preguntas por escrito, sin censura:\n\n* ¿Que parte de mi vida estoy empujando por miedo a quedar mal?\n* ¿Que necesidad emocional vengo postergando hace semanas?\n* ¿En que lugar me abandono para sostener a otras personas?\n* ¿Que limite necesito poner para recuperar paz interna?\n* ¿Que pasaria si avanzo mas lento pero mas fiel a mi verdad?";
     case "alternativas_fisicas":
       return "Prioriza reposo real, acompanamiento profesional y una rehabilitacion progresiva. Evita forzarte por ansiedad de resultados y respeta los tiempos biologicos de recuperacion.";
     case "aromaterapia_sahumerios":
@@ -329,7 +356,7 @@ const buildFallbackByField = (field: DetailTextField, symptomName: string): stri
     case "meditacion_guiada":
       return `Lleva la atencion a ${symptom}, respira en cuatro tiempos y repite: "No necesito forzarme para demostrar mi valor". Visualiza una luz azul que calma y reorganiza tu energia.`;
     case "recomendaciones_adicionales":
-      return "Afirma cada dia: 'Me permito avanzar a mi ritmo', 'Mi cuerpo me protege', 'Pedir ayuda es fortaleza'. Si el dolor aumenta, aparece fiebre o hay limitacion severa, consulta de inmediato a un profesional.";
+      return "Afirmaciones para integrar: \n* 'Me permito avanzar sin violencia interna.'\n* 'Mi cuerpo no me traiciona: me orienta.'\n* 'Descansar tambien es sanar.'\n* 'Pedir ayuda es una forma madura de cuidarme.'\n\n🚩 Si el dolor es intenso, persistente o limita funciones basicas, consulta con un profesional de salud para evaluacion clinica.";
     case "rutina_integral":
       return "1) Respiracion consciente 3 minutos. 2) Movimiento suave indicado por tu tratamiento. 3) Registro emocional breve. 4) Cierre con gratitud y descanso reparador.";
   }
@@ -421,6 +448,24 @@ const normalizeSymptomDetail = (raw: Partial<SymptomDetail>, symptomName: string
   return detail;
 };
 
+const countBullets = (text: string): number => {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("*") || line.startsWith("-"))
+    .length;
+};
+
+const hasHumanDepthSignals = (detail: SymptomDetail): boolean => {
+  if (detail.zona_detalle.length < 300) return false;
+  if (detail.emociones_detalle.length < 700) return false;
+  if (!detail.emociones_detalle.includes("💔 **Lectura de fondo**")) return false;
+  if (!detail.emociones_detalle.includes("🔍 **Posibles conflictos emocionales**")) return false;
+  if (countBullets(detail.emociones_detalle) < 4) return false;
+  if (hasPlaceholderArtifacts(detail.emociones_detalle)) return false;
+  return true;
+};
+
 const calculateDetailQualityScore = (detail: SymptomDetail): number => {
   let score = 0;
 
@@ -433,12 +478,14 @@ const calculateDetailQualityScore = (detail: SymptomDetail): number => {
   }
 
   if (detail.emociones_detalle.includes("🔍 **Posibles conflictos emocionales**")) score += 4;
+  if (detail.emociones_detalle.includes("💔 **Lectura de fondo**")) score += 6;
   if (detail.ejercicio_conexion.includes("¿")) score += 4;
+  if (countBullets(detail.emociones_detalle) >= 4) score += 6;
 
   return Math.min(100, score);
 };
 
-const MIN_DETAIL_QUALITY_SCORE = 68;
+const MIN_DETAIL_QUALITY_SCORE = 82;
 
 const createMaestroPrompt = (symptomName: string): string => `
 Actua como una terapeuta integrativa con base en biodescodificacion, narrativa terapeutica y regulacion emocional.
@@ -450,11 +497,13 @@ Reglas no negociables:
 - Genero neutro.
 - Tono calido, humano, profundo, sin frases vacias.
 - No reemplazar diagnostico medico. Incluir alertas para consulta profesional cuando corresponda.
+- No uses placeholders entre corchetes (ej: [Emocion], [Conflicto]).
 
 Profundidad minima obligatoria:
 - shortDefinition: 100 a 190 caracteres.
 - Cada campo de texto: minimo 220 caracteres (excepto angeles_arcangeles y terapias_holisticas: minimo 140).
 - frases_tipicas: 3 a 5 frases reales.
+- En emociones_detalle: minimo 700 caracteres, incluir "💔 **Lectura de fondo**" y al menos 4 bullets concretos.
 
 Importante para consistencia visual:
 - Cada campo de texto debe comenzar con el emoji y titulo exacto indicado.
@@ -465,7 +514,7 @@ Devuelve este JSON exacto (sin campos extra):
   "name": "${symptomName}",
   "shortDefinition": "Frase breve pero potente y humana.",
   "zona_detalle": "🦶 **Simbologia del sintoma y del avance**\\nDescribe funcion corporal, simbolismo emocional y lectura del lado comprometido (izquierdo/derecho).",
-  "emociones_detalle": "🌌 **Significado emocional profundo**\\nDesarrolla la raiz emocional con profundidad.\\n\\n🔍 **Posibles conflictos emocionales**\\nIncluye al menos 4 bullets claros y concretos.",
+  "emociones_detalle": "🌌 **Significado emocional profundo**\\nDesarrolla la raiz emocional con profundidad.\\n\\n💔 **Lectura de fondo**\\nExplica que dolor emocional suele sostener este sintoma en la vida real.\\n\\n🔍 **Posibles conflictos emocionales**\\nIncluye al menos 4 bullets claros y concretos.",
   "frases_tipicas": ["— Frase 1", "— Frase 2", "— Frase 3"],
   "ejercicio_conexion": "🫂 **Preguntas para ir al corazon**\\nIncluye 4 a 6 preguntas de indagacion profunda.",
   "alternativas_fisicas": "🧬 **Recomendaciones fisicas especificas**\\nIncluye 4 a 6 recomendaciones de recuperacion fisica segura.",
@@ -509,8 +558,24 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
   ): SymptomDetail | null => {
     if (!payload) return null;
 
+    const payloadVersion = String((payload as any)?._methodology_version || "");
+    if (payloadVersion && payloadVersion !== METHODOLOGY_VERSION) {
+      logger.warn(`⚠️ ${source} version antigua (${payloadVersion}). Regenerando...`);
+      return null;
+    }
+
+    if (payloadLooksLegacy(payload)) {
+      logger.warn(`⚠️ ${source} detectado con estructura legacy. Regenerando...`);
+      return null;
+    }
+
     const normalized = normalizeSymptomDetail(payload, normalizedName);
     const score = calculateDetailQualityScore(normalized);
+
+    if (!hasHumanDepthSignals(normalized)) {
+      logger.warn(`⚠️ ${source} sin profundidad humana suficiente. Regenerando...`);
+      return null;
+    }
 
     if (score >= MIN_DETAIL_QUALITY_SCORE) {
       logger.log(`✅ ${source} con calidad ${score}`);
@@ -554,8 +619,17 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
   let detail = parseAndNormalizeDetail(await generateContentSafe(createMaestroPrompt(normalizedName), true), normalizedName);
   let score = calculateDetailQualityScore(detail);
 
-  if (score < MIN_DETAIL_QUALITY_SCORE) {
-    logger.warn(`⚠️ Primera generacion corta (${score}). Reintentando con refuerzo...`);
+  if (score < MIN_DETAIL_QUALITY_SCORE || !hasHumanDepthSignals(detail)) {
+    logger.warn(`⚠️ Primera generacion insuficiente (${score}). Reintentando con refuerzo...`);
+    detail = parseAndNormalizeDetail(
+      await generateContentSafe(createDepthBoosterPrompt(normalizedName), true),
+      normalizedName
+    );
+    score = calculateDetailQualityScore(detail);
+  }
+
+  if (score < MIN_DETAIL_QUALITY_SCORE || !hasHumanDepthSignals(detail)) {
+    logger.warn(`⚠️ Segunda generacion insuficiente (${score}). Intento final...`);
     detail = parseAndNormalizeDetail(
       await generateContentSafe(createDepthBoosterPrompt(normalizedName), true),
       normalizedName
@@ -567,7 +641,17 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
 
   supabase
     .from("symptom_cache")
-    .upsert({ slug, name: normalizedName, data: detail as unknown as any }, { onConflict: "slug" })
+    .upsert(
+      {
+        slug,
+        name: normalizedName,
+        data: {
+          ...detail,
+          _methodology_version: METHODOLOGY_VERSION
+        } as any
+      },
+      { onConflict: "slug" }
+    )
     .then(({ error }) => {
       if (error) logger.error(error);
     });
