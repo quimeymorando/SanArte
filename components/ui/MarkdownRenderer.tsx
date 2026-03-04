@@ -49,6 +49,38 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                     );
                 }
 
+                // Numbered Lists
+                if (/^\d+\.\s/.test(trimmed)) {
+                    const numberPart = trimmed.match(/^(\d+)\./)?.[1] || '1';
+                    const content = trimmed.replace(/^\d+\.\s/, '');
+                    return (
+                        <div key={idx} className="flex items-start gap-3 pl-1">
+                            <span className="mt-0.5 inline-flex size-5 items-center justify-center rounded-full bg-primary/20 text-[10px] font-black text-primary border border-primary/30">
+                                {numberPart}
+                            </span>
+                            <p className="leading-relaxed">
+                                <InlineMarkdown text={content} />
+                            </p>
+                        </div>
+                    );
+                }
+
+                // Checklist
+                if (/^\[( |x|X)\]\s/.test(trimmed)) {
+                    const checked = /^\[(x|X)\]\s/.test(trimmed);
+                    const content = trimmed.replace(/^\[( |x|X)\]\s/, '');
+                    return (
+                        <div key={idx} className="flex items-start gap-2 pl-1">
+                            <span className={`mt-1 inline-flex size-4 items-center justify-center rounded border ${checked ? 'bg-primary/20 border-primary/40 text-primary' : 'border-white/30 text-transparent'}`}>
+                                ✓
+                            </span>
+                            <p className="leading-relaxed">
+                                <InlineMarkdown text={content} />
+                            </p>
+                        </div>
+                    );
+                }
+
                 // Normal Paragraph
                 return (
                     <p key={idx} className="leading-relaxed text-gray-700 dark:text-gray-300">

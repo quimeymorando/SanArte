@@ -228,7 +228,7 @@ export const SymptomDetailPage: React.FC = () => {
             {/* HERO TITLE */}
             <div className="mb-8 relative z-10">
                <div className="inline-block px-4 py-1.5 rounded-xl bg-primary/20 border border-primary/30 text-primary text-[10px] font-black tracking-widest uppercase mb-4 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-                  Guía de Sanación
+                  🌿 Guía de Sanación
                </div>
                <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-4 drop-shadow-md">
                   {data.name}
@@ -243,11 +243,11 @@ export const SymptomDetailPage: React.FC = () => {
                id="emocion"
                isOpen={openSections.has('meaning')}
                onToggle={toggleSection}
-               title="Mensaje del Alma"
-               subtitle="Zona Corporal y Emoción"
-               icon="lightbulb"
-               gradientTheme="bg-gradient-to-br from-cyan-400 to-blue-500"
-               iconColor="text-cyan-500"
+                title="🌌 Mensaje del Alma"
+                subtitle="🦶 Zona corporal y emoción"
+                icon="lightbulb"
+                gradientTheme="bg-gradient-to-br from-cyan-400 to-blue-500"
+                iconColor="text-cyan-500"
             >
                {/* Zona Corporal */}
                <div className="bg-blue-500/5 p-6 rounded-[2rem] border border-blue-500/20 mb-6 shadow-inner relative overflow-hidden">
@@ -268,9 +268,9 @@ export const SymptomDetailPage: React.FC = () => {
                id="monologo"
                isOpen={openSections.has('monologo')}
                onToggle={toggleSection}
-               title="Espejo Interno"
-               subtitle="Frases que resuenan"
-               icon="record_voice_over"
+                title="🪞 Espejo Interno"
+                subtitle="Frases que resuenan" 
+                icon="record_voice_over"
                gradientTheme="bg-gradient-to-br from-purple-500 to-indigo-600"
                iconColor="text-purple-500"
             >
@@ -299,9 +299,9 @@ export const SymptomDetailPage: React.FC = () => {
                id="alquimia"
                isOpen={openSections.has('alquimia')}
                onToggle={toggleSection}
-               title="Alquimia Natural"
-               subtitle="Cuerpo, Hierbas y Aromas"
-               icon="local_florist"
+                title="🌿 Alquimia Natural"
+                subtitle="Cuerpo, hierbas y aromas"
+                icon="local_florist"
                gradientTheme="bg-gradient-to-br from-emerald-400 to-teal-500"
                iconColor="text-emerald-500"
             >
@@ -346,9 +346,9 @@ export const SymptomDetailPage: React.FC = () => {
                id="angel"
                isOpen={openSections.has('angel')}
                onToggle={toggleSection}
-               title="Conexión Divina"
-               subtitle="Ángeles y Energía"
-               icon="self_improvement"
+                title="👼 Conexión Divina"
+                subtitle="Ángeles y energía"
+                icon="self_improvement"
                gradientTheme="bg-gradient-to-br from-indigo-400 to-violet-500"
                iconColor="text-indigo-500"
             >
@@ -375,9 +375,9 @@ export const SymptomDetailPage: React.FC = () => {
                id="ritual"
                isOpen={openSections.has('ritual')}
                onToggle={toggleSection}
-               title="Tu Ritual Diario"
-               subtitle="Meditación y Plan"
-               icon="auto_awesome"
+                title="⏱️ Tu Ritual Diario"
+                subtitle="Meditación y plan"
+                icon="auto_awesome"
                gradientTheme="bg-gradient-to-br from-orange-400 to-red-500"
                iconColor="text-orange-500"
             >
