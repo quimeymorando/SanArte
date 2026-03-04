@@ -83,3 +83,5 @@ Configura en el proyecto de Vercel:
 - El upgrade premium ya no se concede desde cliente.
 - Gemini se consume via endpoint backend (`/api/gemini`).
 - Webhook usa verificacion HMAC de firma.
+
+<!-- TEST DE COMMIT -->
