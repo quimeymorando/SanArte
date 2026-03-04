@@ -39,7 +39,12 @@ const PrivacyPage: React.FC = () => {
 
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white">4. Tus Derechos</h3>
                     <p>
-                        Tienes derecho a acceder, corregir o eliminar tu información personal en cualquier momento. Puedes solicitar la eliminación de tu cuenta desde la sección de Perfil.
+                        Tienes derecho a acceder, corregir o eliminar tu informacion personal en cualquier momento. Desde Perfil puedes descargar una copia de tus datos y eliminar tu cuenta.
+                    </p>
+
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white">5. Consentimiento de Cookies</h3>
+                    <p>
+                        Solo activamos analitica y anuncios personalizados cuando das tu consentimiento explicito desde el banner de privacidad.
                     </p>
 
                     <div className="mt-12 p-6 bg-primary/5 rounded-2xl border border-primary/10">

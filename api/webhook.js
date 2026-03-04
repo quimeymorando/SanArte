@@ -1,11 +1,26 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-// Config
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-// NOTE: This must be the SERVICE ROLE KEY, not the Anon key, to update other users' profiles.
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const WEBHOOK_SECRET = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
+
+const PREMIUM_ON_EVENTS = new Set([
+    'order_created',
+    'subscription_created',
+    'subscription_updated'
+]);
+
+const PREMIUM_OFF_EVENTS = new Set([
+    'subscription_expired',
+    'subscription_cancelled',
+    'subscription_paused'
+]);
+
+const getHeaderValue = (headerValue) => {
+    if (Array.isArray(headerValue)) return headerValue[0] || '';
+    return typeof headerValue === 'string' ? headerValue : '';
+};
 
 const verifyWebhookSignature = (signatureHeader, payload) => {
     if (!signatureHeader || !WEBHOOK_SECRET) return false;
@@ -13,6 +28,8 @@ const verifyWebhookSignature = (signatureHeader, payload) => {
     const normalized = signatureHeader.startsWith('sha256=')
         ? signatureHeader.slice('sha256='.length)
         : signatureHeader;
+
+    if (!/^[a-fA-F0-9]+$/.test(normalized)) return false;
 
     const expected = crypto
         .createHmac('sha256', WEBHOOK_SECRET)
@@ -26,94 +43,101 @@ const verifyWebhookSignature = (signatureHeader, payload) => {
     return crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
 };
 
+const parsePayload = (rawPayload, bodyValue) => {
+    if (bodyValue && typeof bodyValue === 'object' && !Buffer.isBuffer(bodyValue)) {
+        return bodyValue;
+    }
+
+    try {
+        return JSON.parse(rawPayload);
+    } catch {
+        return null;
+    }
+};
+
+const updatePremiumStatus = async (supabase, email, isPremium) => {
+    const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+    if (profileError) {
+        return { ok: false, status: 500, message: 'Failed to resolve user profile' };
+    }
+
+    if (!profile?.id) {
+        return { ok: false, status: 404, message: 'User profile not found' };
+    }
+
+    const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ is_premium: isPremium })
+        .eq('id', profile.id);
+
+    if (updateError) {
+        return { ok: false, status: 500, message: 'Failed to update user premium status' };
+    }
+
+    return { ok: true, status: 200, message: 'Updated' };
+};
+
 export default async function handler(req, res) {
+    res.setHeader('Cache-Control', 'no-store');
+
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !WEBHOOK_SECRET) {
+        return res.status(500).json({ message: 'Server misconfigured' });
+    }
+
     try {
-        // 1. Verify Signature
-        const signature = req.headers['x-signature'];
-        const rawPayload = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
+        const signature = getHeaderValue(req.headers['x-signature']) || getHeaderValue(req.headers['x-signature-sha256']);
+
+        const rawPayload = typeof req.body === 'string'
+            ? req.body
+            : Buffer.isBuffer(req.body)
+                ? req.body.toString('utf8')
+                : Buffer.isBuffer(req.rawBody)
+                    ? req.rawBody.toString('utf8')
+                    : JSON.stringify(req.body || {});
 
         if (!verifyWebhookSignature(signature, rawPayload)) {
-            console.error('Invalid webhook signature');
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-            return res.status(500).json({ message: 'Server misconfigured' });
+        const body = parsePayload(rawPayload, req.body);
+        if (!body) {
+            return res.status(400).json({ message: 'Invalid payload' });
         }
 
-        // 2. Process Event
-        const eventName = req.body.meta.event_name;
-        const body = req.body;
+        const eventName = String(body?.meta?.event_name || '');
+        const email = String(body?.data?.attributes?.user_email || '').trim().toLowerCase();
 
-        if (eventName === 'order_created' || eventName === 'subscription_created' || eventName === 'subscription_updated') {
-            const email = body.data.attributes.user_email;
-            console.log(`Topping up premium for: ${email}`);
-
-            if (!email) return res.status(400).json({ message: 'No email in payload' });
-
-            // Init Supabase Admin
-            const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-            // SCALABLE SEARCH: Look up directly in profiles table instead of listing all auth users.
-            // The 'profiles' table is kept in sync via triggers.
-            const { data: profile, error: searchError } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('email', email)
-                .single(); // Much faster than .listUsers()
-
-            if (searchError) {
-                console.warn(`Profile for ${email} not found or error searching:`, searchError.message);
-                return res.status(404).json({ message: 'User profile not found' });
-            }
-
-            if (profile) {
-                // Update Profile
-                const { error: updateError } = await supabase
-                    .from('profiles')
-                    .update({ is_premium: true })
-                    .eq('id', profile.id);
-
-                if (updateError) {
-                    console.error('Failed to update profile:', updateError);
-                    return res.status(500).json({ error: updateError.message });
-                }
-                console.log(`Success: User ${profile.id} (${email}) upgraded to Premium.`);
-            }
+        if (!eventName) {
+            return res.status(400).json({ message: 'Invalid event name' });
         }
 
-        // --- REVOKE PREMIUM on cancellation/expiration ---
-        if (eventName === 'subscription_expired' || eventName === 'subscription_cancelled' || eventName === 'subscription_paused') {
-            const email = body.data.attributes.user_email;
-            console.log(`Revoking premium for: ${email}`);
-
-            if (email) {
-                const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('email', email)
-                    .single();
-
-                if (profile) {
-                    await supabase
-                        .from('profiles')
-                        .update({ is_premium: false })
-                        .eq('id', profile.id);
-                    console.log(`Premium revoked for: ${profile.id} (${email})`);
-                }
-            }
+        if (!PREMIUM_ON_EVENTS.has(eventName) && !PREMIUM_OFF_EVENTS.has(eventName)) {
+            return res.status(200).json({ received: true, ignored: true });
         }
 
-        res.status(200).json({ received: true });
+        if (!email) {
+            return res.status(400).json({ message: 'No email in payload' });
+        }
 
-    } catch (error) {
-        console.error('Webhook Error:', error);
-        res.status(500).json({ error: error.message });
+        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const shouldBePremium = PREMIUM_ON_EVENTS.has(eventName);
+
+        const result = await updatePremiumStatus(supabase, email, shouldBePremium);
+        if (!result.ok) {
+            return res.status(result.status).json({ message: result.message });
+        }
+
+        return res.status(200).json({ received: true });
+    } catch {
+        return res.status(500).json({ message: 'Webhook processing failed' });
     }
 }

@@ -37,7 +37,7 @@ console.log("Found keys in .env.local:", Object.keys(envVars));
 
 const supabaseUrl = envVars['VITE_SUPABASE_URL'];
 const supabaseKey = envVars['VITE_SUPABASE_ANON_KEY'];
-const geminiKey = envVars['VITE_GEMINI_API_KEY'] || envVars['GOOGLE_API_KEY'] || envVars['GEMINI_API_KEY'];
+const geminiKey = envVars['GEMINI_API_KEY'] || envVars['GOOGLE_API_KEY'] || envVars['VITE_GEMINI_API_KEY'];
 
 console.log("Supabase URL present:", !!supabaseUrl);
 console.log("Supabase Key present:", !!supabaseKey);

@@ -8,6 +8,8 @@ type MonetizationEventName =
 
 type MonetizationPayload = Record<string, string | number | boolean | null | undefined>;
 
+import { canRunAnalytics } from '../utils/consent';
+
 export const trackMonetizationEvent = (
   name: MonetizationEventName,
   payload: MonetizationPayload = {}
@@ -17,7 +19,7 @@ export const trackMonetizationEvent = (
   );
 
   const maybeGtag = (window as any).gtag;
-  if (typeof maybeGtag === 'function') {
+  if (canRunAnalytics() && typeof maybeGtag === 'function') {
     maybeGtag('event', name, safePayload);
   }
 

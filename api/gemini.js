@@ -1,26 +1,45 @@
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-const GEMINI_MAX_OUTPUT_TOKENS = Number(process.env.GEMINI_MAX_OUTPUT_TOKENS || 2048);
-const GEMINI_TEMPERATURE = Number(process.env.GEMINI_TEMPERATURE || 0.7);
+const GEMINI_MAX_OUTPUT_TOKENS = Math.min(
+    4096,
+    Math.max(128, Number(process.env.GEMINI_MAX_OUTPUT_TOKENS || 2048))
+);
+const GEMINI_TEMPERATURE = Math.min(
+    1,
+    Math.max(0, Number(process.env.GEMINI_TEMPERATURE || 0.7))
+);
+
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 25;
+const MAX_REQUEST_BYTES = 60_000;
 const MAX_MESSAGES = 20;
 const MAX_CHARS_PER_MESSAGE = 4000;
 const MAX_TOTAL_CHARS = 15000;
+
 const rateLimitStore = new Map();
 
+const allowedOrigins = new Set(
+    String(process.env.ALLOWED_ORIGINS || '')
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+);
+
+const getHeaderValue = (headerValue) => {
+    if (Array.isArray(headerValue)) return headerValue[0] || '';
+    return typeof headerValue === 'string' ? headerValue : '';
+};
+
 const getClientIp = (req) => {
-    const forwarded = req.headers['x-forwarded-for'];
-    if (typeof forwarded === 'string' && forwarded.length > 0) {
-        return forwarded.split(',')[0].trim();
-    }
-    const realIp = req.headers['x-real-ip'];
-    if (typeof realIp === 'string' && realIp.length > 0) {
-        return realIp.trim();
-    }
+    const forwarded = getHeaderValue(req.headers['x-forwarded-for']);
+    if (forwarded) return forwarded.split(',')[0].trim();
+
+    const realIp = getHeaderValue(req.headers['x-real-ip']);
+    if (realIp) return realIp.trim();
+
     return req.socket?.remoteAddress || 'unknown';
 };
 
@@ -50,7 +69,7 @@ const checkRateLimit = (key) => {
 const isValidRole = (role) => role === 'user' || role === 'assistant' || role === 'system';
 
 const validateSupabaseToken = async (token) => {
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !token) return false;
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !token) return null;
 
     try {
         const resp = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
@@ -60,15 +79,25 @@ const validateSupabaseToken = async (token) => {
                 Authorization: `Bearer ${token}`
             }
         });
-        if (!resp.ok) return false;
+
+        if (!resp.ok) return null;
+
         const user = await resp.json();
-        return !!user?.id;
+        return typeof user?.id === 'string' ? user.id : null;
     } catch {
-        return false;
+        return null;
     }
 };
 
+const isAllowedOrigin = (origin) => {
+    if (allowedOrigins.size === 0) return true;
+    if (!origin) return true;
+    return allowedOrigins.has(origin);
+};
+
 export default async function handler(req, res) {
+    res.setHeader('Cache-Control', 'no-store');
+
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
@@ -77,24 +106,36 @@ export default async function handler(req, res) {
         return res.status(500).json({ message: 'Gemini API key is not configured' });
     }
 
-    const authHeader = req.headers.authorization || '';
-    const token = typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
-        ? authHeader.slice('Bearer '.length)
-        : '';
+    const origin = getHeaderValue(req.headers.origin);
+    if (!isAllowedOrigin(origin)) {
+        return res.status(403).json({ message: 'Origin not allowed' });
+    }
 
-    const isAuthorized = await validateSupabaseToken(token);
-    if (!isAuthorized) {
+    const contentLength = Number(getHeaderValue(req.headers['content-length']) || 0);
+    if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BYTES) {
+        return res.status(413).json({ message: 'Payload too large' });
+    }
+
+    const authHeader = getHeaderValue(req.headers.authorization);
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : '';
+
+    const authUserId = await validateSupabaseToken(token);
+    if (!authUserId) {
         return res.status(401).json({ message: 'Unauthorized request' });
     }
 
     const ip = getClientIp(req);
-    const userAgent = String(req.headers['user-agent'] || 'unknown').slice(0, 80);
-    const rateLimitKey = `${ip}:${userAgent}`;
+    const rateLimitKey = `${authUserId}:${ip}`;
     if (!checkRateLimit(rateLimitKey)) {
         return res.status(429).json({ message: 'Too many requests. Try again in a minute.' });
     }
 
     const { messages, jsonMode = false } = req.body || {};
+
+    if (typeof jsonMode !== 'boolean') {
+        return res.status(400).json({ message: 'Invalid jsonMode value' });
+    }
+
     if (!Array.isArray(messages) || messages.length === 0) {
         return res.status(400).json({ message: 'Invalid messages payload' });
     }
@@ -108,13 +149,16 @@ export default async function handler(req, res) {
         if (!item || typeof item !== 'object' || !isValidRole(item.role)) {
             return res.status(400).json({ message: 'Invalid message format' });
         }
+
         const content = String(item.content || '');
         if (!content.trim()) {
             return res.status(400).json({ message: 'Empty message content' });
         }
+
         if (content.length > MAX_CHARS_PER_MESSAGE) {
             return res.status(400).json({ message: `Message too long. Max chars per message: ${MAX_CHARS_PER_MESSAGE}` });
         }
+
         totalChars += content.length;
         if (totalChars > MAX_TOTAL_CHARS) {
             return res.status(400).json({ message: `Conversation too long. Max total chars: ${MAX_TOTAL_CHARS}` });
@@ -154,17 +198,13 @@ export default async function handler(req, res) {
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            const upstream = String(errorData?.error?.message || response.statusText || 'Gemini API error');
-
             if (response.status === 429) {
                 return res.status(429).json({
-                    message: 'La IA esta temporalmente sin cupo. Intenta mas tarde.',
-                    upstream
+                    message: 'La IA esta temporalmente sin cupo. Intenta mas tarde.'
                 });
             }
 
-            return res.status(response.status).json({ message: upstream });
+            return res.status(502).json({ message: 'No pudimos procesar la consulta en este momento.' });
         }
 
         const data = await response.json();
@@ -174,7 +214,7 @@ export default async function handler(req, res) {
         }
 
         return res.status(200).json({ text });
-    } catch (error) {
-        return res.status(500).json({ message: error?.message || 'Unexpected server error' });
+    } catch {
+        return res.status(500).json({ message: 'Unexpected server error' });
     }
 }

@@ -14,6 +14,8 @@ import { XPToast } from './components/XPToast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { GlobalErrorProvider } from './context/GlobalErrorContext';
 import { ConfettiManager } from './components/ConfettiManager';
+import ConsentBanner from './components/ConsentBanner';
+import { useConsent } from './hooks/useConsent';
 
 
 import { Analytics } from "@vercel/analytics/react"
@@ -38,6 +40,8 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const App: React.FC = () => {
   // Initialize notification checker
   useRoutineNotifications();
+  const { canTrackAnalytics } = useConsent();
+
   // Check for auth redirects
   useEffect(() => {
     authService.getUser().catch(() => null);
@@ -75,7 +79,7 @@ const App: React.FC = () => {
         <ErrorBoundary>
           <ConfettiManager />
           <XPToast />
-          <Analytics />
+          {canTrackAnalytics && <Analytics />}
           <BrowserRouter>
             <div className="min-h-screen bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 transition-colors duration-200 font-sans">
               <NotificationManager />
@@ -116,6 +120,7 @@ const App: React.FC = () => {
                 </Routes>
               </Suspense>
               <Navigation />
+              <ConsentBanner />
             </div>
           </BrowserRouter>
         </ErrorBoundary>

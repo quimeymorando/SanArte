@@ -75,6 +75,7 @@ Configura en el proyecto de Vercel:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `LEMON_SQUEEZY_WEBHOOK_SECRET`
 - `GEMINI_API_KEY`
+- `ALLOWED_ORIGINS` (ej. `https://sanarte.app,https://www.sanarte.app`)
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 
@@ -83,5 +84,7 @@ Configura en el proyecto de Vercel:
 - El upgrade premium ya no se concede desde cliente.
 - Gemini se consume via endpoint backend (`/api/gemini`).
 - Webhook usa verificacion HMAC de firma.
+- Ads y analitica solo se activan con consentimiento explicito del usuario.
+- Perfil incluye exportacion de datos y eliminacion de cuenta.
 
 <!-- TEST DE COMMIT -->

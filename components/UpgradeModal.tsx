@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
 
 interface UpgradeModalProps {
   onClose: () => void;
@@ -12,7 +11,6 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onSuccess }) => {
   const navigate = useNavigate();
 
   const handleUpgrade = () => {
-    authService.upgradeToPremium();
     onSuccess();
     onClose();
     navigate('/upgrade');
@@ -49,7 +47,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ onClose, onSuccess }) => {
             onClick={handleUpgrade}
             className="w-full py-5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all mb-4"
           >
-            Suscribirme por $9.99/mes
+            Ver planes premium
           </button>
           
           <button onClick={onClose} className="text-xs text-gray-400 font-bold uppercase tracking-widest hover:text-gray-600">Tal vez luego</button>

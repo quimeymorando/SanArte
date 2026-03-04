@@ -9,6 +9,8 @@ import { Routine, SymptomLogEntry, Favorite, UserProfile } from '../types';
 import { authService } from '../services/authService';
 import { supabase } from '../supabaseClient';
 import ManageSubscription from '../components/ManageSubscription';
+import { accountService } from '../services/accountService';
+import { clearConsent } from '../utils/consent';
 
 export const FavoritesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -263,6 +265,8 @@ export const ProfilePage: React.FC = () => {
   }, [searchParams, user]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [isExportingData, setIsExportingData] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -282,6 +286,45 @@ export const ProfilePage: React.FC = () => {
         setIsUploading(false);
       }
     }
+  };
+
+  const handleExportData = async () => {
+    setIsExportingData(true);
+    try {
+      await accountService.downloadMyDataExport();
+    } catch (error: any) {
+      logger.error(error);
+      alert(error?.message || 'No pudimos exportar tus datos en este momento.');
+    } finally {
+      setIsExportingData(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const typedConfirmation = window.prompt('Para confirmar, escribe ELIMINAR. Esta accion es irreversible.');
+    if (typedConfirmation !== 'ELIMINAR') return;
+
+    const approved = window.confirm('Tu cuenta y sus datos asociados seran eliminados permanentemente. Deseas continuar?');
+    if (!approved) return;
+
+    setIsDeletingAccount(true);
+    try {
+      await accountService.deleteMyAccount();
+      localStorage.removeItem('sanarte_favorites_cache');
+      await authService.logout().catch(() => null);
+      navigate('/', { replace: true });
+      window.location.reload();
+    } catch (error: any) {
+      logger.error(error);
+      alert(error?.message || 'No pudimos eliminar tu cuenta en este momento.');
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
+  const handleConsentReset = () => {
+    clearConsent();
+    alert('Listo. Puedes ajustar tus preferencias desde el banner de privacidad.');
   };
 
   useEffect(() => {
@@ -457,6 +500,47 @@ export const ProfilePage: React.FC = () => {
             <span className="relative z-10">Conocer Beneficios</span>
           </button>
         )}
+      </div>
+
+      <div className="mb-12">
+        <h3 className="text-lg font-black text-white mb-4 flex items-center gap-2">
+          <span className="text-2xl">🛡️</span>
+          Privacidad y Datos
+        </h3>
+        <div className="bg-[#0a1114]/60 backdrop-blur-xl rounded-[2rem] border border-white/5 p-6">
+          <p className="text-sm text-white/60 leading-relaxed mb-4">
+            Descarga una copia de tus datos o elimina tu cuenta cuando quieras.
+          </p>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              onClick={handleExportData}
+              disabled={isExportingData || isDeletingAccount}
+              className="h-12 rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-xs font-black uppercase tracking-wider hover:bg-cyan-500/20 transition-colors disabled:opacity-50"
+            >
+              {isExportingData ? 'Generando archivo...' : 'Descargar mis datos'}
+            </button>
+
+            <button
+              onClick={handleDeleteAccount}
+              disabled={isDeletingAccount || isExportingData}
+              className="h-12 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 text-xs font-black uppercase tracking-wider hover:bg-red-500/20 transition-colors disabled:opacity-50"
+            >
+              {isDeletingAccount ? 'Eliminando cuenta...' : 'Eliminar mi cuenta'}
+            </button>
+          </div>
+
+          <p className="mt-3 text-[11px] text-white/40">
+            La eliminacion es permanente e invalida tu acceso inmediatamente.
+          </p>
+
+          <button
+            onClick={handleConsentReset}
+            className="mt-3 h-10 rounded-xl border border-white/15 bg-white/5 px-4 text-[11px] font-black uppercase tracking-wider text-white/70 transition-colors hover:bg-white/10"
+          >
+            Revisar consentimiento de cookies
+          </button>
+        </div>
       </div>
 
       {/* 5. HARMONY MENU (SETTINGS) */}

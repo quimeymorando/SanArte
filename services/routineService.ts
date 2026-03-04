@@ -24,19 +24,27 @@ export const sendNotification = (title: string, body: string) => {
 };
 
 export const getStoredRoutines = async (): Promise<Routine[]> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
   const { data } = await supabase
     .from('routines')
     .select('*')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: true });
 
   return (data as Routine[]) || [];
 };
 
 export const toggleRoutine = async (id: string, currentCompleted: boolean): Promise<{ success: boolean, xpEarned: number }> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, xpEarned: 0 };
+
   const { error } = await supabase
     .from('routines')
     .update({ completed: !currentCompleted })
-    .eq('id', id);
+    .eq('id', id)
+    .eq('user_id', user.id);
 
   if (error) {
     logger.error("Error toggling routine:", error);
@@ -47,10 +55,14 @@ export const toggleRoutine = async (id: string, currentCompleted: boolean): Prom
 };
 
 export const deleteRoutine = async (id: string): Promise<boolean> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+
   const { error } = await supabase
     .from('routines')
     .delete()
-    .eq('id', id);
+    .eq('id', id)
+    .eq('user_id', user.id);
 
   return !error;
 };

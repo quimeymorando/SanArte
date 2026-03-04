@@ -7,7 +7,7 @@ import path from 'path';
 // Load env manually for this script
 const envPath = path.resolve(process.cwd(), '.env.local');
 const envConfig = dotenv.parse(fs.readFileSync(envPath));
-const apiKey = envConfig.VITE_GEMINI_API_KEY;
+const apiKey = envConfig.GEMINI_API_KEY || envConfig.GOOGLE_API_KEY || envConfig.VITE_GEMINI_API_KEY;
 
 console.log("Testing Gemini API with Key:", apiKey ? "FOUND (Ends with " + apiKey.slice(-4) + ")" : "MISSING");
 

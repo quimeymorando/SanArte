@@ -23,7 +23,7 @@ envContent.split('\n').forEach(line => {
     }
 });
 
-const key = envVars['VITE_GEMINI_API_KEY'] || envVars['GOOGLE_API_KEY'] || envVars['GEMINI_API_KEY'];
+const key = envVars['GEMINI_API_KEY'] || envVars['GOOGLE_API_KEY'] || envVars['VITE_GEMINI_API_KEY'];
 if (key) {
     console.log(`Key found. Length: ${key.length}`);
     console.log(`First char code: ${key.charCodeAt(0)}`);

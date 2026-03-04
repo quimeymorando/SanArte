@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useIsPremium } from './useIsPremium';
 import AdSenseSlot from './AdSenseSlot';
 import { trackMonetizationEvent } from '../../services/monetizationService';
+import { useConsent } from '../../hooks/useConsent';
 
 interface SmartAdProps {
     /** AdSense slot ID for real ads */
@@ -28,14 +29,20 @@ const SmartAd: React.FC<SmartAdProps> = ({
     className = '',
 }) => {
     const isPremium = useIsPremium();
+    const { canShowAds } = useConsent();
     const navigate = useNavigate();
     const [showHouseAd, setShowHouseAd] = useState(false);
 
     useEffect(() => {
+        if (!canShowAds) {
+            setShowHouseAd(true);
+            return;
+        }
+
         // Randomly decide if this impression shows a house ad
         const impression = Math.floor(Math.random() * houseAdFrequency);
         setShowHouseAd(impression === 0 || !slotId);
-    }, [houseAdFrequency, slotId]);
+    }, [canShowAds, houseAdFrequency, slotId]);
 
     useEffect(() => {
         if (isPremium) return;
@@ -43,11 +50,15 @@ const SmartAd: React.FC<SmartAdProps> = ({
             trackMonetizationEvent('ad_impression_house', { placement: 'smart_ad' });
             return;
         }
+        if (!canShowAds) {
+            return;
+        }
+
         trackMonetizationEvent('ad_impression_network', {
             placement: 'smart_ad',
             slot_id: slotId || 'missing'
         });
-    }, [isPremium, showHouseAd, slotId]);
+    }, [canShowAds, isPremium, showHouseAd, slotId]);
 
     // Premium users don't see ads at all
     if (isPremium) return null;

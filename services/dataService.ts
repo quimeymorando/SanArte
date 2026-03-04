@@ -8,9 +8,13 @@ type CommunityTheme = 'healing' | 'gratitude' | 'release' | 'feedback';
 // --- RUTINAS ---
 export const routineService = {
     getRoutines: async (): Promise<Routine[]> => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
+
         const { data, error } = await supabase
             .from('routines')
             .select('*')
+            .eq('user_id', user.id)
             .order('created_at', { ascending: true });
 
         if (error) {
@@ -35,15 +39,26 @@ export const routineService = {
     },
 
     toggleRoutine: async (id: string, completed: boolean): Promise<void> => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Usuario no autenticado');
+
         const { error } = await supabase
             .from('routines')
             .update({ completed })
-            .eq('id', id);
+            .eq('id', id)
+            .eq('user_id', user.id);
         if (error) throw error;
     },
 
     deleteRoutine: async (id: string): Promise<void> => {
-        const { error } = await supabase.from('routines').delete().eq('id', id);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Usuario no autenticado');
+
+        const { error } = await supabase
+            .from('routines')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', user.id);
         if (error) throw error;
     }
 };
@@ -228,9 +243,13 @@ export const historyService = {
     },
 
     getHistory: async (): Promise<SymptomLogEntry[]> => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
+
         const { data, error } = await supabase
             .from('symptom_logs')
             .select('*')
+            .eq('user_id', user.id)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -247,7 +266,14 @@ export const historyService = {
     },
 
     deleteLog: async (id: string) => {
-        const { error } = await supabase.from('symptom_logs').delete().eq('id', id);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('No autenticado');
+
+        const { error } = await supabase
+            .from('symptom_logs')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', user.id);
         if (error) throw error;
     },
 
@@ -276,16 +302,14 @@ export const historyService = {
 
     getFavorites: async (): Promise<import('../types').Favorite[]> => {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            // Try to get from local storage if no user (or offline check passed implicitly by failure above if session persisted but network fail)
-            // But actually supabase.auth.getUser() might work from local session.
-            // If we are truly offline, supabase.from will fail.
-        }
+        if (!user) return [];
 
         try {
             const { data, error } = await supabase
                 .from('favorites')
-                .select('*');
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
 
@@ -304,7 +328,14 @@ export const historyService = {
         }
     },
     deleteFavoriteById: async (id: string) => {
-        const { error } = await supabase.from('favorites').delete().eq('id', id);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('No autenticado');
+
+        const { error } = await supabase
+            .from('favorites')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', user.id);
         if (error) throw error;
     }
 };

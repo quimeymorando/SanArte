@@ -8,6 +8,13 @@ type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 const XP_PER_LEVEL = 500;
 const FREE_MESSAGE_LIMIT = 5;
+const MIN_PASSWORD_LENGTH = 6;
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
+const ALLOWED_AVATAR_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp'
+]);
 const ENABLE_GUEST_MODE = import.meta.env.DEV && import.meta.env.VITE_ENABLE_GUEST_MODE === 'true';
 
 // Helper to transform raw DB data to TypeScript UserProfile
@@ -87,9 +94,8 @@ export const authService = {
 
   // Register: Creates Auth user, Trigger creates Profile
   register: async (name: string, email: string, password?: string): Promise<UserProfile | null> => {
-    if (!password) {
-      password = "temp-password-123";
-      logger.warn("Usando contraseña temporal. Actualiza tu UI para pedir contraseña.");
+    if (!password || password.trim().length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`);
     }
 
     // Explicitly type the options to ensure emailRedirectTo is accepted
@@ -415,13 +421,33 @@ export const authService = {
     const user = await authService.getUser();
     if (!user) return null;
 
-    const fileExt = file.name.split('.').pop();
+    if (!ALLOWED_AVATAR_MIME_TYPES.has(file.type)) {
+      logger.warn('Formato de avatar no permitido', file.type);
+      return null;
+    }
+
+    if (file.size > MAX_AVATAR_SIZE_BYTES) {
+      logger.warn('Avatar excede tamaño máximo permitido');
+      return null;
+    }
+
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp'
+    };
+
+    const fileExt = mimeToExt[file.type] || 'jpg';
     const fileName = `${user.id}/${Date.now()}.${fileExt}`;
     const filePath = `${fileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      });
 
     if (uploadError) {
       logger.error('Error uploading avatar:', uploadError);
