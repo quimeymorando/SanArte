@@ -1,25 +1,21 @@
+import {
+    isProductionEnvironment,
+    parseAllowedOrigins,
+    validateOriginRequest,
+} from './securityPolicy.js';
+
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const REQUIRED_CONFIRMATION = 'DELETE_MY_ACCOUNT';
 
-const allowedOrigins = new Set(
-    String(process.env.ALLOWED_ORIGINS || '')
-        .split(',')
-        .map((origin) => origin.trim())
-        .filter(Boolean)
-);
+const allowedOrigins = parseAllowedOrigins(process.env.ALLOWED_ORIGINS);
+const isProduction = isProductionEnvironment();
 
 const getHeaderValue = (headerValue) => {
     if (Array.isArray(headerValue)) return headerValue[0] || '';
     return typeof headerValue === 'string' ? headerValue : '';
-};
-
-const isAllowedOrigin = (origin) => {
-    if (allowedOrigins.size === 0) return true;
-    if (!origin) return true;
-    return allowedOrigins.has(origin);
 };
 
 const validateSupabaseToken = async (token) => {
@@ -68,8 +64,9 @@ export default async function handler(req, res) {
     }
 
     const origin = getHeaderValue(req.headers.origin);
-    if (!isAllowedOrigin(origin)) {
-        return res.status(403).json({ message: 'Origin not allowed' });
+    const originValidation = validateOriginRequest({ origin, allowedOrigins, isProduction });
+    if (!originValidation.ok) {
+        return res.status(originValidation.status).json({ message: originValidation.message });
     }
 
     const authHeader = getHeaderValue(req.headers.authorization);

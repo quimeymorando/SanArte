@@ -44,5 +44,9 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "vite-plugin-pwa": "^1.2.0"
+  },
+  "overrides": {
+    "serialize-javascript": "7.0.4",
+    "tar": "7.5.10"
   }
 }
