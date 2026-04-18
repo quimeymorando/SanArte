@@ -2,22 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { logger } from '../utils/logger';
 import { historyService } from '../services/dataService';
 import { SymptomLogEntry } from '../types';
-import { Link } from 'react-router-dom';
 
 export const JournalPage: React.FC = () => {
     const [entries, setEntries] = useState<SymptomLogEntry[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [tab, setTab] = useState<'journal' | 'history'>('journal');
 
-    // Form State
+    // Form state
     const [symptomName, setSymptomName] = useState('');
     const [intensity, setIntensity] = useState(5);
     const [notes, setNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
-    useEffect(() => {
-        loadEntries();
-    }, []);
+    useEffect(() => { loadEntries(); }, []);
 
     const loadEntries = async () => {
         try {
@@ -30,6 +28,11 @@ export const JournalPage: React.FC = () => {
         }
     };
 
+    // Separate personal journal entries from auto-logged search history
+    const journalEntries = entries.filter(e => !e.notes?.startsWith('Consulta:'));
+    const historyEntries = entries.filter(e => e.notes?.startsWith('Consulta:'));
+    const visibleEntries = tab === 'journal' ? journalEntries : historyEntries;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
@@ -39,7 +42,7 @@ export const JournalPage: React.FC = () => {
                 intensity,
                 notes,
                 symptom_name: symptomName,
-                duration: '' // Optional in UI, empty string for now
+                duration: '',
             });
             setShowModal(false);
             resetForm();
@@ -52,198 +55,203 @@ export const JournalPage: React.FC = () => {
         }
     };
 
-    const resetForm = () => {
-        setSymptomName('');
-        setIntensity(5);
-        setNotes('');
-    };
+    const resetForm = () => { setSymptomName(''); setIntensity(5); setNotes(''); };
 
     const handleDelete = async (id: string) => {
         if (window.confirm('¿Eliminar esta entrada?')) {
             try {
                 await historyService.deleteLog(id);
                 setEntries(entries.filter(e => e.id !== id));
-            } catch (error) {
-                console.error(error);
-            }
+            } catch (error) { logger.error(error); }
         }
     };
 
-    const getIntensityLabel = (val: number) => {
-        if (val <= 3) return { text: "Mal / Dolor", color: "text-red-400" };
-        if (val <= 6) return { text: "En Proceso", color: "text-yellow-400" };
-        if (val <= 8) return { text: "Mejorando", color: "text-cyan-400" };
-        return { text: "Sanado / Paz", color: "text-green-400" };
+    const getIntensityInfo = (val: number) => {
+        if (val <= 3) return { text: "Malestar", color: "text-red-400", bg: "bg-red-400" };
+        if (val <= 6) return { text: "En proceso", color: "text-amber-400", bg: "bg-amber-400" };
+        if (val <= 8) return { text: "Mejorando", color: "text-teal-400", bg: "bg-teal-400" };
+        return { text: "Paz", color: "text-emerald-400", bg: "bg-emerald-400" };
     };
 
     return (
-        <div className="min-h-screen pb-24 pt-4 px-4 max-w-2xl mx-auto">
-            {/* Header */}
-            <header className="mb-10 flex justify-between items-end relative z-10">
-                <div>
-                    <h1 className="text-4xl font-black text-white mb-2 tracking-tight flex items-center gap-3">
-                        <span className="text-4xl drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">📖</span> Tu Diario
-                    </h1>
-                    <p className="text-white/60 font-medium">Documenta tu evolución y registra tus síntomas</p>
+        <div className="min-h-screen bg-[#080c0f] pb-28 pt-20 px-5">
+            <div className="max-w-xl mx-auto">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 className="text-xl font-bold text-white">Diario</h1>
+                        <p className="text-white/25 text-sm mt-0.5">Tu espacio de reflexión</p>
+                    </div>
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-semibold text-sm transition-all"
+                    >
+                        <span className="material-symbols-outlined text-lg">edit_note</span>
+                        Escribir
+                    </button>
                 </div>
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="hidden md:flex bg-gradient-to-r from-primary/20 to-cyan-500/20 hover:from-primary/40 hover:to-cyan-500/40 border border-primary/30 text-primary px-6 py-2.5 rounded-[1rem] font-black uppercase text-xs tracking-widest transition-all duration-300 items-center gap-2 shadow-[0_0_20px_rgba(34,211,238,0.2)] hover:shadow-[0_0_30px_rgba(34,211,238,0.4)]"
-                >
-                    <span className="material-symbols-outlined text-sm font-bold">edit_document</span>
-                    Escribir
-                </button>
-            </header>
 
-            {/* Stats/Summary (Optional Future) */}
+                {/* Tabs: Diario / Historial */}
+                <div className="flex gap-1 p-1 bg-white/[0.03] rounded-xl mb-6 border border-white/[0.06]">
+                    <button
+                        onClick={() => setTab('journal')}
+                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                            tab === 'journal'
+                                ? 'bg-white/[0.08] text-white'
+                                : 'text-white/30 hover:text-white/50'
+                        }`}
+                    >
+                        Reflexiones
+                    </button>
+                    <button
+                        onClick={() => setTab('history')}
+                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                            tab === 'history'
+                                ? 'bg-white/[0.08] text-white'
+                                : 'text-white/30 hover:text-white/50'
+                        }`}
+                    >
+                        Historial de búsquedas
+                    </button>
+                </div>
 
-            {/* Timeline */}
-            <div className="space-y-4">
+                {/* Entries */}
                 {loading ? (
-                    <div className="text-center py-10 text-gray-500 animate-pulse">Cargando diario...</div>
-                ) : entries.length === 0 ? (
-                    <div className="text-center py-20 bg-[#0a1114]/60 backdrop-blur-xl rounded-[2.5rem] border border-white/5 border-dashed relative z-10 group cursor-pointer hover:border-primary/30 transition-all duration-500" onClick={() => setShowModal(true)}>
-                        <div className="size-20 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center text-4xl mx-auto mb-6 group-hover:bg-primary/10 group-hover:border-primary/20 transition-all duration-500 shadow-xl">📝</div>
-                        <p className="text-white/40 font-bold mb-2">Tu diario está en blanco.</p>
-                        <span className="text-primary font-black uppercase tracking-widest text-xs group-hover:text-cyan-400 transition-colors">
-                            Escribe tu primera entrada
-                        </span>
+                    <div className="flex items-center justify-center py-20">
+                        <span className="material-symbols-outlined text-white/10 text-3xl animate-pulse">self_improvement</span>
+                    </div>
+                ) : visibleEntries.length === 0 ? (
+                    <div className="text-center py-20">
+                        <div className="size-14 rounded-full bg-white/[0.03] mx-auto mb-4 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-white/15 text-2xl">
+                                {tab === 'journal' ? 'edit_note' : 'history'}
+                            </span>
+                        </div>
+                        <p className="text-white/25 text-sm mb-1">
+                            {tab === 'journal' ? 'Tu diario está en blanco.' : 'Sin búsquedas registradas.'}
+                        </p>
+                        {tab === 'journal' && (
+                            <button
+                                onClick={() => setShowModal(true)}
+                                className="text-teal-400 text-sm font-medium mt-2 hover:text-teal-300 transition-colors"
+                            >
+                                Escribí tu primera reflexión
+                            </button>
+                        )}
                     </div>
                 ) : (
-                    entries.map((entry) => (
-                        <div key={entry.id} className="relative z-10">
-                            <div className="bg-[#0a1114]/80 backdrop-blur-xl border border-white/5 rounded-[2rem] p-6 hover:border-white/20 transition-all duration-500 group shadow-lg relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[40px] rounded-full pointer-events-none group-hover:bg-primary/10 transition-colors duration-700"></div>
+                    <div className="space-y-2.5">
+                        {visibleEntries.map((entry) => {
+                            const info = entry.intensity > 0 ? getIntensityInfo(entry.intensity) : null;
+                            const displayTitle = tab === 'history'
+                                ? entry.notes?.replace('Consulta: ', '') || 'Búsqueda'
+                                : entry.symptom_name || 'Reflexión';
 
-                                <div className="flex justify-between items-start mb-4 relative z-10">
-                                    <div>
-                                        {entry.symptom_name ? (
-                                            <h3 className="text-xl font-black text-white group-hover:text-primary transition-colors duration-300">
-                                                {entry.symptom_name}
-                                            </h3>
-                                        ) : (
-                                            <h3 className="text-xl font-black text-white/50 italic">Reflexión libre</h3>
-                                        )}
-                                        <span className="text-[10px] text-white/40 font-bold tracking-wider uppercase mt-1 block">
-                                            {new Date(entry.date).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })} • {new Date(entry.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
+                            return (
+                                <div
+                                    key={entry.id}
+                                    className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] transition-all group"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="text-sm font-medium text-white truncate">{displayTitle}</h3>
+                                            <span className="text-[11px] text-white/20 mt-0.5 block">
+                                                {new Date(entry.date).toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })} • {new Date(entry.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                            {info && (
+                                                <span className={`text-[10px] font-medium ${info.color}`}>{info.text}</span>
+                                            )}
+                                            <button
+                                                onClick={() => handleDelete(entry.id)}
+                                                className="p-1.5 rounded-lg text-white/0 group-hover:text-white/20 hover:!text-red-400 hover:bg-red-500/10 transition-all"
+                                            >
+                                                <span className="material-symbols-outlined text-base">close</span>
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
-                                        {/* Intensity Indicator */}
-                                        {entry.intensity > 0 && (
-                                            <div className="flex flex-col items-end">
-                                                <span className={`text-[10px] font-black uppercase tracking-widest ${getIntensityLabel(entry.intensity).color}`}>{getIntensityLabel(entry.intensity).text}</span>
-                                                <div className="flex gap-1 mt-1.5">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i < entry.intensity / 2 ? 'bg-current shadow-[0_0_8px_currentColor] scale-110' : 'bg-white/10'}`}></div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Delete Button */}
-                                        <button
-                                            onClick={() => handleDelete(entry.id)}
-                                            className="text-white/20 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100"
-                                            title="Eliminar entrada"
-                                        >
-                                            <span className="material-symbols-outlined text-[20px]">delete</span>
-                                        </button>
-                                    </div>
+                                    {/* Notes (only for journal entries) */}
+                                    {tab === 'journal' && entry.notes && (
+                                        <p className="mt-3 text-white/30 text-sm leading-relaxed whitespace-pre-wrap">
+                                            {entry.notes}
+                                        </p>
+                                    )}
                                 </div>
-
-                                {/* Notes/Content */}
-                                {entry.notes && (
-                                    <div className="mt-4 text-white/80 text-sm md:text-base font-medium leading-relaxed bg-black/20 p-5 rounded-[1.5rem] border border-white/5 relative z-10 whitespace-pre-wrap">
-                                        {entry.notes}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    ))
+                            );
+                        })}
+                    </div>
                 )}
             </div>
 
-            {/* Floating Add Button (Mobile) */}
+            {/* FAB Mobile */}
             <button
                 onClick={() => setShowModal(true)}
-                className="fixed bottom-24 right-6 md:hidden size-14 bg-gradient-to-r from-primary to-cyan-400 text-black rounded-full shadow-[0_0_20px_rgba(34,211,238,0.5)] flex items-center justify-center z-50 active:scale-95 transition-transform"
+                className="fixed bottom-24 right-5 md:hidden size-12 bg-teal-500 text-black rounded-full shadow-lg flex items-center justify-center z-50 active:scale-95 transition-transform"
             >
-                <span className="material-symbols-outlined text-3xl">edit</span>
+                <span className="material-symbols-outlined text-2xl">edit</span>
             </button>
 
-            {/* New Entry Modal */}
+            {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
-                    <div className="bg-[#0a1114]/95 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] w-full max-w-lg p-8 relative shadow-2xl animate-in fade-in zoom-in duration-300 overflow-hidden">
-                        {/* Glow effect */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[60px] rounded-full pointer-events-none"></div>
+                <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+                    <div className="relative bg-[#0e1317] border border-white/[0.08] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md p-6 pb-8 sm:p-8 shadow-2xl animate-in slide-in-from-bottom-4 sm:fade-in sm:zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-semibold text-white">Nueva reflexión</h2>
+                            <button onClick={() => setShowModal(false)} className="p-1.5 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all">
+                                <span className="material-symbols-outlined text-xl">close</span>
+                            </button>
+                        </div>
 
-                        <button onClick={() => setShowModal(false)} className="absolute top-6 right-6 text-white/40 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition-all duration-300 z-10">
-                            <span className="material-symbols-outlined text-[20px]">close</span>
-                        </button>
-
-                        <h2 className="text-3xl font-black mb-8 text-center text-white flex items-center justify-center gap-3 relative z-10">
-                            <span className="text-3xl">✨</span> Nueva Reflexión
-                        </h2>
-
-                        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-                            {/* Sentiment Slider */}
-                            <div className="space-y-4 bg-white/5 p-6 rounded-[2rem] border border-white/5">
-                                <label className="text-xs font-black text-white/60 uppercase tracking-widest block text-center">
-                                    ¿Cómo te sientes ahora?
-                                    <p className={`text-base font-black ${getIntensityLabel(intensity).color} mt-2 drop-shadow-md`}>{getIntensityLabel(intensity).text}</p>
-                                </label>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            {/* Intensity */}
+                            <div className="bg-white/[0.03] p-5 rounded-xl border border-white/[0.06]">
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs text-white/30">¿Cómo te sentís?</span>
+                                    <span className={`text-xs font-medium ${getIntensityInfo(intensity).color}`}>
+                                        {getIntensityInfo(intensity).text}
+                                    </span>
+                                </div>
                                 <input
                                     type="range"
-                                    min="1"
-                                    max="10"
+                                    min="1" max="10"
                                     value={intensity}
                                     onChange={(e) => setIntensity(Number(e.target.value))}
-                                    className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
+                                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-teal-500"
                                 />
-                                <div className="flex justify-between text-[10px] text-white/40 font-bold uppercase tracking-widest px-1">
+                                <div className="flex justify-between text-[10px] text-white/15 mt-1.5">
                                     <span>Malestar</span>
                                     <span>Plenitud</span>
                                 </div>
                             </div>
 
-                            {/* Symptom Name */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-black uppercase tracking-widest text-white/50 ml-2">Título / Síntoma (Opcional)</label>
-                                <input
-                                    type="text"
-                                    value={symptomName}
-                                    onChange={(e) => setSymptomName(e.target.value)}
-                                    placeholder="Ej: Ansiedad, Gratitud, Reflexión..."
-                                    className="w-full bg-black/40 border border-white/5 rounded-[1.5rem] px-5 py-4 text-white focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-white/20 font-medium"
-                                />
-                            </div>
+                            {/* Title */}
+                            <input
+                                type="text"
+                                value={symptomName}
+                                onChange={(e) => setSymptomName(e.target.value)}
+                                placeholder="Título (opcional)"
+                                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm focus:border-teal-500/30 outline-none transition-colors placeholder:text-white/15"
+                            />
 
                             {/* Notes */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-black uppercase tracking-widest text-white/50 ml-2">Notas del Alma</label>
-                                <textarea
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="Deja fluir lo que sientes en este momento..."
-                                    rows={4}
-                                    className="w-full bg-black/40 border border-white/5 rounded-[1.5rem] px-5 py-4 text-white focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none placeholder:text-white/20 font-medium leading-relaxed"
-                                ></textarea>
-                            </div>
+                            <textarea
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                placeholder="¿Qué sentís? Dejá fluir tus palabras..."
+                                rows={4}
+                                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-white text-sm focus:border-teal-500/30 outline-none transition-colors resize-none placeholder:text-white/15 leading-relaxed"
+                            />
 
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="w-full bg-gradient-to-r from-primary to-cyan-400 text-black font-black uppercase tracking-widest py-4 rounded-[1.5rem] shadow-[0_0_20px_rgba(34,211,238,0.3)] hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] transition-all duration-300 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed group flex justify-center items-center gap-2"
+                                className="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
                             >
-                                {submitting ? 'Guardando...' : (
-                                    <>
-                                        Imprimir Luz <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">stylus_note</span>
-                                    </>
-                                )}
+                                {submitting ? 'Guardando...' : 'Guardar reflexión'}
                             </button>
                         </form>
                     </div>

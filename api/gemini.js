@@ -5,6 +5,7 @@ import {
     parseAllowedOrigins,
     validateOriginRequest,
 } from './securityPolicy.js';
+import { geminiRequestSchema, validateBody } from './lib/schemas.js';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
@@ -129,19 +130,12 @@ export default async function handler(req, res) {
         return res.status(429).json({ message: 'Too many requests. Try again in a minute.' });
     }
 
-    const { messages, jsonMode = false } = req.body || {};
-
-    if (typeof jsonMode !== 'boolean') {
-        return res.status(400).json({ message: 'Invalid jsonMode value' });
+    const validation = validateBody(geminiRequestSchema, req.body || {});
+    if (!validation.ok) {
+        return res.status(400).json({ message: validation.error });
     }
 
-    if (!Array.isArray(messages) || messages.length === 0) {
-        return res.status(400).json({ message: 'Invalid messages payload' });
-    }
-
-    if (messages.length > MAX_MESSAGES) {
-        return res.status(400).json({ message: `Too many messages. Max allowed: ${MAX_MESSAGES}` });
-    }
+    const { messages, jsonMode } = validation.data;
 
     if (hasPromptInjectionAttempt(messages)) {
         return res.status(400).json({ message: 'La solicitud incluye instrucciones no permitidas.' });
@@ -149,20 +143,7 @@ export default async function handler(req, res) {
 
     let totalChars = 0;
     for (const item of messages) {
-        if (!item || typeof item !== 'object' || !isValidRole(item.role)) {
-            return res.status(400).json({ message: 'Invalid message format' });
-        }
-
-        const content = String(item.content || '');
-        if (!content.trim()) {
-            return res.status(400).json({ message: 'Empty message content' });
-        }
-
-        if (content.length > MAX_CHARS_PER_MESSAGE) {
-            return res.status(400).json({ message: `Message too long. Max chars per message: ${MAX_CHARS_PER_MESSAGE}` });
-        }
-
-        totalChars += content.length;
+        totalChars += item.content.length;
         if (totalChars > MAX_TOTAL_CHARS) {
             return res.status(400).json({ message: `Conversation too long. Max total chars: ${MAX_TOTAL_CHARS}` });
         }

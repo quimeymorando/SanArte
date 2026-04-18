@@ -22,6 +22,8 @@ export interface UserProfile {
   avatar?: string;
   joinDate: string;
   isPremium: boolean;
+  premiumGraceUntil?: string;
+  trialEndsAt?: string;
   xp: number;
   level: number;
   role?: 'user' | 'admin';

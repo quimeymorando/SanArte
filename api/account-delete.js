@@ -3,6 +3,7 @@ import {
     parseAllowedOrigins,
     validateOriginRequest,
 } from './securityPolicy.js';
+import { accountDeleteSchema, validateBody } from './lib/schemas.js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
@@ -78,7 +79,8 @@ export default async function handler(req, res) {
     }
 
     const parsedBody = parseBody(req.body);
-    if (parsedBody.confirmPhrase !== REQUIRED_CONFIRMATION) {
+    const validation = validateBody(accountDeleteSchema, parsedBody);
+    if (!validation.ok) {
         return res.status(400).json({ message: 'Missing account deletion confirmation' });
     }
 

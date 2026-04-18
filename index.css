@@ -4,7 +4,8 @@
 
 body {
   font-family: 'Outfit', sans-serif;
-  @apply bg-surface-light text-text-main dark:bg-[#050b0d] dark:text-gray-200;
+  background-color: #F3EDE0;
+  color: #1C1814;
   min-height: 100vh;
   /* iOS Polish: Premuim rendering & Native feel */
   overscroll-behavior-y: none;
@@ -72,12 +73,12 @@ body::-webkit-scrollbar {
 
 /* Light Mode: Ceramic/Clean Health Vibe */
 body:not(.dark) {
-  background: radial-gradient(circle at 50% 0%, #eefcfd 0%, #f0f4f5 100%);
+  background: #F3EDE0;
 }
 
 /* Dark Mode: Deep Space Healing */
 .dark body {
-  background: radial-gradient(circle at 50% -20%, #0f242d 0%, #050b0d 60%);
+  background: #0C0E18;
   background-attachment: fixed;
 }
 
@@ -94,29 +95,24 @@ h6,
 
 /* Glassmorphism Classes */
 .glass-panel {
-  background: rgba(15, 32, 39, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  transition: all 0.2s ease-out;
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(0, 242, 255, 0.3);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px 0 rgba(0, 242, 255, 0.1);
+  border-color: rgba(196, 162, 82, 0.25);
+  box-shadow: 0 4px 20px rgba(196, 162, 82, 0.08);
 }
 
 .neo-glow {
-  text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+  text-shadow: 0 0 20px rgba(196, 162, 82, 0.3);
 }
 
 .neon-border {
@@ -151,15 +147,15 @@ h6,
 }
 
 .gold-shimmer {
-  background: linear-gradient(90deg, #d4af37 0%, #f9e295 50%, #d4af37 100%);
+  background: linear-gradient(90deg, #C4A252 0%, #E8C96A 50%, #C4A252 100%);
   background-size: 200% auto;
   animation: shimmer 3s infinite linear;
 }
 
 /* Premium Neon & Text Styles */
 .text-neon-cyan {
-  color: #00f2ff !important;
-  text-shadow: 0 0 10px rgba(0, 242, 255, 0.6) !important;
+  color: #C4A252 !important;
+  text-shadow: none !important;
 }
 
 .text-neon-green {
@@ -175,10 +171,8 @@ h6,
 em,
 i {
   font-style: italic;
-  color: #ffffff !important;
-  /* White text for italics as requested */
-  text-shadow: 0 0 10px rgba(0, 242, 255, 0.4) !important;
-  /* Gentle cyan glow */
+  color: #C4A252 !important;
+  text-shadow: none !important;
 }
 
 /* Base Neon Title Style for H1, H2, H3 if they have .neon-title class or generally */

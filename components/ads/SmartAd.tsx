@@ -22,12 +22,12 @@ interface SmartAdProps {
  * 
  * Auto-hides entirely for Premium users.
  */
-const SmartAd: React.FC<SmartAdProps> = ({
+const SmartAd = React.memo(function SmartAd({
     slotId = '',
     houseAdFrequency = 3,
     format = 'banner',
     className = '',
-}) => {
+}: SmartAdProps) {
     const isPremium = useIsPremium();
     const { canShowAds } = useConsent();
     const navigate = useNavigate();
@@ -115,6 +115,6 @@ const SmartAd: React.FC<SmartAdProps> = ({
             </div>
         </div>
     );
-};
+});
 
 export default SmartAd;

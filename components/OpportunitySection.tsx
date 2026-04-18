@@ -1,38 +1,33 @@
 import React from 'react';
-import { OpportunityCard } from './ui/OpportunityCard';
+
+const items = [
+    { icon: 'psychology', title: 'Decodificá tus síntomas', desc: 'Traducí al instante qué emoción está detrás de tu dolor. Atacá el problema donde nace, no solo donde duele.' },
+    { icon: 'auto_awesome', title: 'IA que te guía', desc: 'Decile qué sentís y SanArte traza la ruta emocional. Claridad en minutos, no en meses de terapia.' },
+    { icon: 'favorite', title: 'Recuperá tu energía', desc: 'Al liberar la carga emocional, desbloqueás vitalidad para tu vida, proyectos y familia.' },
+];
 
 export const OpportunitySection: React.FC = () => {
-    const opportunities = [
-        {
-            icon: '📘',
-            title: 'Descubre el "Diccionario Oculto"',
-            description: 'Olvida los diagnósticos difusos. Traduce al instante qué emoción (miedo, ira, soledad) está encendiendo tu dolor. Ataca el problema donde nace, no solo donde duele.'
-        },
-        {
-            icon: '🤖',
-            title: 'Tecnología Guiada (Sin Esfuerzo)',
-            description: 'Tu Asistente IA hace el trabajo pesado. Solo dile qué sientes y SanArte trazará la ruta emocional exacta. Claridad total y control en minutos, no en meses de terapia.'
-        },
-        {
-            icon: '🔋',
-            title: 'Sanar es Recuperar tu Futuro',
-            description: 'Al liberar la carga emocional, desbloqueas una vitalidad renovada. Deja de permitir que tu pasado dicte tu salud y recupera la energía para tus proyectos y familia.'
-        }
-    ];
-
     return (
-        <div className="max-w-4xl mx-auto px-6 pb-24 relative z-10">
-            <div className="grid gap-4">
-                {opportunities.map((opt, idx) => (
-                    <OpportunityCard
-                        key={idx}
-                        icon={opt.icon}
-                        title={opt.title}
-                        description={opt.description}
-                        delay={idx * 200}
-                    />
-                ))}
+        <section className="py-16 md:py-24 bg-[#10142A]">
+            <div className="max-w-2xl mx-auto px-6">
+                <span className="text-[10px] font-medium tracking-widest uppercase text-[#4A5280] block mb-3">Tecnología con alma</span>
+                <h2 className="text-2xl md:text-3xl font-light text-[#F0EBE0] mb-12 leading-snug">
+                    Sin esfuerzo.<br/><em>Con intención.</em>
+                </h2>
+                <div className="space-y-8">
+                    {items.map((item) => (
+                        <div key={item.title} className="flex items-start gap-5">
+                            <div className="size-10 rounded-xl bg-sanarte-gold/15 border border-sanarte-gold/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span className="material-symbols-outlined text-sanarte-gold text-lg" style={{fontVariationSettings: "'wght' 300"}}>{item.icon}</span>
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-medium text-[#F0EBE0] mb-1">{item.title}</h3>
+                                <p className="text-sm text-[#4A5280] leading-relaxed">{item.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
-        </div>
+        </section>
     );
 };

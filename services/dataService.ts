@@ -1,67 +1,9 @@
 
 import { supabase } from '../supabaseClient';
-import { Routine, SymptomLogEntry } from '../types';
+import { SymptomLogEntry } from '../types';
 import { logger } from '../utils/logger';
 
 type CommunityTheme = 'healing' | 'gratitude' | 'release' | 'feedback';
-
-// --- RUTINAS ---
-export const routineService = {
-    getRoutines: async (): Promise<Routine[]> => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return [];
-
-        const { data, error } = await supabase
-            .from('routines')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: true });
-
-        if (error) {
-            logger.error("Error fetching routines:", error);
-            return [];
-        }
-        return (data as Routine[]) || [];
-    },
-
-    addRoutine: async (routine: Omit<Routine, 'id'>): Promise<Routine | null> => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Usuario no autenticado');
-
-        const { data, error } = await supabase
-            .from('routines')
-            .insert({ ...routine, user_id: user.id })
-            .select()
-            .single();
-
-        if (error) throw error;
-        return data as Routine;
-    },
-
-    toggleRoutine: async (id: string, completed: boolean): Promise<void> => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Usuario no autenticado');
-
-        const { error } = await supabase
-            .from('routines')
-            .update({ completed })
-            .eq('id', id)
-            .eq('user_id', user.id);
-        if (error) throw error;
-    },
-
-    deleteRoutine: async (id: string): Promise<void> => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error('Usuario no autenticado');
-
-        const { error } = await supabase
-            .from('routines')
-            .delete()
-            .eq('id', id)
-            .eq('user_id', user.id);
-        if (error) throw error;
-    }
-};
 
 // --- COMUNIDAD (INTENCIONES) ---
 export interface IntentionData {
@@ -78,13 +20,15 @@ export interface IntentionData {
 }
 
 export const communityService = {
-    getIntentions: async (): Promise<IntentionData[]> => {
+    getIntentions: async (page = 0, pageSize = 20): Promise<IntentionData[]> => {
         const { data: { user } } = await supabase.auth.getUser();
 
         // Obtenemos intenciones y cargamos sus comentarios también
         const { data, error } = await supabase
             .from('intentions')
-            .select('*, comments(*)');
+            .select('*, comments(*)')
+            .order('created_at', { ascending: false })
+            .range(page * pageSize, (page + 1) * pageSize - 1);
 
         if (error) {
             logger.error(error);
@@ -242,7 +186,7 @@ export const historyService = {
         if (error) throw error;
     },
 
-    getHistory: async (): Promise<SymptomLogEntry[]> => {
+    getHistory: async (page = 0, pageSize = 20): Promise<SymptomLogEntry[]> => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return [];
 
@@ -250,7 +194,8 @@ export const historyService = {
             .from('symptom_logs')
             .select('*')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .range(page * pageSize, (page + 1) * pageSize - 1);
 
         if (error) throw error;
 

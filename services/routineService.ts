@@ -128,35 +128,3 @@ export const addFromSymptom = async (symptom: SymptomDetail): Promise<boolean> =
   return !error;
 };
 
-export const updateStreak = (): number => {
-  // Streak logic can remain local or verify vs last_message_date, 
-  // but for now let's keep it mostly local or stubbed since DB profiles has daily_message_count but not explicit streak.
-  // Implementation of streak in DB requires more schema changes. 
-  // We can leave this as LocalStorage for UI purposes or ignore it for strict cloud sync.
-  // Let's keep it "Legacy" local storage for now to avoid breaking too much.
-
-  const STREAK_KEY = 'sanarte_streak_count';
-  const LAST_VISIT_KEY = 'sanarte_last_visit';
-
-  const today = new Date().toDateString();
-  const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
-  let currentStreak = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10);
-
-  if (lastVisit === today) {
-    return currentStreak;
-  }
-
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  if (lastVisit === yesterday.toDateString()) {
-    currentStreak++;
-  } else {
-    currentStreak = 1;
-  }
-
-  localStorage.setItem(LAST_VISIT_KEY, today);
-  localStorage.setItem(STREAK_KEY, currentStreak.toString());
-
-  return currentStreak;
-};

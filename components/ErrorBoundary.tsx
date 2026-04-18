@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import * as Sentry from '@sentry/react';
 import { logger } from '../utils/logger';
 
 interface Props {
@@ -25,14 +26,19 @@ export class ErrorBoundary extends Component<Props, State> {
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         logger.error("Uncaught error:", error, errorInfo);
+        Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } });
         this.setState({ errorInfo });
     }
 
     public render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen flex flex-col items-center justify-center bg-red-50 dark:bg-red-900/20 p-6 text-center">
-                    <span className="material-symbols-outlined text-6xl text-red-500 mb-4 animate-bounce">error_medication</span>
+                <div
+                    role="alert"
+                    aria-live="assertive"
+                    className="min-h-screen flex flex-col items-center justify-center bg-red-50 dark:bg-red-900/20 p-6 text-center"
+                >
+                    <span className="material-symbols-outlined text-6xl text-red-500 mb-4 animate-bounce" aria-hidden="true">error_medication</span>
                     <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-2">Algo salió mal</h1>
                     <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md">
                         Nuestro sistema sanador tuvo un pequeño tropiezo. Por favor intenta recargar.
@@ -50,7 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
                         <summary className="text-xs font-bold text-red-400 cursor-pointer">Detalles Técnicos</summary>
                         <pre className="mt-2 text-[10px] text-red-800 dark:text-red-200 overflow-auto whitespace-pre-wrap font-mono">
                             {this.state.error?.toString()}
-                            <br />
+                            {'\n'}
                             {this.state.errorInfo?.componentStack}
                         </pre>
                     </details>

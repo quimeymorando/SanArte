@@ -10,6 +10,8 @@ create table profiles (
   name text,
   join_date timestamptz default now(),
   is_premium boolean default false,
+  premium_grace_until timestamptz,
+  trial_ends_at timestamptz,
   xp integer default 0,
   level integer default 1,
   role text default 'user',
@@ -36,6 +38,7 @@ create table symptom_logs (
   id uuid default uuid_generate_v4() primary key,
   user_id uuid references auth.users on delete cascade not null,
   date text not null,
+  symptom_name text,
   intensity integer check (intensity >= 1 and intensity <= 10),
   duration text,
   notes text,
@@ -116,7 +119,7 @@ create policy "Users can delete own comments" on comments for delete using (auth
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email, name, join_date, is_premium, xp, level, badges, daily_message_count, last_message_date)
+  insert into public.profiles (id, email, name, join_date, is_premium, xp, level, role, badges, daily_message_count, last_message_date)
   values (
     new.id,
     new.email,
@@ -138,3 +141,18 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- --- FUNCIÓN RPC: INCREMENTAR CAMPO ---
+-- Usada por el frontend para incrementar contadores (candles, loves) en intenciones
+create or replace function public.increment_field(row_id uuid, table_name text, field_name text)
+returns void as $$
+begin
+  -- Solo permitir tablas y campos específicos por seguridad
+  if table_name = 'intentions' and field_name in ('candles', 'loves') then
+    execute format('update public.%I set %I = %I + 1 where id = $1', table_name, field_name, field_name)
+    using row_id;
+  else
+    raise exception 'Operación no permitida: tabla=% campo=%', table_name, field_name;
+  end if;
+end;
+$$ language plpgsql security definer;

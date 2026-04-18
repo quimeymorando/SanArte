@@ -1,0 +1,126 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "community": "Comunidad",
+    "routines": "Rutinas",
+    "journal": "Diario",
+    "profile": "Perfil",
+    "search": "Buscar",
+    "upgrade": "Premium",
+    "back": "Volver",
+    "skip_to_content": "Saltar al contenido principal"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "confirm_password": "Confirmar contraseña",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "login_with_google": "Continuar con Google",
+    "no_account": "¿No tenés cuenta?",
+    "have_account": "¿Ya tenés cuenta?"
+  },
+  "search": {
+    "placeholder": "¿Qué síntoma querés explorar?",
+    "searching": "Buscando...",
+    "no_results": "No encontramos resultados para \"{{query}}\"",
+    "try_another": "Intentá con otro término",
+    "results_count": "{{count}} resultados"
+  },
+  "premium": {
+    "unlock": "Desbloquear",
+    "exclusive_content": "Contenido Exclusivo",
+    "upgrade_title": "Eleva tu Vibración",
+    "upgrade_cta": "Prueba 7 Días Gratis",
+    "free_limit": "Alcanzaste tu límite diario gratuito",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "most_popular": "Más Popular",
+    "cancel_anytime": "Cancelas cuando quieras. Sin compromiso.",
+    "trial_badge": "7 días gratis"
+  },
+  "community": {
+    "title": "Comunidad",
+    "new_intention": "Nueva intención",
+    "send_intention": "Enviar intención",
+    "placeholder": "Comparte tu intención de sanación...",
+    "themes": {
+      "healing": "Sanación",
+      "gratitude": "Gratitud",
+      "release": "Liberación",
+      "feedback": "Feedback"
+    },
+    "candles": "Velas",
+    "loves": "Amor"
+  },
+  "journal": {
+    "title": "Diario de Síntomas",
+    "add_entry": "Nueva entrada",
+    "symptom_name": "Síntoma",
+    "intensity": "Intensidad",
+    "duration": "Duración",
+    "notes": "Notas",
+    "date": "Fecha",
+    "empty": "No hay registros aún. ¡Empieza a registrar tus síntomas!"
+  },
+  "routines": {
+    "title": "Mis Rutinas",
+    "add": "Agregar rutina",
+    "categories": {
+      "meditation": "Meditación",
+      "infusion": "Infusión",
+      "movement": "Movimiento",
+      "spiritual": "Espiritual",
+      "general": "General"
+    },
+    "empty": "No tenés rutinas configuradas aún."
+  },
+  "profile": {
+    "level": "Nivel {{level}}",
+    "xp": "{{xp}} XP",
+    "streak": "{{days}} días de racha",
+    "healing_moments": "{{count}} momentos de sanación",
+    "badges": "Insignias",
+    "edit": "Editar perfil",
+    "premium_member": "Miembro Premium"
+  },
+  "errors": {
+    "generic": "Algo salió mal. Por favor intentá de nuevo.",
+    "network": "Sin conexión. Verificá tu internet.",
+    "reload": "Recargar Página",
+    "not_found": "Página no encontrada",
+    "unauthorized": "Debés iniciar sesión para continuar"
+  },
+  "loading": {
+    "default": "Cargando...",
+    "searching": "Buscando en el catálogo...",
+    "saving": "Guardando...",
+    "sending": "Enviando..."
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "share": "Compartir",
+    "copy_link": "Copiar enlace",
+    "try_again": "Intentar de nuevo"
+  },
+  "seo": {
+    "home_title": "Inicio — SanArte",
+    "home_description": "Explorá síntomas, llevá tu diario de bienestar y conectá con la comunidad sanadora.",
+    "search_title": "Buscar Síntomas — SanArte",
+    "search_description": "Descubrí el mensaje emocional detrás de tus síntomas con biodescodificación asistida por IA.",
+    "community_title": "Comunidad — SanArte",
+    "community_description": "Compartí intenciones de sanación y conectá con miles de sanadores.",
+    "upgrade_title": "Premium — SanArte",
+    "upgrade_description": "Desbloqueá todo el poder de SanArte: búsquedas ilimitadas, meditaciones guiadas y más.",
+    "profile_title": "Mi Perfil — SanArte",
+    "journal_title": "Diario de Síntomas — SanArte"
+  }
+}

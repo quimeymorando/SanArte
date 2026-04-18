@@ -11,6 +11,22 @@ export default {
     theme: {
         extend: {
             colors: {
+                sanarte: {
+                    'night':       '#0C0E18',
+                    'indigo':      '#10142A',
+                    'cream':       '#F3EDE0',
+                    'cream-card':  '#FFFFFF',
+                    'gold':        '#C4A252',
+                    'gold-muted':  'rgba(196,162,82,0.12)',
+                    'slate':       '#7B9BB5',
+                    'sage':        '#8BA888',
+                    'text-dark':   '#1C1814',
+                    'text-mid':    '#7A6A5A',
+                    'text-muted':  '#A09080',
+                    'text-faint':  '#B0A090',
+                    'border-dark': 'rgba(255,255,255,0.07)',
+                    'border-light':'rgba(0,0,0,0.07)',
+                },
                 "primary": "#00f2ff", // Cyan Neón
                 "primary-hover": "#00d1db",
                 "secondary": "#7000ff", // Violeta Profundo

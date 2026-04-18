@@ -1,0 +1,126 @@
+{
+  "nav": {
+    "home": "Home",
+    "community": "Community",
+    "routines": "Routines",
+    "journal": "Journal",
+    "profile": "Profile",
+    "search": "Search",
+    "upgrade": "Premium",
+    "back": "Back",
+    "skip_to_content": "Skip to main content"
+  },
+  "auth": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "register": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "confirm_password": "Confirm password",
+    "forgot_password": "Forgot your password?",
+    "login_with_google": "Continue with Google",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?"
+  },
+  "search": {
+    "placeholder": "What symptom do you want to explore?",
+    "searching": "Searching...",
+    "no_results": "No results found for \"{{query}}\"",
+    "try_another": "Try a different term",
+    "results_count": "{{count}} results"
+  },
+  "premium": {
+    "unlock": "Unlock",
+    "exclusive_content": "Exclusive Content",
+    "upgrade_title": "Elevate your Vibration",
+    "upgrade_cta": "Try 7 Days Free",
+    "free_limit": "You've reached your daily free limit",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "most_popular": "Most Popular",
+    "cancel_anytime": "Cancel anytime. No commitment.",
+    "trial_badge": "7 days free"
+  },
+  "community": {
+    "title": "Community",
+    "new_intention": "New intention",
+    "send_intention": "Send intention",
+    "placeholder": "Share your healing intention...",
+    "themes": {
+      "healing": "Healing",
+      "gratitude": "Gratitude",
+      "release": "Release",
+      "feedback": "Feedback"
+    },
+    "candles": "Candles",
+    "loves": "Love"
+  },
+  "journal": {
+    "title": "Symptom Journal",
+    "add_entry": "New entry",
+    "symptom_name": "Symptom",
+    "intensity": "Intensity",
+    "duration": "Duration",
+    "notes": "Notes",
+    "date": "Date",
+    "empty": "No entries yet. Start tracking your symptoms!"
+  },
+  "routines": {
+    "title": "My Routines",
+    "add": "Add routine",
+    "categories": {
+      "meditation": "Meditation",
+      "infusion": "Infusion",
+      "movement": "Movement",
+      "spiritual": "Spiritual",
+      "general": "General"
+    },
+    "empty": "No routines configured yet."
+  },
+  "profile": {
+    "level": "Level {{level}}",
+    "xp": "{{xp}} XP",
+    "streak": "{{days}} day streak",
+    "healing_moments": "{{count}} healing moments",
+    "badges": "Badges",
+    "edit": "Edit profile",
+    "premium_member": "Premium Member"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "No connection. Check your internet.",
+    "reload": "Reload Page",
+    "not_found": "Page not found",
+    "unauthorized": "You must be signed in to continue"
+  },
+  "loading": {
+    "default": "Loading...",
+    "searching": "Searching catalog...",
+    "saving": "Saving...",
+    "sending": "Sending..."
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "share": "Share",
+    "copy_link": "Copy link",
+    "try_again": "Try again"
+  },
+  "seo": {
+    "home_title": "Home — SanArte",
+    "home_description": "Explore symptoms, keep your wellness journal and connect with the healing community.",
+    "search_title": "Search Symptoms — SanArte",
+    "search_description": "Discover the emotional message behind your symptoms with AI-assisted biodecodification.",
+    "community_title": "Community — SanArte",
+    "community_description": "Share healing intentions and connect with thousands of healers.",
+    "upgrade_title": "Premium — SanArte",
+    "upgrade_description": "Unlock the full power of SanArte: unlimited searches, guided meditations and more.",
+    "profile_title": "My Profile — SanArte",
+    "journal_title": "Symptom Journal — SanArte"
+  }
+}

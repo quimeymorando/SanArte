@@ -1,9 +1,7 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { trackMonetizationEvent } from '../services/monetizationService';
 
-// Lemon Squeezy Checkout URLs — Replace with your real ones
 const CHECKOUT_URLS = {
     monthly: import.meta.env.VITE_LS_CHECKOUT_MONTHLY || 'https://sanarte.lemonsqueezy.com/checkout/buy/cdc04c6b-be2e-4486-88e6-bbf61cfc945e',
     annual: import.meta.env.VITE_LS_CHECKOUT_ANNUAL || '',
@@ -24,220 +22,153 @@ const UpgradePage: React.FC = () => {
         monthly: { price: '$3', period: '/mes', total: '$36/año', savings: '' },
         annual: { price: '$2.50', period: '/mes', total: '$30/año', savings: '17%' },
     };
-
     const current = pricing[billingCycle];
+    const annualEnabled = isValidCheckout(CHECKOUT_URLS.annual);
+    const mecenasEnabled = isValidCheckout(CHECKOUT_URLS.mecenas);
 
     const handleSubscribe = () => {
         const url = CHECKOUT_URLS[billingCycle];
-        if (!isValidCheckout(url)) {
-            window.alert('Este plan aún no está configurado. Mientras tanto puedes usar el plan mensual.');
-            return;
-        }
-        trackMonetizationEvent('checkout_click', {
-            source: 'upgrade_page',
-            billing_cycle: billingCycle
-        });
+        if (!isValidCheckout(url)) { alert('Este plan aún no está configurado.'); return; }
+        trackMonetizationEvent('checkout_click', { source: 'upgrade_page', billing_cycle: billingCycle });
         window.open(url, '_blank', 'noopener,noreferrer');
     };
 
     const handleMecenas = () => {
-        if (!isValidCheckout(CHECKOUT_URLS.mecenas)) {
-            window.alert('La opción Mecenas aún no está configurada.');
-            return;
-        }
+        if (!isValidCheckout(CHECKOUT_URLS.mecenas)) { alert('La opción Mecenas aún no está configurada.'); return; }
         trackMonetizationEvent('donation_click', { source: 'upgrade_page' });
         window.open(CHECKOUT_URLS.mecenas, '_blank', 'noopener,noreferrer');
     };
 
-    const annualEnabled = isValidCheckout(CHECKOUT_URLS.annual);
-    const mecenasEnabled = isValidCheckout(CHECKOUT_URLS.mecenas);
+    const features = [
+        { icon: 'auto_awesome', text: 'Búsquedas Ilimitadas' },
+        { icon: 'spa', text: 'Remedios Naturales y Hierbas' },
+        { icon: 'record_voice_over', text: 'Meditaciones Guiadas (Audio)' },
+        { icon: 'flight', text: 'Guía de Arcángeles' },
+        { icon: 'favorite', text: 'Favoritos Ilimitados' },
+        { icon: 'block', text: 'Sin Publicidad' },
+    ];
 
     return (
-        <div className="relative min-h-screen bg-[#050b0d] text-gray-200 py-20 px-6 overflow-hidden">
-            {/* --- PREMIUM BACKGROUND (Match Landing) --- */}
-            <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900 via-[#050b0d] to-[#050b0d] pointer-events-none"></div>
-            <div className="absolute top-[-20%] left-[-10%] w-[120%] h-[120%] opacity-20 blur-[100px] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 30% 20%, rgba(112, 0, 255, 0.4) 0%, transparent 60%)' }}></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] opacity-15 blur-[80px] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 70% 80%, rgba(0, 242, 255, 0.3) 0%, transparent 60%)' }}></div>
-
-            <div className="relative z-10 max-w-5xl mx-auto">
-                {/* Back Button */}
-                <button
-                    onClick={() => navigate(-1)}
-                    className="mb-8 flex items-center gap-2 text-gray-500 hover:text-cyan-400 font-bold transition-colors"
-                >
-                    <span className="material-symbols-outlined">arrow_back</span> Volver
+        <div className="min-h-screen bg-[#080c0f] pb-28 pt-20 px-5">
+            <div className="max-w-md mx-auto">
+                {/* Back */}
+                <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-white/25 hover:text-white/50 text-sm mb-8 transition-colors">
+                    <span className="material-symbols-outlined text-lg">arrow_back</span>
+                    Volver
                 </button>
 
                 {/* Header */}
-                <div className="text-center mb-12 space-y-4">
-                    <span className="inline-block py-1.5 px-4 rounded-full bg-gradient-to-r from-amber-300 to-orange-500 text-black text-[10px] font-black tracking-[0.2em] uppercase shadow-lg shadow-orange-500/20">
-                        Membresía SanArte Premium
-                    </span>
-                    <h1 className="text-4xl md:text-6xl font-black text-white leading-tight">
-                        Eleva tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">Vibración</span>
-                    </h1>
-                    <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                        Desbloquea todo el poder de las plantas maestras, meditaciones guiadas y la sabiduría ancestral completa.
+                <div className="text-center mb-8">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-teal-400/60 mb-2">SanArte Premium</p>
+                    <h1 className="text-3xl font-bold text-white mb-3">Desbloqueá todo</h1>
+                    <p className="text-white/30 text-sm leading-relaxed">
+                        Remedios ancestrales, meditaciones guiadas, guía de arcángeles y más.
                     </p>
                 </div>
 
                 {/* Billing Toggle */}
-                <div className="flex items-center justify-center gap-4 mb-10">
+                <div className="flex gap-1 p-1 bg-white/[0.03] rounded-xl mb-8 border border-white/[0.06]">
                     <button
                         onClick={() => setBillingCycle('monthly')}
-                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-white/10 text-white border border-white/20' : 'text-gray-500 hover:text-gray-300'}`}
+                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                            billingCycle === 'monthly' ? 'bg-white/[0.08] text-white' : 'text-white/25'
+                        }`}
                     >
                         Mensual
                     </button>
                     <button
                         onClick={() => setBillingCycle('annual')}
                         disabled={!annualEnabled}
-                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all relative ${billingCycle === 'annual' ? 'bg-white/10 text-white border border-white/20' : 'text-gray-500 hover:text-gray-300'}`}
+                        className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all relative ${
+                            billingCycle === 'annual' ? 'bg-white/[0.08] text-white' : 'text-white/25'
+                        } disabled:opacity-30`}
                     >
                         Anual
-                        <span className="absolute -top-2 -right-2 bg-emerald-500 text-black text-[8px] font-black px-1.5 py-0.5 rounded-full">
-                            -17%
-                        </span>
+                        {annualEnabled && (
+                            <span className="absolute -top-1.5 -right-1 bg-emerald-500 text-black text-[8px] font-bold px-1.5 py-0.5 rounded-full">
+                                -17%
+                            </span>
+                        )}
                     </button>
                 </div>
 
-                {/* Pricing Grid */}
-                <div className="grid md:grid-cols-3 gap-6 items-center">
-
-                    {/* FREE TIER */}
-                    <div className="bg-[#0a1114]/60 backdrop-blur-md p-8 rounded-[2.5rem] border border-white/5 order-2 md:order-1 opacity-60 hover:opacity-100 transition-all">
-                        <h3 className="text-xl font-bold text-white mb-2">Buscador</h3>
-                        <div className="text-4xl font-black text-white mb-6">Gratis</div>
-                        <ul className="space-y-3 mb-8 text-gray-400 text-sm">
-                            <li className="flex items-center gap-2">
-                                <span className="material-symbols-outlined text-emerald-500 text-lg">check</span>
-                                Búsqueda de Síntomas
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="material-symbols-outlined text-emerald-500 text-lg">check</span>
-                                Definición Emocional Básica
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="material-symbols-outlined text-emerald-500 text-lg">check</span>
-                                5 Búsquedas Diarias
-                            </li>
-                        </ul>
-                        <button className="w-full py-4 text-gray-600 font-bold rounded-2xl bg-white/5 border border-white/5 cursor-not-allowed">
-                            Plan Actual
-                        </button>
+                {/* Premium Card */}
+                <div className="rounded-2xl border border-teal-500/20 bg-white/[0.03] p-6 mb-4">
+                    {/* Trial badge */}
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/15 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-xs">timer</span>
+                            7 días gratis
+                        </span>
                     </div>
 
-                    {/* PREMIUM TIER (Featured) */}
-                    <div className="relative bg-[#0a1114]/80 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-cyan-500/30 shadow-[0_0_40px_rgba(0,242,255,0.1)] transform md:scale-110 z-10 order-1 md:order-2">
-                        {/* Badge */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-cyan-500 to-primary text-white text-[10px] font-black uppercase tracking-[0.2em] py-2 px-5 rounded-full shadow-lg shadow-cyan-500/20">
-                            Más Popular
-                        </div>
-
-                        {/* Trial Badge */}
-                        <div className="flex items-center gap-2 mb-4 mt-2">
-                            <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
-                                <span className="material-symbols-outlined text-xs">timer</span>
-                                7 días gratis
-                            </span>
-                        </div>
-
-                        <h3 className="text-2xl font-bold text-white mb-2">Sanador</h3>
-                        <div className="flex items-baseline gap-1 mb-1">
-                            <span className="text-5xl font-black text-white">{current.price}</span>
-                            <span className="text-gray-400">{current.period}</span>
-                        </div>
-                        {billingCycle === 'annual' && (
-                            <p className="text-xs text-emerald-400 font-bold mb-4">
-                                Ahorrás {current.savings} → {current.total}
-                            </p>
-                        )}
-                        <p className="text-xs text-gray-500 mb-6 italic">
-                            {billingCycle === 'monthly'
-                                ? 'Se renueva automáticamente cada mes.'
-                                : 'Se renueva automáticamente cada año.'}
-                        </p>
-
-                        <ul className="space-y-3 mb-8 text-gray-200 font-medium text-sm">
-                            <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-cyan-400">auto_awesome</span>
-                                Búsquedas Ilimitadas
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-cyan-400">spa</span>
-                                Remedios Naturales y Hierbas
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-cyan-400">record_voice_over</span>
-                                Meditaciones Guiadas (Audio)
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-cyan-400">flight</span>
-                                Guía de Arcángeles
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-cyan-400">favorite</span>
-                                Guardar Favoritos Ilimitados
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <span className="material-symbols-outlined text-cyan-400">block</span>
-                                Sin Publicidad
-                            </li>
-                        </ul>
-
-                        <button
-                            className="relative w-full py-4 bg-gradient-to-r from-cyan-500 to-primary text-white font-black rounded-2xl shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-95 transition-all text-lg flex items-center justify-center gap-2 overflow-hidden group"
-                            onClick={handleSubscribe}
-                        >
-                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                            <span className="relative flex items-center gap-2">
-                                Prueba 7 Días Gratis
-                                <span className="material-symbols-outlined">arrow_forward</span>
-                            </span>
-                        </button>
-                        <p className="text-center text-xs text-gray-500 mt-3">Cancelas cuando quieras. Sin compromiso.</p>
+                    <div className="flex items-baseline gap-1 mb-1">
+                        <span className="text-4xl font-bold text-white">{current.price}</span>
+                        <span className="text-white/30 text-sm">{current.period}</span>
                     </div>
+                    {billingCycle === 'annual' && (
+                        <p className="text-xs text-emerald-400/70 mb-4">Ahorrás {current.savings} → {current.total}</p>
+                    )}
 
-                    {/* MECENAS TIER */}
-                    <div className="bg-[#0a1114]/60 backdrop-blur-md p-8 rounded-[2.5rem] border border-white/5 hover:border-purple-500/20 order-3 transition-all">
-                        <h3 className="text-xl font-bold text-white mb-2">Mecenas</h3>
-                        <div className="flex items-baseline gap-1 mb-6">
-                            <span className="text-4xl font-black text-white">$15</span>
-                            <span className="text-gray-400">/único</span>
+                    {/* Features */}
+                    <ul className="space-y-3 my-6">
+                        {features.map(f => (
+                            <li key={f.icon} className="flex items-center gap-3 text-sm text-white/50">
+                                <span className="material-symbols-outlined text-teal-400/60 text-lg">{f.icon}</span>
+                                {f.text}
+                            </li>
+                        ))}
+                    </ul>
+
+                    <button
+                        onClick={handleSubscribe}
+                        className="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-semibold text-sm transition-all active:scale-[0.98]"
+                    >
+                        Probar 7 días gratis
+                    </button>
+                    <p className="text-center text-[11px] text-white/15 mt-3">Cancelás cuando quieras. Sin compromiso.</p>
+                </div>
+
+                {/* Free Plan */}
+                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                    <div className="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 className="text-sm font-medium text-white/50">Plan Gratuito</h3>
+                            <p className="text-xs text-white/20 mt-0.5">Búsqueda básica con 5 consultas diarias</p>
                         </div>
-                        <p className="text-xs text-gray-500 -mt-4 mb-6">Apoyo puntual al proyecto.</p>
+                        <span className="text-[10px] text-white/15 font-medium bg-white/[0.04] px-2.5 py-1 rounded-lg">Actual</span>
+                    </div>
+                </div>
 
-                        <ul className="space-y-3 mb-8 text-gray-400 text-sm">
-                            <li className="flex items-center gap-2">
-                                <span className="material-symbols-outlined text-purple-400 text-lg">check</span>
-                                1 mes de Premium incluido
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="material-symbols-outlined text-purple-400 text-lg">check</span>
-                                Insignia "Mecenas" en Perfil
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <span className="material-symbols-outlined text-purple-400 text-lg">favorite</span>
-                                Karma instantáneo
-                            </li>
-                        </ul>
+                {/* Mecenas */}
+                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-sm font-medium text-white/50">Mecenas — $15 único</h3>
+                            <p className="text-xs text-white/20 mt-0.5">1 mes premium + insignia en perfil</p>
+                        </div>
                         <button
                             disabled={!mecenasEnabled}
-                            className="w-full py-4 text-purple-400 font-bold rounded-2xl bg-purple-500/10 border border-purple-500/10 hover:bg-purple-500/20 hover:border-purple-500/30 transition-all active:scale-95"
                             onClick={handleMecenas}
+                            className="text-xs text-violet-400/60 hover:text-violet-400 font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
-                            Hacer Donación
+                            Donar
                         </button>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="mt-16 text-center text-sm text-gray-500 max-w-2xl mx-auto space-y-2">
-                    <p className="flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined text-sm">lock</span>
-                        Pagos seguros procesados globalmente por Lemon Squeezy (Merchant of Record).
+                <div className="text-center text-[11px] text-white/15 space-y-1">
+                    <p className="flex items-center justify-center gap-1">
+                        <span className="material-symbols-outlined text-xs">lock</span>
+                        Pagos seguros via Lemon Squeezy
                     </p>
-                    <p>Al suscribirte aceptas nuestros <span className="underline cursor-pointer hover:text-cyan-400 transition-colors" onClick={() => navigate('/terms')}>Términos de Servicio</span>.</p>
+                    <p>
+                        Al suscribirte aceptás los{' '}
+                        <span className="underline cursor-pointer hover:text-teal-400 transition-colors" onClick={() => navigate('/terms')}>
+                            Términos de Servicio
+                        </span>.
+                    </p>
                 </div>
             </div>
         </div>
