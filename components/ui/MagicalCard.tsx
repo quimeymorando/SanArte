@@ -1,4 +1,5 @@
 import React from 'react';
+import { DimensionAccentProvider } from './MarkdownRenderer';
 
 interface MagicalCardProps {
     id: string;
@@ -7,73 +8,125 @@ interface MagicalCardProps {
     title: string;
     subtitle?: string;
     icon: string;
-    gradientTheme: string; // now treated as a CSS color string
-    iconColor: string;     // now treated as a CSS color string
+    gradientTheme: string; // accent color for this dimension
+    iconColor: string;     // kept for API compatibility
     children: React.ReactNode;
 }
 
 export const MagicalCard = React.memo(function MagicalCard({
-    id, isOpen, onToggle, title, subtitle, icon, gradientTheme, iconColor, children
+    id, isOpen, onToggle, title, subtitle, icon, gradientTheme, children
 }: MagicalCardProps) {
+    const accent = gradientTheme;
+
     return (
         <div
             style={{
                 borderRadius: '16px',
-                border: isOpen
-                    ? '1px solid rgba(201,168,76,0.18)'
-                    : '1px solid rgba(201,168,76,0.12)',
-                background: isOpen
-                    ? 'rgba(255,255,255,0.05)'
-                    : 'rgba(255,255,255,0.04)',
-                transition: 'all 0.5s',
+                background: 'rgba(255,255,255,0.025)',
+                border: `1px solid ${accent}26`,
+                borderLeft: `3px solid ${accent}`,
+                padding: '18px',
+                transition: 'all 0.4s',
             }}
         >
             <button
                 onClick={() => onToggle(id)}
-                className="w-full p-5 flex items-center justify-between text-left outline-none"
+                className="w-full"
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    textAlign: 'left',
+                    outline: 'none',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                }}
             >
-                <div className="flex items-center gap-3.5">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div
-                        className="size-10 rounded-xl flex items-center justify-center transition-all duration-300"
-                        style={isOpen
-                            ? { background: gradientTheme, color: '#fff' }
-                            : { background: 'rgba(255,255,255,0.06)', color: iconColor }
-                        }
+                        style={{
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '50%',
+                            background: `${accent}1F`,
+                            border: `1px solid ${accent}40`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            lineHeight: 1,
+                        }}
                     >
-                        <span className="material-symbols-outlined text-xl">{icon}</span>
+                        <span
+                            className="material-symbols-outlined"
+                            style={{
+                                color: accent,
+                                fontSize: '20px',
+                                fontVariationSettings: "'wght' 300",
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >{icon}</span>
                     </div>
                     <div>
                         <h3
-                            className="text-sm font-semibold transition-colors"
-                            style={{ color: isOpen ? '#F0EBE0' : '#4A5280' }}
-                        >
-                            {title}
-                        </h3>
+                            style={{
+                                fontFamily: '"Outfit", "Inter", sans-serif',
+                                fontSize: '15px',
+                                fontWeight: 500,
+                                color: '#F0EBE0',
+                                margin: 0,
+                                lineHeight: 1.2,
+                            }}
+                        >{title}</h3>
                         {subtitle && (
-                            <p className="text-[11px] mt-0.5" style={{ color: '#4A5280' }}>{subtitle}</p>
+                            <p
+                                style={{
+                                    fontFamily: '"Outfit", "Inter", sans-serif',
+                                    fontSize: '11px',
+                                    fontStyle: 'italic',
+                                    color: `${accent}99`,
+                                    margin: '3px 0 0',
+                                }}
+                            >{subtitle}</p>
                         )}
                     </div>
                 </div>
-                <div
-                    className="size-7 rounded-lg flex items-center justify-center transition-all duration-300"
-                    style={isOpen
-                        ? { transform: 'rotate(180deg)', background: 'rgba(255,255,255,0.08)', color: 'rgba(201,168,76,0.6)' }
-                        : { background: 'rgba(255,255,255,0.04)', color: 'rgba(201,168,76,0.4)' }
-                    }
-                >
-                    <span className="material-symbols-outlined text-base">expand_more</span>
-                </div>
+                <span
+                    className="material-symbols-outlined"
+                    style={{
+                        fontSize: '22px',
+                        color: `${accent}66`,
+                        transition: 'transform 0.3s',
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0)',
+                        fontVariationSettings: "'wght' 300",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                    }}
+                >expand_more</span>
             </button>
 
-            <div className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
-                isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-            }`}>
-                <div className="overflow-hidden">
-                    <div className="px-5 pb-5 pt-0">
-                        <div className="w-full h-px mb-5" style={{ background: 'rgba(201,168,76,0.1)' }} />
-                        <div className="text-sm leading-relaxed" style={{ color: '#8B7A6A' }}>
+            <div
+                className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+                    isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                }`}
+            >
+                <div style={{ overflow: 'hidden' }}>
+                    <div
+                        style={{
+                            marginTop: '18px',
+                            paddingTop: '20px',
+                            borderTop: `1px solid ${accent}1A`,
+                        }}
+                    >
+                        <DimensionAccentProvider value={accent}>
                             {children}
-                        </div>
+                        </DimensionAccentProvider>
                     </div>
                 </div>
             </div>
