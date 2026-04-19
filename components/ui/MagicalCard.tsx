@@ -7,8 +7,8 @@ interface MagicalCardProps {
     title: string;
     subtitle?: string;
     icon: string;
-    gradientTheme: string;
-    iconColor: string;
+    gradientTheme: string; // now treated as a CSS color string
+    iconColor: string;     // now treated as a CSS color string
     children: React.ReactNode;
 }
 
@@ -16,39 +16,51 @@ export const MagicalCard = React.memo(function MagicalCard({
     id, isOpen, onToggle, title, subtitle, icon, gradientTheme, iconColor, children
 }: MagicalCardProps) {
     return (
-        <div className={`rounded-2xl border transition-all duration-500 ${
-            isOpen
-                ? 'bg-white/[0.03] border-white/[0.08]'
-                : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04]'
-        }`}>
+        <div
+            style={{
+                borderRadius: '16px',
+                border: isOpen
+                    ? '1px solid rgba(201,168,76,0.18)'
+                    : '1px solid rgba(201,168,76,0.12)',
+                background: isOpen
+                    ? 'rgba(255,255,255,0.05)'
+                    : 'rgba(255,255,255,0.04)',
+                transition: 'all 0.5s',
+            }}
+        >
             <button
                 onClick={() => onToggle(id)}
                 className="w-full p-5 flex items-center justify-between text-left outline-none"
             >
                 <div className="flex items-center gap-3.5">
-                    <div className={`size-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                        isOpen
-                            ? `${gradientTheme} text-white`
-                            : `bg-white/[0.05] ${iconColor}`
-                    }`}>
+                    <div
+                        className="size-10 rounded-xl flex items-center justify-center transition-all duration-300"
+                        style={isOpen
+                            ? { background: gradientTheme, color: '#fff' }
+                            : { background: 'rgba(255,255,255,0.06)', color: iconColor }
+                        }
+                    >
                         <span className="material-symbols-outlined text-xl">{icon}</span>
                     </div>
                     <div>
-                        <h3 className={`text-sm font-semibold transition-colors ${
-                            isOpen ? 'text-white' : 'text-white/60'
-                        }`}>
+                        <h3
+                            className="text-sm font-semibold transition-colors"
+                            style={{ color: isOpen ? '#F0EBE0' : '#4A5280' }}
+                        >
                             {title}
                         </h3>
                         {subtitle && (
-                            <p className="text-[11px] text-white/25 mt-0.5">{subtitle}</p>
+                            <p className="text-[11px] mt-0.5" style={{ color: '#4A5280' }}>{subtitle}</p>
                         )}
                     </div>
                 </div>
-                <div className={`size-7 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                    isOpen
-                        ? 'rotate-180 bg-white/10 text-white/60'
-                        : 'bg-white/[0.04] text-white/20'
-                }`}>
+                <div
+                    className="size-7 rounded-lg flex items-center justify-center transition-all duration-300"
+                    style={isOpen
+                        ? { transform: 'rotate(180deg)', background: 'rgba(255,255,255,0.08)', color: 'rgba(201,168,76,0.6)' }
+                        : { background: 'rgba(255,255,255,0.04)', color: 'rgba(201,168,76,0.4)' }
+                    }
+                >
                     <span className="material-symbols-outlined text-base">expand_more</span>
                 </div>
             </button>
@@ -58,8 +70,8 @@ export const MagicalCard = React.memo(function MagicalCard({
             }`}>
                 <div className="overflow-hidden">
                     <div className="px-5 pb-5 pt-0">
-                        <div className="w-full h-px bg-white/[0.06] mb-5" />
-                        <div className="text-white/60 text-sm leading-relaxed">
+                        <div className="w-full h-px mb-5" style={{ background: 'rgba(201,168,76,0.1)' }} />
+                        <div className="text-sm leading-relaxed" style={{ color: '#8B7A6A' }}>
                             {children}
                         </div>
                     </div>
