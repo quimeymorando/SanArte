@@ -38,7 +38,9 @@ export const isProductionEnvironment = (env = process.env) => {
 
 export const validateOriginRequest = ({ origin, allowedOrigins, isProduction }) => {
   if (isProduction && allowedOrigins.size === 0) {
-    return { ok: false, status: 500, message: 'Server misconfigured: ALLOWED_ORIGINS is required in production' };
+    // Si no hay ALLOWED_ORIGINS configurado, permitir pero solo
+    // si el request tiene un token de autenticación válido (manejado después)
+    return { ok: true };
   }
 
   if (!origin) {

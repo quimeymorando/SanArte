@@ -30,7 +30,9 @@ const MAX_TOTAL_CHARS = 15000;
 
 const rateLimitStore = new Map();
 
-const allowedOrigins = parseAllowedOrigins(process.env.ALLOWED_ORIGINS);
+const rawOrigins = process.env.ALLOWED_ORIGINS ||
+  'https://sanarte.vercel.app,https://sanarte-two.vercel.app';
+const allowedOrigins = parseAllowedOrigins(rawOrigins);
 const isProduction = isProductionEnvironment();
 
 const getHeaderValue = (headerValue) => {
