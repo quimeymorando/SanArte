@@ -3,6 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { UserProfile } from '../types';
 
+const GOLD = '#C9A84C';
+const MUTED = '#6A6460';
+
 const Navigation: React.FC = React.memo(function Navigation() {
   const location = useLocation();
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -23,43 +26,104 @@ const Navigation: React.FC = React.memo(function Navigation() {
   ];
 
   return (
-    <>
-      {/* ── Bottom Nav (all screen sizes) ── */}
-      <nav
-        aria-label="Navegación"
-        className="fixed bottom-0 w-full backdrop-blur-xl py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] px-2 z-[90]"
-        style={{ background: 'rgba(6,13,27,0.95)', borderTop: '1px solid rgba(201,168,76,0.15)' }}
-      >
-        <div className="flex justify-around items-center max-w-[448px] mx-auto">
-          {navItems.map(({ to, icon, label }) => {
-            const active = isActive(to);
-            const isProfile = to === '/profile' && user?.avatar;
-            return (
-              <Link
-                key={to}
-                to={to}
-                aria-current={active ? 'page' : undefined}
-                className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all duration-200 ${
-                  active ? 'text-[#C9A84C]' : 'text-[#8B8A9B]'
-                }`}
+    <nav
+      aria-label="Navegación"
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 'calc(64px + env(safe-area-inset-bottom))',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        background: 'rgba(6,13,27,0.92)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        borderTop: '1px solid rgba(201,168,76,0.12)',
+        zIndex: 100,
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+      }}
+    >
+      {navItems.map(({ to, icon, label }) => {
+        const active = isActive(to);
+        const color = active ? GOLD : MUTED;
+        const isProfile = to === '/profile' && user?.avatar;
+        return (
+          <Link
+            key={to}
+            to={to}
+            aria-current={active ? 'page' : undefined}
+            style={{
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '6px 14px',
+              background: 'transparent',
+              minWidth: '56px',
+              textDecoration: 'none',
+            }}
+          >
+            {active && (
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  top: '4px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '4px',
+                  height: '4px',
+                  borderRadius: '999px',
+                  background: GOLD,
+                }}
+              />
+            )}
+            {isProfile ? (
+              <div
+                className="bg-cover bg-center"
+                style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '50%',
+                  backgroundImage: `url('${user.avatar}')`,
+                  opacity: active ? 1 : 0.6,
+                  border: active ? `1px solid ${GOLD}` : 'none',
+                }}
+              />
+            ) : (
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: '22px',
+                  fontVariationSettings: "'wght' 300",
+                  color,
+                  lineHeight: 1,
+                }}
+                aria-hidden="true"
               >
-                {isProfile ? (
-                  <div
-                    className={`size-7 rounded-full bg-cover bg-center transition-all ${active ? 'ring-2 ring-[#C4A252]/50' : 'opacity-60'}`}
-                    style={{ backgroundImage: `url('${user.avatar}')` }}
-                  />
-                ) : (
-                  <span className="material-symbols-outlined text-[22px]" style={{fontVariationSettings:"'wght' 300"}} aria-hidden="true">{icon}</span>
-                )}
-                <span className={`text-[9px] font-medium ${active ? 'text-[#C9A84C]' : 'text-[#8B8A9B]'}`}>
-                  {label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-    </>
+                {icon}
+              </span>
+            )}
+            <span
+              style={{
+                fontFamily: '"Outfit", "Inter", sans-serif',
+                fontSize: '10px',
+                fontWeight: 500,
+                letterSpacing: '0.02em',
+                color,
+                marginTop: '2px',
+                lineHeight: 1,
+              }}
+            >
+              {label}
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 });
 

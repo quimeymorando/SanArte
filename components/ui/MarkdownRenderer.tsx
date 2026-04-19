@@ -7,10 +7,14 @@ interface MarkdownRendererProps {
 
 // ─── Dimension accent context ─────────────────────────
 // Cada MagicalCard envuelve sus children en este provider con su color.
-// MarkdownRenderer lo consume para teñir headings, bullets y numbered lists.
+// MarkdownRenderer consume este accent para headings y bullet dots (identidad dimensión).
+// Las palabras clave de bullets van SIEMPRE en dorado (legibilidad uniforme).
 const DimensionAccentContext = createContext<string>('#C9A84C');
 export const DimensionAccentProvider = DimensionAccentContext.Provider;
 export const useDimensionAccent = () => useContext(DimensionAccentContext);
+
+// Dorado uniforme para palabras clave (no varía por dimensión).
+const KEYWORD_GOLD = '#C9A84C';
 
 // ─── Heading text → Material Symbol ──────────────────
 const SECTION_ICON_MAP: Array<{ keywords: string[]; icon: string }> = [
@@ -39,27 +43,90 @@ const pickIcon = (text: string): string | null => {
     return null;
 };
 
-const stripLeadingEmojis = (s: string) =>
-    s.replace(/^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2700}-\u{27BF}]+\s*/u, '').trim();
+// ─── Emoji stripping ──────────────────────────────────
+// Cubre Extended_Pictographic + bloques Unicode de símbolos/emoji comunes.
+const EMOJI_GLOBAL_RE = /[\p{Extended_Pictographic}\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]/gu;
+const EMOJI_LEADING_RE = /^[\p{Extended_Pictographic}\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]+\s*/u;
+
+const stripAllEmojis = (s: string) => s.replace(EMOJI_GLOBAL_RE, '').replace(/\s+/g, ' ').trim();
+const stripLeadingEmojis = (s: string) => s.replace(EMOJI_LEADING_RE, '').trim();
+
+// ─── Pre-processor ───────────────────────────────────
+// Convierte líneas que son headings disfrazados en markdown real,
+// y elimina duplicados emoji + **bold** que aparecerían como párrafo extra.
+const preprocessMarkdown = (raw: string): string => {
+    if (!raw) return raw;
+    const lines = raw.split('\n');
+    const out: string[] = [];
+
+    // Patterns para detectar "heading camuflado":
+    //   🌿 **Título**           → ### Título
+    //   🌿 Texto terminado en : → ### Texto
+    //   🌿 **Texto:** resto     → ### Texto  (+ resto como bullet)
+    const boldHeadingRe = /^[\p{Extended_Pictographic}\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]+\s+\*\*(.+?)\*\*\s*:?\s*$/u;
+    const colonHeadingRe = /^[\p{Extended_Pictographic}\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]+\s+([^:*]+):\s*$/u;
+    const boldLeadWithTailRe = /^[\p{Extended_Pictographic}\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]+\s+\*\*(.+?):\*\*\s+(.+)$/u;
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+
+        // Heading camuflado: "🌿 **Título**"
+        const mBold = trimmed.match(boldHeadingRe);
+        if (mBold) {
+            out.push(`### ${stripAllEmojis(mBold[1])}`);
+            continue;
+        }
+
+        // Heading camuflado: "🌿 Texto:"
+        const mColon = trimmed.match(colonHeadingRe);
+        if (mColon) {
+            out.push(`### ${stripAllEmojis(mColon[1])}`);
+            continue;
+        }
+
+        // "🌿 **Título:** descripción" → heading + bullet
+        const mTail = trimmed.match(boldLeadWithTailRe);
+        if (mTail) {
+            out.push(`### ${stripAllEmojis(mTail[1])}`);
+            out.push(`* ${mTail[2]}`);
+            continue;
+        }
+
+        // Heading markdown con emoji embebido: "## 🌿 Título" o "### 🌿 **Título**"
+        if (/^###?\s/.test(trimmed)) {
+            const hashMatch = trimmed.match(/^(###?)\s+(.*)$/);
+            if (hashMatch) {
+                const cleaned = stripAllEmojis(hashMatch[2]).replace(/\*+/g, '').trim();
+                out.push(`${hashMatch[1]} ${cleaned}`);
+                continue;
+            }
+        }
+
+        out.push(line);
+    }
+
+    return out.join('\n');
+};
 
 // ─── SectionHeading — reutilizable ────────────────────
 export const SectionHeading: React.FC<{ text: string; color: string; first?: boolean }> = ({ text, color, first = false }) => {
-    const icon = pickIcon(text);
+    const cleanText = stripAllEmojis(text).replace(/\*+/g, '').trim();
+    const icon = pickIcon(cleanText);
     return (
         <div
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                marginTop: first ? 0 : '22px',
-                marginBottom: '12px',
+                gap: '10px',
+                marginTop: first ? 0 : '24px',
+                marginBottom: '14px',
             }}
         >
             {icon && (
                 <span
                     className="material-symbols-outlined"
                     style={{
-                        fontSize: '16px',
+                        fontSize: '22px',
                         color,
                         fontVariationSettings: "'wght' 300",
                         lineHeight: 1,
@@ -73,25 +140,26 @@ export const SectionHeading: React.FC<{ text: string; color: string; first?: boo
             <span
                 style={{
                     fontFamily: '"Outfit", "Inter", sans-serif',
-                    fontSize: '13px',
-                    fontWeight: 500,
+                    fontSize: '14px',
+                    fontWeight: 600,
                     color,
                     lineHeight: 1.3,
                 }}
-            >{text}</span>
+            >{cleanText}</span>
         </div>
     );
 };
 
 // ─── Inline formatter (bold, italic) ──────────────────
-const InlineMarkdown: React.FC<{ text: string; accent: string }> = ({ text, accent }) => {
+// Bold → dorado uniforme. Italic → gris suave.
+const InlineMarkdown: React.FC<{ text: string }> = ({ text }) => {
     const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
     return (
         <>
             {parts.map((part, i) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     return (
-                        <span key={i} style={{ fontWeight: 600, color: accent }}>
+                        <span key={i} style={{ fontWeight: 600, color: KEYWORD_GOLD }}>
                             {part.slice(2, -2)}
                         </span>
                     );
@@ -121,37 +189,39 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
     const accent = useDimensionAccent();
     if (!text) return null;
 
+    const processed = preprocessMarkdown(text);
     let headingCount = 0;
 
     return (
         <div className={className}>
-            {text.split('\n').map((line, idx) => {
+            {processed.split('\n').map((line, idx) => {
                 const trimmed = line.trim();
                 if (!trimmed) return <div key={idx} style={{ height: '4px' }} />;
 
-                // Headers (## y ###) — strip leading emojis before detecting and from heading text
-                const stripped = stripLeadingEmojis(trimmed);
-                if (stripped.startsWith('### ')) {
-                    const headingText = stripLeadingEmojis(stripped.slice(4));
+                // Headers (## y ###) — emojis ya limpiados por preprocessor
+                if (trimmed.startsWith('### ')) {
+                    const headingText = trimmed.slice(4);
                     const isFirst = headingCount === 0;
                     headingCount++;
                     return <SectionHeading key={idx} text={headingText} color={accent} first={isFirst} />;
                 }
-                if (stripped.startsWith('## ')) {
-                    const headingText = stripLeadingEmojis(stripped.slice(3));
+                if (trimmed.startsWith('## ')) {
+                    const headingText = trimmed.slice(3);
                     const isFirst = headingCount === 0;
                     headingCount++;
                     return <SectionHeading key={idx} text={headingText} color={accent} first={isFirst} />;
                 }
 
-                // Bullets con palabra clave destacada
+                // Bullets: dot en color dimensión, keyword en dorado.
                 if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
-                    const content = trimmed.slice(2);
+                    const content = stripLeadingEmojis(trimmed.slice(2));
                     const isQuestion = content.trim().endsWith('?');
                     const colonIdx = content.indexOf(':');
                     const hasKeyword =
                         colonIdx > 0 && colonIdx < 60 && !content.slice(0, colonIdx).includes(',');
-                    const keyword = hasKeyword ? content.slice(0, colonIdx).replace(/\*+/g, '').trim() : '';
+                    const keyword = hasKeyword
+                        ? stripAllEmojis(content.slice(0, colonIdx)).replace(/\*+/g, '').trim()
+                        : '';
                     const rest = hasKeyword ? content.slice(colonIdx + 1).trim() : content;
 
                     return (
@@ -183,12 +253,13 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                                     fontStyle: isQuestion ? 'italic' : 'normal',
                                 }}
                             >
-                                {hasKeyword && (
+                                {hasKeyword && keyword && (
                                     <>
                                         <span
                                             style={{
+                                                fontFamily: '"Outfit", "Inter", sans-serif',
                                                 fontWeight: 600,
-                                                color: isQuestion ? '#8B7A6A' : accent,
+                                                color: isQuestion ? '#8B7A6A' : KEYWORD_GOLD,
                                                 fontStyle: isQuestion ? 'italic' : 'normal',
                                             }}
                                         >
@@ -197,7 +268,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                                         {' '}
                                     </>
                                 )}
-                                <InlineMarkdown text={rest} accent={accent} />
+                                <InlineMarkdown text={rest} />
                             </p>
                         </div>
                     );
@@ -238,7 +309,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                                 {numberPart}
                             </span>
                             <p style={{ ...bodyStyle, flex: 1 }}>
-                                <InlineMarkdown text={content} accent={accent} />
+                                <InlineMarkdown text={content} />
                             </p>
                         </div>
                     );
@@ -275,7 +346,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                                 }}
                             >✓</span>
                             <p style={{ ...bodyStyle, flex: 1 }}>
-                                <InlineMarkdown text={content} accent={accent} />
+                                <InlineMarkdown text={content} />
                             </p>
                         </div>
                     );
@@ -284,7 +355,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                 // Párrafo normal
                 return (
                     <p key={idx} style={{ ...bodyStyle, marginBottom: '14px' }}>
-                        <InlineMarkdown text={line} accent={accent} />
+                        <InlineMarkdown text={line} />
                     </p>
                 );
             })}

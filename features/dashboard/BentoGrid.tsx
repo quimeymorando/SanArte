@@ -332,12 +332,12 @@ const BreathingWidget = () => {
             className="mb-6 cursor-pointer flex items-center justify-between transition-all duration-200"
             style={{ ...glassCard(GOLD), borderRadius: 16, padding: '14px 18px' }}
         >
-            <div className="flex items-center gap-3.5">
+            <div className="flex items-center" style={{ gap: 16 }}>
                 <div
                     className="flex items-center justify-center"
                     style={{
-                        width: 42,
-                        height: 42,
+                        width: 44,
+                        height: 44,
                         borderRadius: '50%',
                         background: 'rgba(217,119,6,0.22)',
                         border: '1px solid rgba(255,255,255,0.12)',
@@ -394,7 +394,7 @@ const NavCard = ({
 }) => (
     <button
         onClick={onClick}
-        className="w-full text-left flex items-center gap-3.5 transition-all duration-200 active:scale-[0.99]"
+        className="w-full text-left flex items-center transition-all duration-200 active:scale-[0.99]"
         style={{
             ...glassCard(accent),
             borderRadius: 16,
@@ -402,13 +402,14 @@ const NavCard = ({
             fontFamily: '"Inter", sans-serif',
             color: '#fff',
             cursor: 'pointer',
+            gap: 16,
         }}
     >
         <div
             className="flex items-center justify-center flex-shrink-0"
             style={{
-                width: 42,
-                height: 42,
+                width: 44,
+                height: 44,
                 borderRadius: '50%',
                 background: accentBg,
                 border: '1px solid rgba(255,255,255,0.12)',
@@ -454,7 +455,7 @@ const StatRow = ({ icon, label, value, last = false }: { icon: string; label: st
             borderBottom: last ? 'none' : '1px solid rgba(255,255,255,0.06)',
         }}
     >
-        <div className="flex items-center gap-3.5">
+        <div className="flex items-center" style={{ gap: 16 }}>
             <Icon name={icon} size={20} color={GOLD} />
             <span
                 className="uppercase"
@@ -594,6 +595,7 @@ const LogoHeader = ({ user, onProfile }: { user: UserProfile | null; onProfile: 
 };
 
 // ─── ATMOSPHERIC ORBS ────────────────────────────────
+// Blurs reducidos a 40px y sin background-attachment fixed para scroll fluido en mobile.
 const Atmosphere = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
         <div
@@ -605,7 +607,8 @@ const Atmosphere = () => (
                 height: 460,
                 borderRadius: '50%',
                 background: 'radial-gradient(circle, rgba(201,168,76,0.08) 0%, rgba(201,168,76,0) 70%)',
-                filter: 'blur(100px)',
+                filter: 'blur(40px)',
+                transform: 'translateZ(0)',
             }}
         />
         <div
@@ -617,7 +620,8 @@ const Atmosphere = () => (
                 height: 480,
                 borderRadius: '50%',
                 background: 'radial-gradient(circle, rgba(124,58,237,0.07) 0%, rgba(124,58,237,0) 70%)',
-                filter: 'blur(110px)',
+                filter: 'blur(40px)',
+                transform: 'translateZ(0)',
             }}
         />
     </div>
@@ -658,6 +662,8 @@ export const BentoGrid = () => {
                 color: '#fff',
                 fontFamily: '"Inter", sans-serif',
                 paddingBottom: 110,
+                willChange: 'transform',
+                transform: 'translateZ(0)',
             }}
         >
             <Atmosphere />
