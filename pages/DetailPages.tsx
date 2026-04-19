@@ -8,7 +8,7 @@ import { authService } from '../services/authService';
 import { supabase } from '../supabaseClient';
 import { historyService } from '../services/dataService';
 import { PremiumLock } from '../components/PremiumLock';
-import { MarkdownRenderer, SectionHeading } from '../components/ui/MarkdownRenderer';
+import { MarkdownRenderer, SectionHeading, DimensionAccentProvider } from '../components/ui/MarkdownRenderer';
 import { MagicalCard } from '../components/ui/MagicalCard';
 import { AudioVisualizer } from '../components/AudioVisualizer';
 
@@ -286,7 +286,9 @@ export const SymptomDetailPage: React.FC = () => {
                paddingLeft: '20px',
                paddingRight: '20px',
                paddingBottom: '24px',
-               background: 'linear-gradient(to bottom, #060D1B, rgba(6,13,27,0.8), transparent)',
+               background: 'linear-gradient(to bottom, rgba(6,13,27,0.95) 0%, rgba(6,13,27,0.75) 70%, transparent 100%)',
+               backdropFilter: 'blur(14px)',
+               WebkitBackdropFilter: 'blur(14px)',
             }}
          >
             <div
@@ -635,15 +637,9 @@ export const SymptomDetailPage: React.FC = () => {
                            }}
                         >Alertas médicas</span>
                      </div>
-                     <p
-                        style={{
-                           fontFamily: '"Outfit", "Inter", sans-serif',
-                           fontSize: '13px',
-                           color: '#A08570',
-                           lineHeight: 1.75,
-                           margin: 0,
-                        }}
-                     >{alertasMedicas}</p>
+                     <DimensionAccentProvider value="#E8A87C">
+                        <MarkdownRenderer text={alertasMedicas} />
+                     </DimensionAccentProvider>
                   </div>
                )}
             </div>

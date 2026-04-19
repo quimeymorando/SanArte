@@ -37,8 +37,8 @@ export default defineConfig(() => {
           name: 'SanArte - Tu Guía de Autosanación',
           short_name: 'SanArte',
           description: 'Descubre el mensaje emocional de tus síntomas y sana desde el alma.',
-          theme_color: '#00f2ff',
-          background_color: '#ffffff',
+          theme_color: '#060D1B',
+          background_color: '#060D1B',
           display: 'standalone',
           icons: [
             {

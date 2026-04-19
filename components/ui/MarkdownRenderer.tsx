@@ -39,6 +39,9 @@ const pickIcon = (text: string): string | null => {
     return null;
 };
 
+const stripLeadingEmojis = (s: string) =>
+    s.replace(/^[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2700}-\u{27BF}]+\s*/u, '').trim();
+
 // ─── SectionHeading — reutilizable ────────────────────
 export const SectionHeading: React.FC<{ text: string; color: string; first?: boolean }> = ({ text, color, first = false }) => {
     const icon = pickIcon(text);
@@ -126,15 +129,16 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                 const trimmed = line.trim();
                 if (!trimmed) return <div key={idx} style={{ height: '4px' }} />;
 
-                // Headers (## y ###) → SectionHeading con ícono según texto
-                if (trimmed.startsWith('### ')) {
-                    const headingText = trimmed.slice(4);
+                // Headers (## y ###) — strip leading emojis before detecting and from heading text
+                const stripped = stripLeadingEmojis(trimmed);
+                if (stripped.startsWith('### ')) {
+                    const headingText = stripLeadingEmojis(stripped.slice(4));
                     const isFirst = headingCount === 0;
                     headingCount++;
                     return <SectionHeading key={idx} text={headingText} color={accent} first={isFirst} />;
                 }
-                if (trimmed.startsWith('## ')) {
-                    const headingText = trimmed.slice(3);
+                if (stripped.startsWith('## ')) {
+                    const headingText = stripLeadingEmojis(stripped.slice(3));
                     const isFirst = headingCount === 0;
                     headingCount++;
                     return <SectionHeading key={idx} text={headingText} color={accent} first={isFirst} />;
@@ -147,7 +151,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                     const colonIdx = content.indexOf(':');
                     const hasKeyword =
                         colonIdx > 0 && colonIdx < 60 && !content.slice(0, colonIdx).includes(',');
-                    const keyword = hasKeyword ? content.slice(0, colonIdx) : '';
+                    const keyword = hasKeyword ? content.slice(0, colonIdx).replace(/\*+/g, '').trim() : '';
                     const rest = hasKeyword ? content.slice(colonIdx + 1).trim() : content;
 
                     return (
