@@ -108,6 +108,41 @@ const preprocessMarkdown = (raw: string): string => {
     return out.join('\n');
 };
 
+// ─── Deduplicación defensiva ─────────────────────────
+// La IA a veces devuelve el mismo heading dos veces consecutivas
+// (uno con diacríticos/caps distintos al otro). Conservamos el primero.
+const normalizeForCompare = (text: string): string =>
+    text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+const dedupeConsecutiveHeadings = (markdown: string): string => {
+    if (!markdown) return markdown;
+    const lines = markdown.split('\n');
+    const result: string[] = [];
+    let lastHeadingNormalized: string | null = null;
+
+    for (const line of lines) {
+        const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+        if (headingMatch) {
+            const currentNormalized = normalizeForCompare(headingMatch[2]);
+            if (currentNormalized && currentNormalized === lastHeadingNormalized) {
+                continue;
+            }
+            lastHeadingNormalized = currentNormalized;
+        } else if (line.trim() !== '') {
+            lastHeadingNormalized = null;
+        }
+        result.push(line);
+    }
+
+    return result.join('\n');
+};
+
 // ─── SectionHeading — reutilizable ────────────────────
 export const SectionHeading: React.FC<{ text: string; color: string; first?: boolean }> = ({ text, color, first = false }) => {
     const cleanText = stripAllEmojis(text).replace(/\*+/g, '').trim();
@@ -189,7 +224,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
     const accent = useDimensionAccent();
     if (!text) return null;
 
-    const processed = preprocessMarkdown(text);
+    const processed = dedupeConsecutiveHeadings(preprocessMarkdown(text));
     let headingCount = 0;
 
     return (

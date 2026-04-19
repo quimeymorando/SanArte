@@ -15,10 +15,11 @@ const AMBER = '#FCD34D';
 
 const GOLD_GRAD = `linear-gradient(135deg, ${GOLD_DARK} 0%, ${GOLD} 40%, ${GOLD_LIGHT} 55%, ${GOLD} 70%, ${GOLD_DARK} 100%)`;
 
+// Glass cards SIN backdrop-filter (eran 6+ capas apiladas y el compositor
+// de mobile las recalculaba en cada frame → scroll jank). Background rgba
+// más opaco para mantener el look sin costo GPU.
 const glassCard = (accent?: string): React.CSSProperties => ({
-    background: 'rgba(9,17,32,0.55)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    background: 'rgba(9,17,32,0.78)',
     border: '1px solid rgba(255,255,255,0.06)',
     borderLeft: accent ? `3px solid ${accent}` : '1px solid rgba(255,255,255,0.06)',
     boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
@@ -664,6 +665,8 @@ export const BentoGrid = () => {
                 paddingBottom: 110,
                 willChange: 'transform',
                 transform: 'translateZ(0)',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
             }}
         >
             <Atmosphere />
