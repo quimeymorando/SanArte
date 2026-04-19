@@ -1,4 +1,5 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
+import { SplashScreen } from './components/SplashScreen';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from './supabaseClient';
@@ -52,6 +53,20 @@ const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(() => {
+    if (sessionStorage.getItem('splashShown')) return false;
+    return true;
+  });
+  const [appVisible, setAppVisible] = useState(() => {
+    return !!sessionStorage.getItem('splashShown');
+  });
+
+  const handleSplashDone = () => {
+    sessionStorage.setItem('splashShown', '1');
+    setShowSplash(false);
+    setAppVisible(true);
+  };
+
   // Initialize notification checker
   useRoutineNotifications();
   const { canTrackAnalytics } = useConsent();
@@ -94,11 +109,18 @@ const App: React.FC = () => {
     <ThemeProvider>
       <GlobalErrorProvider>
         <ErrorBoundary>
+          {showSplash && <SplashScreen onDone={handleSplashDone} />}
           <ConfettiManager />
           <XPToast />
           {canTrackAnalytics && <Analytics />}
           <BrowserRouter>
-            <div className="min-h-screen bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 transition-colors duration-200 font-sans">
+            <div
+              className="min-h-screen bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 font-sans"
+              style={{
+                opacity: appVisible ? 1 : 0,
+                transition: appVisible ? 'opacity 0.35s ease' : 'none',
+              }}
+            >
               {/* Skip navigation — visible on focus for keyboard/screen reader users */}
               <a
                 href="#main-content"

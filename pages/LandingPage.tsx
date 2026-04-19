@@ -67,7 +67,7 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full overflow-hidden bg-white dark:bg-[#080c0f] text-gray-900 dark:text-gray-100">
+    <div style={{ background: '#060D1B', color: '#F0EBE0', width: '100%', overflowX: 'hidden' }}>
       {/* Navbar */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-200 ${
         scrolled ? 'bg-sanarte-night/90 backdrop-blur-xl border-b border-sanarte-gold/10' : 'bg-transparent'
@@ -101,90 +101,101 @@ const LandingPage: React.FC = () => {
 
       {/* Auth Modal */}
       {showAuthModal && (
-        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAuthModal(false)} />
-          <div className="relative bg-white dark:bg-[#0e1317] w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 sm:fade-in sm:zoom-in-95 duration-300">
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(6, 13, 27, 0.85)', backdropFilter: 'blur(8px)' }}
+          onClick={() => setShowAuthModal(false)}
+        >
+          <style>{`.sa-input::placeholder{color:#4A5280}.sa-input:focus{border-color:rgba(201,168,76,0.5)!important;outline:none}`}</style>
+          <div
+            style={{ position: 'relative', background: '#0D1526', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '20px', padding: '36px 32px', maxWidth: '420px', width: '90%', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
-            <div className="px-6 pt-6 pb-4">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  {authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
-                </h3>
-                <button onClick={() => setShowAuthModal(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                  <span className="material-symbols-outlined text-xl">close</span>
-                </button>
-              </div>
-
-              <form onSubmit={handleAuthSubmit} className="space-y-3">
-                {authMode === 'register' && (
-                  <input
-                    type="text" value={name} onChange={(e) => setName(e.target.value)}
-                    placeholder="Nombre" required
-                    className="w-full bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] rounded-xl px-4 py-3 text-sm outline-none focus:border-teal-500 transition-colors dark:text-white dark:placeholder-white/20"
-                  />
-                )}
-                <input
-                  type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Correo electrónico" required
-                  className="w-full bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] rounded-xl px-4 py-3 text-sm outline-none focus:border-teal-500 transition-colors dark:text-white dark:placeholder-white/20"
-                />
-                <input
-                  type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Contraseña" required minLength={6}
-                  className="w-full bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] rounded-xl px-4 py-3 text-sm outline-none focus:border-teal-500 transition-colors dark:text-white dark:placeholder-white/20"
-                />
-                {authMode === 'register' && (
-                  <input
-                    type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repetir contraseña" required
-                    className="w-full bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] rounded-xl px-4 py-3 text-sm outline-none focus:border-teal-500 transition-colors dark:text-white dark:placeholder-white/20"
-                  />
-                )}
-
-                {authError && (
-                  <div className="text-red-500 dark:text-red-400 text-sm bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl px-4 py-3">
-                    {authError}
-                  </div>
-                )}
-
-                <button
-                  type="submit" disabled={isLoggingIn}
-                  className="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50"
-                >
-                  {isLoggingIn ? 'Cargando...' : authMode === 'login' ? 'Ingresar' : 'Crear cuenta'}
-                </button>
-              </form>
-
-              {/* Divider */}
-              <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-gray-200 dark:bg-white/[0.06]" />
-                <span className="text-[11px] text-gray-400 dark:text-gray-500">o</span>
-                <div className="flex-1 h-px bg-gray-200 dark:bg-white/[0.06]" />
-              </div>
-
-              {/* Google */}
-              <button
-                onClick={async () => {
-                  try { setAuthError(''); setIsLoggingIn(true); await authService.loginWithGoogle(); }
-                  catch (err: any) { setAuthError(err.message || 'Error con Google'); setIsLoggingIn(false); }
-                }}
-                disabled={isLoggingIn}
-                className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl border border-gray-200 dark:border-white/[0.08] bg-white dark:bg-white/[0.03] hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all text-sm font-medium text-gray-700 dark:text-gray-200 active:scale-[0.98]"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                </svg>
-                Continuar con Google
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '28px' }}>
+              <h3 style={{ fontFamily: 'Playfair Display, serif', fontWeight: 300, fontSize: '26px', color: '#F0EBE0', margin: 0 }}>
+                {authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
+              </h3>
+              <button onClick={() => setShowAuthModal(false)} style={{ color: '#4A5280', background: 'none', border: 'none', cursor: 'pointer', padding: '2px', lineHeight: 1 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>close</span>
               </button>
+            </div>
 
-              <div className="mt-5 mb-2 text-center">
-                <button onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setAuthError(''); }} className="text-teal-500 text-sm font-medium">
-                  {authMode === 'login' ? '¿No tenés cuenta? Registrate' : '¿Ya tenés cuenta? Ingresá'}
-                </button>
-              </div>
+            <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {authMode === 'register' && (
+                <input
+                  type="text" value={name} onChange={(e) => setName(e.target.value)}
+                  placeholder="Nombre" required
+                  className="sa-input"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: '12px', padding: '14px 18px', color: '#F0EBE0', fontSize: '14px', width: '100%', outline: 'none', boxSizing: 'border-box' }}
+                />
+              )}
+              <input
+                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                placeholder="Correo electrónico" required
+                className="sa-input"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: '12px', padding: '14px 18px', color: '#F0EBE0', fontSize: '14px', width: '100%', outline: 'none', boxSizing: 'border-box' }}
+              />
+              <input
+                type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                placeholder="Contraseña" required minLength={6}
+                className="sa-input"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: '12px', padding: '14px 18px', color: '#F0EBE0', fontSize: '14px', width: '100%', outline: 'none', boxSizing: 'border-box' }}
+              />
+              {authMode === 'register' && (
+                <input
+                  type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repetir contraseña" required
+                  className="sa-input"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,168,76,0.15)', borderRadius: '12px', padding: '14px 18px', color: '#F0EBE0', fontSize: '14px', width: '100%', outline: 'none', boxSizing: 'border-box' }}
+                />
+              )}
+
+              {authError && (
+                <div style={{ color: '#F87171', fontSize: '12px', background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px', padding: '10px 14px' }}>
+                  {authError}
+                </div>
+              )}
+
+              <button
+                type="submit" disabled={isLoggingIn}
+                style={{ background: 'linear-gradient(135deg, #C9A84C, #F0D080, #C9A84C)', color: '#060D1B', borderRadius: '999px', padding: '15px', fontSize: '14px', fontWeight: 700, border: 'none', width: '100%', cursor: isLoggingIn ? 'not-allowed' : 'pointer', letterSpacing: '0.05em', opacity: isLoggingIn ? 0.5 : 1 }}
+              >
+                {isLoggingIn ? 'Cargando...' : authMode === 'login' ? 'Ingresar' : 'Crear cuenta'}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '20px 0' }}>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(42,48,80,0.8)' }} />
+              <span style={{ color: '#2A3050', fontSize: '12px' }}>o</span>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(42,48,80,0.8)' }} />
+            </div>
+
+            {/* Google */}
+            <button
+              onClick={async () => {
+                try { setAuthError(''); setIsLoggingIn(true); await authService.loginWithGoogle(); }
+                catch (err: any) { setAuthError(err.message || 'Error con Google'); setIsLoggingIn(false); }
+              }}
+              disabled={isLoggingIn}
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', color: '#F0EBE0', fontSize: '14px', width: '100%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+              </svg>
+              Continuar con Google
+            </button>
+
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <button
+                onClick={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setAuthError(''); }}
+                style={{ color: '#C9A84C', fontSize: '13px', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                {authMode === 'login' ? '¿No tenés cuenta? Registrate' : '¿Ya tenés cuenta? Ingresá'}
+              </button>
             </div>
           </div>
         </div>

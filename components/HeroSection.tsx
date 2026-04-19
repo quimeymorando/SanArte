@@ -1,57 +1,55 @@
 import React from 'react';
 
-interface HeroSectionProps {
-    onStart: () => void;
-}
+interface HeroSectionProps { onStart: () => void; }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onStart }) => {
-    return (
-        <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-sanarte-night">
-            {/* Ambient dorado sutil */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[500px] bg-sanarte-gold/[0.05] blur-[120px] rounded-full pointer-events-none" />
+export const HeroSection: React.FC<HeroSectionProps> = ({ onStart }) => (
+  <section style={{
+    minHeight: '100dvh', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', background: '#060D1B', position: 'relative',
+    overflow: 'hidden', padding: '0 24px'
+  }}>
+    <div style={{
+      position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)',
+      width: '600px', height: '600px', borderRadius: '50%',
+      background: 'radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%)',
+      pointerEvents: 'none'
+    }} />
+    <div style={{ position: 'relative', zIndex: 1, maxWidth: '680px', width: '100%', textAlign: 'center', paddingTop: '96px', paddingBottom: '80px' }}>
 
-            <div className="relative z-10 max-w-2xl mx-auto px-6 flex flex-col items-center text-center pt-24 pb-20">
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '999px', padding: '6px 16px', marginBottom: '40px' }}>
+        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#C9A84C' }} />
+        <span style={{ fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#C9A84C', fontWeight: 500 }}>Tu cuerpo tiene un mensaje</span>
+      </div>
 
-                {/* Pill */}
-                <div className="flex items-center gap-2 border border-sanarte-gold/20 rounded-full px-4 py-1.5 mb-10">
-                    <div className="w-1.5 h-1.5 rounded-full bg-sanarte-gold" />
-                    <span className="text-[10px] font-medium tracking-widest uppercase text-sanarte-gold">Nueva oportunidad</span>
-                </div>
+      <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 300, color: '#F0EBE0', lineHeight: 1.15, marginBottom: '12px' }}>
+        Tu cuerpo lleva años
+      </h1>
+      <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 400, fontStyle: 'italic', background: 'linear-gradient(135deg, #F5E4B3 0%, #C9A84C 50%, #F0D080 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.15, marginBottom: '24px' }}>
+        hablándote.
+      </h1>
+      <p style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(20px, 3vw, 28px)', fontWeight: 300, color: '#F0EBE0', marginBottom: '12px' }}>
+        Hoy aprendés a <em style={{ color: '#C9A84C' }}>escucharlo.</em>
+      </p>
 
-                {/* Título */}
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.15] text-[#F0EBE0] mb-6">
-                    Tu cuerpo te habla.{' '}
-                    <br />
-                    Es hora de{' '}
-                    <em className="font-normal">escucharlo.</em>
-                </h1>
+      <p style={{ fontSize: '16px', color: '#6A6460', lineHeight: 1.7, maxWidth: '480px', margin: '0 auto 40px' }}>
+        Cada síntoma es un mensaje emocional que nadie te enseñó a leer. SanArte lo traduce al instante — sin fármacos, sin años de terapia.
+      </p>
 
-                {/* Subtítulo */}
-                <p className="text-base md:text-lg text-[#4A4840] max-w-md leading-relaxed mb-10">
-                    Descubrí el mensaje emocional detrás de cada síntoma. Sin fármacos, sin años de terapia.
-                </p>
+      <button onClick={onStart} style={{
+        background: 'linear-gradient(135deg, #C9A84C, #F0D080, #C9A84C)', color: '#060D1B',
+        border: 'none', borderRadius: '999px', padding: '16px 40px',
+        fontSize: '15px', fontWeight: 600, cursor: 'pointer',
+        letterSpacing: '0.04em', marginBottom: '16px', display: 'inline-block'
+      }}>
+        Descubrí el mensaje →
+      </button>
+      <p style={{ fontSize: '11px', color: '#3A3830', letterSpacing: '0.08em' }}>GRATIS PARA EMPEZAR · SIN TARJETA DE CRÉDITO</p>
 
-                {/* CTA */}
-                <button
-                    onClick={onStart}
-                    className="px-8 py-4 bg-sanarte-gold hover:opacity-90 text-sanarte-night text-base font-medium rounded-full transition-opacity duration-200 mb-4"
-                >
-                    Comenzar ahora →
-                </button>
-                <p className="text-xs text-[#3A3830]">Sin tarjeta de crédito</p>
-
-                {/* Social proof */}
-                <div className="mt-14 flex items-center gap-3 opacity-50">
-                    <div className="w-16 h-px bg-sanarte-gold/30" />
-                    <p className="text-xs tracking-widest uppercase text-[#4A4840]">+2.400 almas sanando hoy</p>
-                    <div className="w-16 h-px bg-sanarte-gold/30" />
-                </div>
-            </div>
-
-            {/* Scroll hint */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-20">
-                <span className="material-symbols-outlined text-[#4A4840]">expand_more</span>
-            </div>
-        </section>
-    );
-};
+      <div style={{ marginTop: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', opacity: 0.5 }}>
+        <div style={{ width: '40px', height: '1px', background: 'rgba(201,168,76,0.4)' }} />
+        <span style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4A4840' }}>+2.400 almas sanando hoy</span>
+        <div style={{ width: '40px', height: '1px', background: 'rgba(201,168,76,0.4)' }} />
+      </div>
+    </div>
+  </section>
+);

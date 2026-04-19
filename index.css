@@ -30,8 +30,6 @@ body {
   /* Standard icon size to reserve space */
   height: 1.5rem;
   overflow: hidden;
-  /* Hide text content until font is ready */
-  color: transparent !important;
   transition: color 0.2s ease-in;
 }
 
@@ -39,11 +37,6 @@ body {
 nav .material-symbols-outlined {
   width: 3rem;
   height: 3rem;
-}
-
-/* Reset color once font is applied */
-body.font-loaded .material-symbols-outlined {
-  color: inherit !important;
 }
 
 /* Ensure neon titles show correctly even during load */

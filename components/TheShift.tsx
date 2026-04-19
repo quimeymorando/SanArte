@@ -1,31 +1,51 @@
 import React from 'react';
 
-export const TheShift: React.FC = () => {
-    return (
-        <section className="py-20 md:py-28 bg-sanarte-cream relative">
-            <div className="max-w-3xl mx-auto px-6 text-center">
-                <span className="text-[10px] font-medium tracking-widest uppercase text-sanarte-gold block mb-4">Lo que cambia</span>
-                <h2 className="text-3xl md:text-4xl font-light text-sanarte-text-dark leading-tight mb-4">
-                    Tu cuerpo tiene un{' '}
-                    <em>diccionario oculto.</em>
-                </h2>
-                <p className="text-base text-sanarte-text-muted max-w-xl mx-auto mb-14">
-                    Cada síntoma es un mensaje emocional que nadie te enseñó a leer. SanArte te da la herramienta para decodificarlo.
-                </p>
-                <div className="grid md:grid-cols-3 gap-4 mt-4">
-                    {[
-                        { num: '01', title: 'Buscás tu síntoma', desc: 'Describís lo que sentís en tu cuerpo.' },
-                        { num: '02', title: 'La IA lo decodifica', desc: 'Biodescodificación y sabiduría ancestral.' },
-                        { num: '03', title: 'Sanás de raíz', desc: 'Remedios naturales, meditaciones y rutinas.' },
-                    ].map((item) => (
-                        <div key={item.num} className="p-6 rounded-2xl bg-white border border-sanarte-border-light text-left">
-                            <span className="text-xs font-medium text-sanarte-gold tracking-widest">{item.num}</span>
-                            <h3 className="text-sm font-medium text-sanarte-text-dark mt-3 mb-2">{item.title}</h3>
-                            <p className="text-xs text-sanarte-text-muted leading-relaxed">{item.desc}</p>
-                        </div>
-                    ))}
-                </div>
+const symptoms = [
+  {
+    symptom: 'Dolor de espalda baja',
+    color: '#7B9BB5',
+    emotional: 'Sentís que cargás el peso del mundo solo. Hay una responsabilidad, una carga económica o emocional que creés que nadie más puede sostener. Tu columna literalmente refleja lo que tu mente no puede soltar.',
+    question: '¿Qué estás sosteniendo que en realidad no te pertenece?'
+  },
+  {
+    symptom: 'Contractura en el cuello',
+    color: '#C9A84C',
+    emotional: 'Hay algo que no querés ver, una situación que evitás mirar de frente. También puede ser rigidez mental — la dificultad de girar hacia otro punto de vista. Tu cuello se tensiona donde tu mente se niega a flexibilizarse.',
+    question: '¿Qué verdad estás evitando mirar?'
+  }
+];
+
+export const TheShift: React.FC = () => (
+  <section style={{ padding: '80px 24px', background: '#F3EDE0' }}>
+    <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+        <span style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#C9A84C', display: 'block', marginBottom: '16px' }}>El diccionario oculto</span>
+        <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 300, color: '#1C1814', lineHeight: 1.25, marginBottom: '16px' }}>
+          El dolor no es tu enemigo.<br />
+          <em style={{ color: '#8B6E3A' }}>Es tu maestro más honesto.</em>
+        </h2>
+        <p style={{ fontSize: '15px', color: '#7A6A5A', maxWidth: '480px', margin: '0 auto', lineHeight: 1.7 }}>
+          Cada síntoma tiene una causa emocional. Estos son solo dos ejemplos de lo que SanArte revela.
+        </p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+        {symptoms.map((s) => (
+          <div key={s.symptom} style={{
+            background: '#FFFFFF', borderRadius: '20px', padding: '28px',
+            borderLeft: `4px solid ${s.color}`,
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)'
+          }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: s.color, marginBottom: '12px' }}>Síntoma</p>
+            <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '22px', fontWeight: 400, color: '#1C1814', marginBottom: '16px' }}>{s.symptom}</h3>
+            <p style={{ fontSize: '14px', color: '#7A6A5A', lineHeight: 1.75, marginBottom: '20px', fontStyle: 'italic' }}>"{s.emotional}"</p>
+            <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '16px' }}>
+              <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#B0A090', marginBottom: '8px' }}>La pregunta que libera</p>
+              <p style={{ fontSize: '14px', color: '#1C1814', fontWeight: 500, fontStyle: 'italic' }}>{s.question}</p>
             </div>
-        </section>
-    );
-};
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
