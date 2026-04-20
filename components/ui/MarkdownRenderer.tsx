@@ -245,14 +245,17 @@ export const SectionHeading: React.FC<{ text: string; color: string; first?: boo
 
 // ─── Inline formatter (bold, italic) ──────────────────
 // Bold → dorado uniforme. Italic → gris suave.
-const InlineMarkdown: React.FC<{ text: string }> = ({ text }) => {
+const InlineMarkdown: React.FC<{ text: string; isStandalone?: boolean }> = ({ text, isStandalone }) => {
     const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
     return (
         <>
             {parts.map((part, i) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     return (
-                        <span key={i} style={{ fontWeight: 600, color: KEYWORD_GOLD }}>
+                        <span key={i} style={{
+                            fontWeight: 600,
+                            color: isStandalone ? '#E8E0D0' : KEYWORD_GOLD
+                        }}>
                             {part.slice(2, -2)}
                         </span>
                     );
@@ -469,9 +472,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                 }
 
                 // Párrafo normal
+                const isStandaloneBold = /^\*\*[^*]+\*\*$|^\*\*[^*]+:\*\*$/.test(trimmed);
                 return (
                     <p key={idx} style={{ ...bodyStyle, marginBottom: '14px' }}>
-                        <InlineMarkdown text={line} />
+                        <InlineMarkdown text={line} isStandalone={isStandaloneBold} />
                     </p>
                 );
             })}
