@@ -752,7 +752,7 @@ export const ProfilePage: React.FC = () => {
   const subscriptionRef = React.useRef<HTMLDivElement>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
-  const [isExportingData, setIsExportingData] = useState(false);
+
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -775,13 +775,6 @@ export const ProfilePage: React.FC = () => {
       if (url) setUser(prev => prev ? { ...prev, avatar: url } : null);
     } catch (error) { logger.error(error); }
     finally { setIsUploading(false); }
-  };
-
-  const handleExportData = async () => {
-    setIsExportingData(true);
-    try { await accountService.downloadMyDataExport(); }
-    catch (error: any) { logger.error(error); alert(error?.message || 'Error al exportar.'); }
-    finally { setIsExportingData(false); }
   };
 
   const handleDeleteAccount = async () => {
@@ -1283,32 +1276,6 @@ export const ProfilePage: React.FC = () => {
               overflow: 'hidden',
             }}
           >
-            <button
-              onClick={handleExportData}
-              disabled={isExportingData}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '14px 18px',
-                background: 'none',
-                border: 'none',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                cursor: isExportingData ? 'not-allowed' : 'pointer',
-                textAlign: 'left',
-                fontFamily: '"Outfit", sans-serif',
-                fontSize: 13,
-                color: '#8B7A6A',
-                opacity: isExportingData ? 0.5 : 1,
-              }}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', fontVariationSettings: "'wght' 300" }}
-              >download</span>
-              {isExportingData ? 'Generando...' : 'Descargar mis datos'}
-            </button>
             <button
               onClick={() => { clearConsent(); alert('Preferencias de cookies reiniciadas.'); }}
               style={{

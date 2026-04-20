@@ -105,7 +105,39 @@ const preprocessMarkdown = (raw: string): string => {
         out.push(line);
     }
 
-    return out.join('\n');
+    // Second pass: remove "emoji + text" lines that duplicate an existing heading
+    const headingNorms = new Set<string>();
+    for (const l of out) {
+        const m = l.match(/^#{1,6}\s+(.+)$/);
+        if (m) {
+            headingNorms.add(
+                m[1].toLowerCase().normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^\w\s]/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+            );
+        }
+    }
+
+    const normStr = (s: string) =>
+        s.replace(/\*+/g, '').toLowerCase().normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^\w\s]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+    const emojiBoldRe2 = /^[\p{Extended_Pictographic}\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]+\s+\*\*(.+?)\*\*/u;
+    const emojiTextRe2 = /^[\p{Extended_Pictographic}\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}]+\s+(.+)$/u;
+
+    return out.filter(l => {
+        const trimmed = l.trim();
+        const mBold = trimmed.match(emojiBoldRe2);
+        if (mBold && headingNorms.has(normStr(mBold[1]))) return false;
+        const mText = trimmed.match(emojiTextRe2);
+        if (mText && headingNorms.has(normStr(mText[1]))) return false;
+        return true;
+    }).join('\n');
 };
 
 // ─── Deduplicación defensiva ─────────────────────────
@@ -121,32 +153,25 @@ const normalizeForCompare = (text: string): string =>
         .trim();
 
 const dedupeConsecutiveHeadings = (markdown: string): string => {
-    if (!markdown) return markdown;
     const lines = markdown.split('\n');
     const result: string[] = [];
-    const seenHeadings = new Set<string>();
-    let lastNonEmptyWasHeading = false;
+    const recentHeadings = new Set<string>();
 
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
         const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+
         if (headingMatch) {
             const normalized = normalizeForCompare(headingMatch[2]);
-            if (seenHeadings.has(normalized)) {
+            if (recentHeadings.has(normalized)) {
                 continue;
             }
-            seenHeadings.add(normalized);
-            lastNonEmptyWasHeading = true;
-            result.push(line);
-        } else if (line.trim() === '') {
-            // Líneas vacías entre headings no resetean el tracker
-            if (!lastNonEmptyWasHeading) {
-                seenHeadings.clear();
-            }
+            recentHeadings.add(normalized);
             result.push(line);
         } else {
-            // Contenido real — resetear tracker
-            lastNonEmptyWasHeading = false;
-            seenHeadings.clear();
+            if (line.trim().length > 20) {
+                recentHeadings.clear();
+            }
             result.push(line);
         }
     }
