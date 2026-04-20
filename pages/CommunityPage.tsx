@@ -348,7 +348,7 @@ export const CommunityPage: React.FC = () => {
                     >
                       <span
                         className="material-symbols-outlined"
-                        style={{ fontSize: 16, color: 'rgba(255,255,255,0.2)', fontVariationSettings: "'wght' 300" }}
+                        style={{ fontSize: 16, color: 'rgba(232,100,100,0.5)', fontVariationSettings: "'wght' 300" }}
                       >close</span>
                     </button>
                   )}
@@ -473,7 +473,7 @@ export const CommunityPage: React.FC = () => {
                           >
                             <span
                               className="material-symbols-outlined"
-                              style={{ fontSize: 14, color: 'rgba(255,255,255,0.2)', fontVariationSettings: "'wght' 300" }}
+                              style={{ fontSize: 14, color: 'rgba(232,100,100,0.5)', fontVariationSettings: "'wght' 300" }}
                             >close</span>
                           </button>
                         )}
@@ -584,12 +584,23 @@ export const CommunityPage: React.FC = () => {
               borderRadius: '24px 24px 0 0',
               width: '100%',
               maxWidth: 480,
-              padding: '28px 24px 40px',
+              maxHeight: '85vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
               boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
             }}
           >
-            {/* Modal Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            {/* Modal Header — fijo arriba */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '20px 24px 14px',
+                flexShrink: 0,
+              }}
+            >
               <h2
                 style={{
                   fontFamily: '"Playfair Display", serif',
@@ -615,119 +626,166 @@ export const CommunityPage: React.FC = () => {
               >
                 <span
                   className="material-symbols-outlined"
-                  style={{ fontSize: 18, color: 'rgba(255,255,255,0.4)', fontVariationSettings: "'wght' 300" }}
+                  style={{ fontSize: 18, color: 'rgba(232,100,100,0.5)', fontVariationSettings: "'wght' 300" }}
                 >close</span>
               </button>
             </div>
 
-            {/* Theme selector */}
-            <p
+            {/* Área scrollable */}
+            <div
               style={{
-                fontFamily: '"Outfit", sans-serif',
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: '#4A4840',
-                margin: '0 0 10px',
+                flex: 1,
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+                padding: '0 24px 14px',
               }}
-            >Elegí un tema</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-              {THEMES.map(t => (
+            >
+              <p
+                style={{
+                  fontFamily: '"Outfit", sans-serif',
+                  fontSize: 10,
+                  fontWeight: 500,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: '#4A4840',
+                  margin: '0 0 10px',
+                }}
+              >Elegí un tema</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+                {THEMES.map(t => {
+                  const selected = selectedTheme === t.key;
+                  return (
+                    <button
+                      key={t.key}
+                      onClick={() => setSelectedTheme(t.key as Intention['theme'])}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                        padding: '10px 16px',
+                        borderRadius: 999,
+                        border: selected ? `1px solid ${t.color}66` : '1px solid rgba(255,255,255,0.08)',
+                        background: selected ? `rgba(${t.rgb},0.15)` : 'rgba(255,255,255,0.04)',
+                        cursor: 'pointer',
+                        fontFamily: '"Outfit", sans-serif',
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: selected ? t.color : '#5A6170',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <span
+                        className="material-symbols-outlined"
+                        style={{
+                          fontSize: 16,
+                          color: selected ? t.color : '#5A6170',
+                          fontVariationSettings: "'wght' 300",
+                          display: 'block',
+                          lineHeight: 1,
+                        }}
+                      >{t.icon}</span>
+                      <span>{t.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <textarea
+                value={newIntention}
+                onChange={(e) => setNewIntention(e.target.value)}
+                rows={4}
+                placeholder={
+                  selectedTheme === 'feedback' ? '¿Cómo te ha ayudado SanArte?' :
+                  selectedTheme === 'gratitude' ? 'Hoy agradezco por...' :
+                  selectedTheme === 'release' ? 'Hoy suelto...' :
+                  'Compartí tu intención o mensaje...'
+                }
+                style={{
+                  width: '100%',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(201,168,76,0.1)',
+                  borderRadius: 12,
+                  padding: '12px 16px',
+                  fontFamily: '"Outfit", sans-serif',
+                  fontSize: 13,
+                  color: '#F0EBE0',
+                  outline: 'none',
+                  resize: 'none',
+                  lineHeight: 1.6,
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Footer — siempre visible */}
+            <div
+              style={{
+                flexShrink: 0,
+                position: 'sticky',
+                bottom: 0,
+                background: '#0E1420',
+                padding: '12px 24px 20px',
+                borderTop: '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 12,
+                }}
+              >
                 <button
-                  key={t.key}
-                  onClick={() => setSelectedTheme(t.key as Intention['theme'])}
+                  onClick={() => setShowName(!showName)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 6,
-                    padding: '8px 12px',
-                    borderRadius: 999,
-                    border: selectedTheme === t.key ? `1px solid rgba(${t.rgb},0.4)` : '1px solid rgba(255,255,255,0.06)',
-                    background: selectedTheme === t.key ? `rgba(${t.rgb},0.12)` : 'transparent',
+                    gap: 8,
+                    background: 'none',
+                    border: 'none',
                     cursor: 'pointer',
-                    fontFamily: '"Outfit", sans-serif',
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: selectedTheme === t.key ? t.color : '#5A6170',
-                    transition: 'all 0.2s',
+                    padding: 0,
                   }}
                 >
                   <span
                     className="material-symbols-outlined"
-                    style={{ fontSize: 14, fontVariationSettings: "'wght' 300" }}
-                  >{t.icon}</span>
-                  {t.label}
+                    style={{
+                      fontSize: 16,
+                      color: '#4A4840',
+                      fontVariationSettings: "'wght' 300",
+                      display: 'block',
+                      lineHeight: 1,
+                    }}
+                  >{showName ? 'person' : 'visibility_off'}</span>
+                  <span
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 12,
+                      color: '#6A6460',
+                    }}
+                  >{showName ? (user?.name || 'Con mi nombre') : 'Anónimo'}</span>
                 </button>
-              ))}
-            </div>
-
-            {/* Textarea */}
-            <textarea
-              value={newIntention}
-              onChange={(e) => setNewIntention(e.target.value)}
-              rows={4}
-              placeholder={
-                selectedTheme === 'feedback' ? '¿Cómo te ha ayudado SanArte?' :
-                selectedTheme === 'gratitude' ? 'Hoy agradezco por...' :
-                selectedTheme === 'release' ? 'Hoy suelto...' :
-                'Compartí tu intención o mensaje...'
-              }
-              style={{
-                width: '100%',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(201,168,76,0.1)',
-                borderRadius: 12,
-                padding: '12px 16px',
-                fontFamily: '"Outfit", sans-serif',
-                fontSize: 13,
-                color: '#F0EBE0',
-                outline: 'none',
-                resize: 'none',
-                lineHeight: 1.6,
-                boxSizing: 'border-box',
-                marginBottom: 14,
-              }}
-            />
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <button
-                onClick={() => setShowName(!showName)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: '"Outfit", sans-serif',
-                  fontSize: 11,
-                  color: '#8B7A6A',
-                  padding: 0,
-                }}
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontSize: 14, fontVariationSettings: "'wght' 300" }}
-                >{showName ? 'visibility' : 'visibility_off'}</span>
-                {showName ? (user?.name || 'Con mi nombre') : 'Anónimo'}
-              </button>
+              </div>
 
               <button
                 onClick={handlePost}
                 disabled={!newIntention.trim()}
                 style={{
-                  padding: '12px 24px',
+                  width: '100%',
+                  padding: '14px 24px',
                   borderRadius: 999,
                   background: newIntention.trim() ? GOLD_GRAD : 'rgba(255,255,255,0.06)',
                   color: newIntention.trim() ? '#060D1B' : 'rgba(255,255,255,0.2)',
                   border: 'none',
                   fontFamily: '"Outfit", sans-serif',
                   fontWeight: 700,
-                  fontSize: 12,
+                  fontSize: 13,
                   letterSpacing: '0.04em',
                   cursor: newIntention.trim() ? 'pointer' : 'not-allowed',
                   transition: 'all 0.2s',
+                  boxShadow: newIntention.trim() ? '0 8px 24px rgba(201,168,76,0.2)' : 'none',
                 }}
               >
                 Publicar

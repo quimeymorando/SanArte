@@ -16,6 +16,7 @@ const VIOLET = '#A78BFA';
 const SAGE = '#8BA888';
 const ROSE = '#F472B6';
 const SLATE = '#7B9BB5';
+const X_RED = 'rgba(232,100,100,0.5)';
 
 // ─── Sticky Header común ───────────────────────────
 const StickyHeader: React.FC<{ kicker: string; title: string; subtitle?: React.ReactNode }> = ({ kicker, title, subtitle }) => (
@@ -136,8 +137,8 @@ export const FavoritesPage: React.FC = () => {
                   className="material-symbols-outlined"
                   style={{
                     fontSize: 18,
-                    color: 'rgba(167,139,250,0.5)',
-                    fontVariationSettings: "'wght' 300",
+                    color: VIOLET,
+                    fontVariationSettings: "'wght' 400, 'FILL' 1",
                     flexShrink: 0,
                   }}
                 >favorite</span>
@@ -185,7 +186,7 @@ export const FavoritesPage: React.FC = () => {
                     className="material-symbols-outlined"
                     style={{
                       fontSize: 18,
-                      color: 'rgba(255,255,255,0.2)',
+                      color: X_RED,
                       fontVariationSettings: "'wght' 300",
                     }}
                   >close</span>
@@ -200,12 +201,135 @@ export const FavoritesPage: React.FC = () => {
 };
 
 // ═══════════════════════════════════════════════════════
+// ─── ROUTINE ITEM ───────────────────────────────────
+// ═══════════════════════════════════════════════════════
+
+const RoutineItem: React.FC<{
+  routine: Routine;
+  onToggle: (id: string) => void;
+  onDelete: (id: string, e: React.MouseEvent) => void;
+  faded?: boolean;
+}> = ({ routine, onToggle, onDelete, faded = false }) => (
+  <div
+    onClick={() => onToggle(routine.id)}
+    style={{
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: 14,
+      padding: '16px 20px',
+      borderBottom: '1px solid rgba(255,255,255,0.05)',
+      cursor: 'pointer',
+      opacity: faded ? 0.4 : (routine.completed ? 0.55 : 1),
+      transition: 'opacity 0.2s',
+    }}
+  >
+    <div
+      style={{
+        width: 28,
+        height: 28,
+        borderRadius: 8,
+        flexShrink: 0,
+        marginTop: 0,
+        border: routine.completed ? `2px solid ${SAGE}` : '2px solid rgba(255,255,255,0.2)',
+        background: routine.completed ? 'rgba(139,168,136,0.15)' : 'transparent',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'all 0.2s',
+      }}
+    >
+      {routine.completed && (
+        <span
+          className="material-symbols-outlined"
+          style={{
+            fontSize: 18,
+            color: SAGE,
+            fontVariationSettings: "'wght' 500",
+            lineHeight: 1,
+          }}
+        >check</span>
+      )}
+    </div>
+
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <p
+        style={{
+          fontFamily: '"Outfit", sans-serif',
+          fontSize: 14,
+          fontWeight: 500,
+          color: routine.completed ? '#4A4840' : '#C8BFB0',
+          textDecoration: routine.completed ? 'line-through' : 'none',
+          margin: 0,
+        }}
+      >{routine.text}</p>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginTop: 6,
+          flexWrap: 'wrap',
+        }}
+      >
+        {routine.time && (
+          <span style={{ fontFamily: '"Outfit", sans-serif', fontSize: 11, color: '#4A4840' }}>
+            {routine.time}
+          </span>
+        )}
+        {routine.category && (
+          <span
+            style={{
+              display: 'inline-block',
+              fontFamily: '"Outfit", sans-serif',
+              fontSize: 10,
+              fontWeight: 500,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: GOLD,
+              border: '1px solid rgba(201,168,76,0.2)',
+              borderRadius: 999,
+              padding: '2px 8px',
+            }}
+          >{routine.category}</span>
+        )}
+        {routine.source && (
+          <span style={{ fontFamily: '"Outfit", sans-serif', fontSize: 10, color: 'rgba(201,168,76,0.45)' }}>
+            {routine.source}
+          </span>
+        )}
+      </div>
+    </div>
+
+    <button
+      onClick={(e) => onDelete(routine.id, e)}
+      style={{
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        padding: 6,
+        flexShrink: 0,
+      }}
+    >
+      <span
+        className="material-symbols-outlined"
+        style={{
+          fontSize: 18,
+          color: X_RED,
+          fontVariationSettings: "'wght' 300",
+        }}
+      >close</span>
+    </button>
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════
 // ─── ROUTINES PAGE ──────────────────────────────────
 // ═══════════════════════════════════════════════════════
 
 export const RoutinesPage: React.FC = () => {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [xpAdded, setXpAdded] = useState<number | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
 
   useEffect(() => { getStoredRoutines().then(setRoutines); }, []);
 
@@ -230,8 +354,10 @@ export const RoutinesPage: React.FC = () => {
     if (success) setRoutines(prev => prev.filter(r => r.id !== id));
   };
 
-  const completedCount = routines.filter(r => r.completed).length;
+  const pendingRoutines = routines.filter(r => !r.completed);
+  const completedRoutines = routines.filter(r => r.completed);
   const total = routines.length;
+  const completedCount = completedRoutines.length;
 
   const subtitle = total === 0
     ? <span style={{ color: '#4A4840' }}>Construí tu bienestar día a día</span>
@@ -299,125 +425,92 @@ export const RoutinesPage: React.FC = () => {
           </div>
         ) : (
           <div>
-            {routines.map((routine) => (
-              <div
-                key={routine.id}
-                onClick={() => handleToggle(routine.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 14,
-                  padding: '16px 20px',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  cursor: 'pointer',
-                  opacity: routine.completed ? 0.5 : 1,
-                  transition: 'opacity 0.2s',
-                }}
-              >
+            {pendingRoutines.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                 <div
                   style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: 6,
-                    flexShrink: 0,
-                    marginTop: 1,
-                    border: routine.completed ? `2px solid ${SAGE}` : '2px solid rgba(255,255,255,0.15)',
-                    background: routine.completed ? 'rgba(139,168,136,0.15)' : 'transparent',
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    background: 'rgba(139,168,136,0.1)',
+                    border: '1px solid rgba(139,168,136,0.2)',
+                    margin: '0 auto 16px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'all 0.2s',
                   }}
                 >
-                  {routine.completed && (
-                    <span
-                      className="material-symbols-outlined"
-                      style={{
-                        fontSize: 14,
-                        color: SAGE,
-                        fontVariationSettings: "'wght' 400",
-                      }}
-                    >check</span>
-                  )}
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: 24, color: SAGE, fontVariationSettings: "'wght' 300" }}
+                  >check_circle</span>
                 </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p
-                    style={{
-                      fontFamily: '"Outfit", sans-serif',
-                      fontSize: 14,
-                      fontWeight: 500,
-                      color: routine.completed ? '#4A4840' : '#C8BFB0',
-                      textDecoration: routine.completed ? 'line-through' : 'none',
-                      margin: 0,
-                    }}
-                  >{routine.text}</p>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      marginTop: 6,
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    {routine.time && (
-                      <span
-                        style={{
-                          fontFamily: '"Outfit", sans-serif',
-                          fontSize: 11,
-                          color: '#4A4840',
-                        }}
-                      >{routine.time}</span>
-                    )}
-                    {routine.category && (
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          fontFamily: '"Outfit", sans-serif',
-                          fontSize: 10,
-                          fontWeight: 500,
-                          letterSpacing: '0.1em',
-                          textTransform: 'uppercase',
-                          color: GOLD,
-                          border: '1px solid rgba(201,168,76,0.2)',
-                          borderRadius: 999,
-                          padding: '2px 8px',
-                        }}
-                      >{routine.category}</span>
-                    )}
-                    {routine.source && (
-                      <span
-                        style={{
-                          fontFamily: '"Outfit", sans-serif',
-                          fontSize: 10,
-                          color: 'rgba(201,168,76,0.45)',
-                        }}
-                      >{routine.source}</span>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  onClick={(e) => handleDelete(routine.id, e)}
+                <p
                   style={{
+                    fontFamily: '"Playfair Display", serif',
+                    fontStyle: 'italic',
+                    fontSize: 16,
+                    color: SAGE,
+                    margin: 0,
+                  }}
+                >Todo completado hoy</p>
+              </div>
+            )}
+
+            {pendingRoutines.map(routine => (
+              <RoutineItem
+                key={routine.id}
+                routine={routine}
+                onToggle={handleToggle}
+                onDelete={handleDelete}
+              />
+            ))}
+
+            {completedRoutines.length > 0 && (
+              <div style={{ padding: '0 20px' }}>
+                <button
+                  onClick={() => setShowCompleted(!showCompleted)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    padding: '14px 20px',
                     background: 'none',
-                    border: 'none',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 12,
                     cursor: 'pointer',
-                    padding: 6,
-                    flexShrink: 0,
+                    margin: '16px 0 8px',
                   }}
                 >
                   <span
                     className="material-symbols-outlined"
                     style={{
                       fontSize: 18,
-                      color: 'rgba(255,255,255,0.2)',
+                      color: '#4A4840',
                       fontVariationSettings: "'wght' 300",
                     }}
-                  >close</span>
+                  >{showCompleted ? 'expand_less' : 'expand_more'}</span>
+                  <span
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 12,
+                      color: '#4A4840',
+                    }}
+                  >Ver completadas ({completedRoutines.length})</span>
                 </button>
               </div>
+            )}
+
+            {showCompleted && completedRoutines.map(routine => (
+              <RoutineItem
+                key={routine.id}
+                routine={routine}
+                onToggle={handleToggle}
+                onDelete={handleDelete}
+                faded
+              />
             ))}
           </div>
         )}
@@ -427,7 +520,7 @@ export const RoutinesPage: React.FC = () => {
 };
 
 // ═══════════════════════════════════════════════════════
-// ─── HISTORY PAGE (sin cambios de estilo mayor) ─────
+// ─── HISTORY PAGE ───────────────────────────────────
 // ═══════════════════════════════════════════════════════
 
 export const HistoryPage: React.FC = () => {
@@ -499,7 +592,7 @@ export const HistoryPage: React.FC = () => {
                   >
                     <span
                       className="material-symbols-outlined"
-                      style={{ fontSize: 18, color: 'rgba(255,255,255,0.2)', fontVariationSettings: "'wght' 300" }}
+                      style={{ fontSize: 18, color: X_RED, fontVariationSettings: "'wght' 300" }}
                     >close</span>
                   </button>
                 </div>
@@ -513,7 +606,7 @@ export const HistoryPage: React.FC = () => {
 };
 
 // ═══════════════════════════════════════════════════════
-// ─── PROFILE PAGE ───────────────────────────────────
+// ─── PROFILE HELPERS ────────────────────────────────
 // ═══════════════════════════════════════════════════════
 
 const SectionLabel: React.FC<{ children: React.ReactNode; faint?: boolean }> = ({ children, faint = false }) => (
@@ -540,16 +633,27 @@ const StatCard: React.FC<{ icon: string; iconColor: string; value: number | stri
       textAlign: 'center',
     }}
   >
-    <span
-      className="material-symbols-outlined"
+    <div
       style={{
-        fontSize: 20,
-        color: iconColor,
-        fontVariationSettings: "'wght' 300",
-        display: 'block',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
         marginBottom: 4,
       }}
-    >{icon}</span>
+    >
+      <span
+        className="material-symbols-outlined"
+        style={{
+          fontSize: 20,
+          color: iconColor,
+          fontVariationSettings: "'wght' 300",
+          display: 'block',
+          lineHeight: 1,
+          textAlign: 'center',
+        }}
+      >{icon}</span>
+    </div>
     <p
       style={{
         fontFamily: '"Playfair Display", serif',
@@ -607,7 +711,14 @@ const ActionCard: React.FC<{ icon: string; accent: string; title: string; desc: 
     >
       <span
         className="material-symbols-outlined"
-        style={{ fontSize: 20, color: accent, fontVariationSettings: "'wght' 300" }}
+        style={{
+          fontSize: 20,
+          color: accent,
+          fontVariationSettings: "'wght' 300",
+          display: 'block',
+          lineHeight: 1,
+          textAlign: 'center',
+        }}
       >{icon}</span>
     </div>
     <div style={{ flex: 1, minWidth: 0 }}>
@@ -621,6 +732,19 @@ const ActionCard: React.FC<{ icon: string; accent: string; title: string; desc: 
   </button>
 );
 
+// ═══════════════════════════════════════════════════════
+// ─── PROFILE PAGE ───────────────────────────────────
+// ═══════════════════════════════════════════════════════
+
+const HEALTH_DISCLAIMER_TEXT =
+  'SanArte es una herramienta de bienestar emocional y no reemplaza el diagnóstico ni tratamiento médico profesional. Ante cualquier síntoma físico, consultá siempre a un profesional de la salud. El uso de esta app es responsabilidad exclusiva del usuario.';
+
+const TERMS_TEXT =
+  'Al usar SanArte aceptás las condiciones del servicio: uso personal y no comercial, respeto a la comunidad, y reconocimiento de que la app es una guía de exploración emocional. Podemos actualizar estas condiciones notificándote por email.';
+
+const PRIVACY_TEXT =
+  'Guardamos únicamente los datos necesarios para que tu experiencia funcione: perfil, favoritos, historial de consultas, rutinas y reflexiones. No vendemos tus datos. Podés exportar o eliminar tu información en cualquier momento desde este perfil.';
+
 export const ProfilePage: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const navigate = useNavigate();
@@ -630,6 +754,7 @@ export const ProfilePage: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isExportingData, setIsExportingData] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -709,65 +834,87 @@ export const ProfilePage: React.FC = () => {
 
         {/* Avatar + Name */}
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            style={{
-              position: 'relative',
-              width: 72,
-              height: 72,
-              borderRadius: '50%',
-              margin: '0 auto 16px',
-              border: `2px solid ${GOLD}`,
-              padding: 3,
-              cursor: 'pointer',
-              background: 'rgba(201,168,76,0.08)',
-            }}
-          >
-            {user.avatar ? (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  backgroundImage: `url('${user.avatar}')`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  background: 'rgba(201,168,76,0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: '"Playfair Display", serif',
-                  fontSize: 26,
-                  color: GOLD,
-                }}
-              >{initial}</div>
-            )}
-            {isUploading && (
+          <div style={{ position: 'relative', display: 'inline-block', marginBottom: 16 }}>
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                border: `2px solid ${GOLD}`,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                position: 'relative',
+                background: 'rgba(201,168,76,0.08)',
+              }}
+            >
+              {user.avatar ? (
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundImage: `url('${user.avatar}')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'rgba(201,168,76,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: '"Playfair Display", serif',
+                    fontSize: 28,
+                    color: GOLD,
+                  }}
+                >{initial}</div>
+              )}
+              {/* Overlay photo_camera */}
               <div
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.5)',
+                  background: 'rgba(0,0,0,0.4)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  opacity: 0,
+                  transition: 'opacity 0.2s',
                 }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = '1'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = '0'; }}
               >
                 <span
-                  className="material-symbols-outlined animate-spin"
-                  style={{ fontSize: 20, color: '#fff' }}
-                >progress_activity</span>
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: 20,
+                    color: 'rgba(255,255,255,0.8)',
+                    fontVariationSettings: "'wght' 300",
+                  }}
+                >photo_camera</span>
               </div>
-            )}
+              {isUploading && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.6)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined animate-spin"
+                    style={{ fontSize: 22, color: '#fff' }}
+                  >progress_activity</span>
+                </div>
+              )}
+            </div>
             <input type="file" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" />
           </div>
           <h1
@@ -823,28 +970,267 @@ export const ProfilePage: React.FC = () => {
         {/* Subscription */}
         <div ref={subscriptionRef} style={{ marginBottom: 36 }}>
           <SectionLabel>Suscripción</SectionLabel>
-          <ManageSubscription isPremium={user.isPremium} userEmail={user.email} />
-          {!user.isPremium && (
-            <button
-              onClick={() => navigate('/upgrade')}
+          {user.isPremium ? (
+            <div
               style={{
-                width: '100%',
-                marginTop: 12,
-                padding: 14,
-                borderRadius: 999,
-                background: GOLD_GRAD,
-                color: '#060D1B',
-                border: 'none',
-                fontFamily: '"Outfit", sans-serif',
-                fontWeight: 700,
-                fontSize: 13,
-                letterSpacing: '0.04em',
-                cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(201,168,76,0.2)',
+                background: 'rgba(201,168,76,0.06)',
+                border: '1px solid rgba(201,168,76,0.2)',
+                borderLeft: `3px solid ${GOLD}`,
+                borderRadius: 16,
+                padding: 20,
               }}
             >
-              Conocer Premium
-            </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background: 'rgba(201,168,76,0.12)',
+                    border: '1px solid rgba(201,168,76,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 20,
+                      color: GOLD,
+                      fontVariationSettings: "'wght' 300",
+                      display: 'block',
+                      lineHeight: 1,
+                    }}
+                  >diamond</span>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontFamily: '"Playfair Display", serif',
+                      fontSize: 16,
+                      fontWeight: 400,
+                      color: '#F0EBE0',
+                      margin: 0,
+                    }}
+                  >Loto Brillante</p>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 11,
+                      color: SAGE,
+                      margin: '2px 0 0',
+                      letterSpacing: '0.08em',
+                    }}
+                  >● PREMIUM ACTIVO</p>
+                </div>
+                <span
+                  style={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontSize: 10,
+                    fontWeight: 600,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: GOLD,
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    borderRadius: 999,
+                    padding: '3px 10px',
+                  }}
+                >PRO</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                <div
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 12,
+                    padding: 12,
+                    textAlign: 'center',
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 18,
+                      color: GOLD,
+                      display: 'block',
+                      marginBottom: 4,
+                      fontVariationSettings: "'wght' 300",
+                      lineHeight: 1,
+                    }}
+                  >all_inclusive</span>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 9,
+                      fontWeight: 600,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: '#6A6460',
+                      margin: 0,
+                    }}
+                  >Búsquedas</p>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: SAGE,
+                      margin: '2px 0 0',
+                    }}
+                  >Ilimitadas</p>
+                </div>
+                <div
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 12,
+                    padding: 12,
+                    textAlign: 'center',
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 18,
+                      color: VIOLET,
+                      display: 'block',
+                      marginBottom: 4,
+                      fontVariationSettings: "'wght' 300",
+                      lineHeight: 1,
+                    }}
+                  >block</span>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 9,
+                      fontWeight: 600,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: '#6A6460',
+                      margin: 0,
+                    }}
+                  >Publicidad</p>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: VIOLET,
+                      margin: '2px 0 0',
+                    }}
+                  >Sin Ads</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowSubscriptionManager(v => !v)}
+                style={{
+                  width: '100%',
+                  padding: 12,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  fontFamily: '"Outfit", sans-serif',
+                  fontSize: 13,
+                  color: '#8B7A6A',
+                }}
+              >{showSubscriptionManager ? 'Cerrar' : 'Gestionar Suscripción'}</button>
+
+              {showSubscriptionManager && (
+                <div style={{ marginTop: 12 }}>
+                  <ManageSubscription isPremium={user.isPremium} userEmail={user.email} />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div
+              style={{
+                background: 'linear-gradient(135deg, rgba(201,168,76,0.12), rgba(240,208,128,0.05))',
+                border: '1px solid rgba(201,168,76,0.25)',
+                borderLeft: `3px solid ${GOLD}`,
+                borderRadius: 16,
+                padding: 20,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '50%',
+                    background: 'rgba(201,168,76,0.15)',
+                    border: '1px solid rgba(201,168,76,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 20,
+                      color: GOLD,
+                      fontVariationSettings: "'wght' 300",
+                      display: 'block',
+                      lineHeight: 1,
+                    }}
+                  >auto_awesome</span>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontFamily: '"Playfair Display", serif',
+                      fontSize: 16,
+                      fontWeight: 400,
+                      color: '#F0EBE0',
+                      margin: 0,
+                    }}
+                  >Plan gratuito</p>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 11,
+                      color: '#6A6460',
+                      margin: '2px 0 0',
+                      letterSpacing: '0.08em',
+                    }}
+                  >Accedé a funciones básicas</p>
+                </div>
+              </div>
+              <p
+                style={{
+                  fontFamily: '"Outfit", sans-serif',
+                  fontSize: 12,
+                  color: '#8B7A6A',
+                  lineHeight: 1.65,
+                  margin: '0 0 14px',
+                }}
+              >Desbloqueá búsquedas ilimitadas, meditaciones guiadas, ritos premium y experiencia sin publicidad.</p>
+              <button
+                onClick={() => navigate('/upgrade')}
+                style={{
+                  width: '100%',
+                  padding: 14,
+                  borderRadius: 999,
+                  background: GOLD_GRAD,
+                  color: '#060D1B',
+                  border: 'none',
+                  fontFamily: '"Outfit", sans-serif',
+                  fontWeight: 700,
+                  fontSize: 13,
+                  letterSpacing: '0.04em',
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 24px rgba(201,168,76,0.2)',
+                }}
+              >Desbloquear Premium →</button>
+            </div>
           )}
         </div>
 
@@ -872,9 +1258,12 @@ export const ProfilePage: React.FC = () => {
                       fontSize: 20,
                       color: unlocked ? badge.color : 'rgba(255,255,255,0.2)',
                       fontVariationSettings: "'wght' 300",
+                      display: 'block',
+                      lineHeight: 1,
+                      textAlign: 'center',
                     }}
                   >{badge.icon}</span>
-                  <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 10, color: '#4A4840', margin: '4px 0 0' }}>
+                  <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 10, color: '#4A4840', margin: '6px 0 0' }}>
                     {badge.name}
                   </p>
                 </div>
@@ -883,9 +1272,9 @@ export const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Privacidad */}
+        {/* Privacidad (datos) */}
         <div style={{ marginBottom: 36 }}>
-          <SectionLabel>Privacidad</SectionLabel>
+          <SectionLabel>Datos personales</SectionLabel>
           <div
             style={{
               borderRadius: 14,
@@ -996,6 +1385,101 @@ export const ProfilePage: React.FC = () => {
               />
             </div>
           </button>
+        </div>
+
+        {/* Información Legal */}
+        <div style={{ marginBottom: 36 }}>
+          <SectionLabel faint>Información legal</SectionLabel>
+          <div
+            style={{
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.05)',
+              borderRadius: 14,
+              overflow: 'hidden',
+            }}
+          >
+            {[
+              { icon: 'gavel', label: 'Términos y condiciones', body: TERMS_TEXT },
+              { icon: 'privacy_tip', label: 'Política de privacidad', body: PRIVACY_TEXT },
+              { icon: 'health_and_safety', label: 'Aviso de salud', body: HEALTH_DISCLAIMER_TEXT },
+            ].map((item, idx) => (
+              <button
+                key={item.label}
+                onClick={() => alert(item.body)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '14px 18px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderTop: idx > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                }}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: 18,
+                    color: '#4A4840',
+                    fontVariationSettings: "'wght' 300",
+                  }}
+                >{item.icon}</span>
+                <span
+                  style={{
+                    fontFamily: '"Outfit", sans-serif',
+                    fontSize: 13,
+                    color: '#6A6460',
+                    flex: 1,
+                    textAlign: 'left',
+                  }}
+                >{item.label}</span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: 16,
+                    color: 'rgba(255,255,255,0.1)',
+                    fontVariationSettings: "'wght' 300",
+                  }}
+                >chevron_right</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Aviso de salud inline */}
+          <div
+            style={{
+              marginTop: 12,
+              background: 'rgba(232,168,124,0.05)',
+              border: '1px solid rgba(232,168,124,0.15)',
+              borderLeft: '3px solid #E8A87C',
+              borderRadius: 12,
+              padding: '14px 16px',
+            }}
+          >
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: 16,
+                  color: '#E8A87C',
+                  flexShrink: 0,
+                  marginTop: 1,
+                  fontVariationSettings: "'wght' 300",
+                }}
+              >warning</span>
+              <p
+                style={{
+                  fontFamily: '"Outfit", sans-serif',
+                  fontSize: 11,
+                  color: '#A08570',
+                  lineHeight: 1.65,
+                  margin: 0,
+                }}
+              >{HEALTH_DISCLAIMER_TEXT}</p>
+            </div>
+          </div>
         </div>
 
         {/* CUENTA */}

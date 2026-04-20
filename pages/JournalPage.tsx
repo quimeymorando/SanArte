@@ -328,7 +328,7 @@ export const JournalPage: React.FC = () => {
                                             className="material-symbols-outlined"
                                             style={{
                                                 fontSize: 18,
-                                                color: 'rgba(255,255,255,0.2)',
+                                                color: 'rgba(232,100,100,0.5)',
                                                 fontVariationSettings: "'wght' 300",
                                             }}
                                         >close</span>
@@ -409,7 +409,7 @@ export const JournalPage: React.FC = () => {
                                                 className="material-symbols-outlined"
                                                 style={{
                                                     fontSize: 18,
-                                                    color: 'rgba(255,255,255,0.2)',
+                                                    color: 'rgba(232,100,100,0.5)',
                                                     fontVariationSettings: "'wght' 300",
                                                 }}
                                             >close</span>
