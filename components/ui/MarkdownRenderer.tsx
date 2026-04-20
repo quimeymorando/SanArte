@@ -246,19 +246,19 @@ export const SectionHeading: React.FC<{ text: string; color: string; first?: boo
 // ─── Inline formatter (bold, italic) ──────────────────
 // Bold → dorado uniforme. Italic → gris suave.
 const InlineMarkdown: React.FC<{ text: string }> = ({ text }) => {
-    const isEntireTextBold = /^\*\*[^*]+\*\*$/.test(text.trim()) ||
-                              /^\*\*[^*]+:\*\*$/.test(text.trim());
     const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
     return (
         <>
             {parts.map((part, i) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
+                    const innerText = part.slice(2, -2);
+                    const isKeyword = innerText.endsWith(':');
                     return (
                         <span key={i} style={{
                             fontWeight: 600,
-                            color: isEntireTextBold ? '#E8E0D0' : KEYWORD_GOLD
+                            color: isKeyword ? KEYWORD_GOLD : '#E8E0D0'
                         }}>
-                            {part.slice(2, -2)}
+                            {innerText}
                         </span>
                     );
                 }
