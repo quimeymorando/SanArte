@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { UserProfile } from '../../types';
+import { userHistoryService, HistoryItem, FavoriteItem } from '../../services/userHistoryService';
 
 // ─── Sacred Noir · Tierra Dorada palette ────────────────
 const NAVY = '#0B1628';
@@ -540,6 +541,218 @@ const DailyQuote = () => {
     );
 };
 
+// ─── HISTORY CARD ────────────────────────────────────
+const HistoryCard = ({ items, onItemClick }: {
+    items: HistoryItem[];
+    onItemClick: (slug: string) => void;
+}) => {
+    if (items.length === 0) return null;
+
+    return (
+        <div
+            style={{
+                background: 'rgba(255,255,255,0.025)',
+                border: '1px solid rgba(201,168,76,0.12)',
+                borderLeft: `3px solid ${GOLD}`,
+                borderRadius: 16,
+                padding: '18px 20px',
+                marginBottom: 12,
+            }}
+        >
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 14,
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 18,
+                            color: GOLD,
+                            fontVariationSettings: "'wght' 300",
+                        }}
+                    >history</span>
+                    <span
+                        style={{
+                            fontFamily: '"Outfit", sans-serif',
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: GOLD,
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                        }}
+                    >Búsquedas recientes</span>
+                </div>
+            </div>
+
+            {items.map((item, idx) => (
+                <button
+                    key={item.id}
+                    onClick={() => onItemClick(item.slug || item.symptom_name)}
+                    style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 0',
+                        background: 'none',
+                        cursor: 'pointer',
+                        borderLeft: 'none',
+                        borderRight: 'none',
+                        borderBottom: 'none',
+                        borderTopColor: idx > 0 ? 'rgba(255,255,255,0.05)' : 'transparent',
+                        borderTopStyle: idx > 0 ? 'solid' : 'none',
+                        borderTopWidth: idx > 0 ? 1 : 0,
+                    }}
+                >
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 16,
+                            color: 'rgba(201,168,76,0.4)',
+                            fontVariationSettings: "'wght' 300",
+                            flexShrink: 0,
+                        }}
+                    >search</span>
+                    <span
+                        style={{
+                            fontFamily: '"Outfit", sans-serif',
+                            fontSize: 13,
+                            color: '#C8BFB0',
+                            textAlign: 'left',
+                            flex: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {item.symptom_name}
+                    </span>
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 16,
+                            color: 'rgba(201,168,76,0.25)',
+                            fontVariationSettings: "'wght' 300",
+                            flexShrink: 0,
+                        }}
+                    >chevron_right</span>
+                </button>
+            ))}
+        </div>
+    );
+};
+
+// ─── FAVORITES CARD ──────────────────────────────────
+const FavoritesCard = ({ items, onItemClick }: {
+    items: FavoriteItem[];
+    onItemClick: (slug: string) => void;
+}) => {
+    if (items.length === 0) return null;
+
+    return (
+        <div
+            style={{
+                background: 'rgba(255,255,255,0.025)',
+                border: '1px solid rgba(167,139,250,0.15)',
+                borderLeft: '3px solid #A78BFA',
+                borderRadius: 16,
+                padding: '18px 20px',
+                marginBottom: 12,
+            }}
+        >
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 14,
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 18,
+                            color: '#A78BFA',
+                            fontVariationSettings: "'wght' 300",
+                        }}
+                    >favorite</span>
+                    <span
+                        style={{
+                            fontFamily: '"Outfit", sans-serif',
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: '#A78BFA',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                        }}
+                    >Mis favoritos</span>
+                </div>
+            </div>
+
+            {items.map((item, idx) => (
+                <button
+                    key={item.id}
+                    onClick={() => onItemClick(item.slug || item.symptom_name)}
+                    style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 0',
+                        background: 'none',
+                        cursor: 'pointer',
+                        borderLeft: 'none',
+                        borderRight: 'none',
+                        borderBottom: 'none',
+                        borderTopColor: idx > 0 ? 'rgba(255,255,255,0.05)' : 'transparent',
+                        borderTopStyle: idx > 0 ? 'solid' : 'none',
+                        borderTopWidth: idx > 0 ? 1 : 0,
+                    }}
+                >
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 16,
+                            color: 'rgba(167,139,250,0.5)',
+                            fontVariationSettings: "'wght' 400",
+                            flexShrink: 0,
+                        }}
+                    >favorite</span>
+                    <span
+                        style={{
+                            fontFamily: '"Outfit", sans-serif',
+                            fontSize: 13,
+                            color: '#C8BFB0',
+                            textAlign: 'left',
+                            flex: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {item.symptom_name}
+                    </span>
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 16,
+                            color: 'rgba(167,139,250,0.25)',
+                            fontVariationSettings: "'wght' 300",
+                            flexShrink: 0,
+                        }}
+                    >chevron_right</span>
+                </button>
+            ))}
+        </div>
+    );
+};
+
 // ─── LOGO HEADER (inline, reemplaza top nav) ─────────
 const LogoHeader = ({ user, onProfile }: { user: UserProfile | null; onProfile: () => void }) => {
     const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'S';
@@ -636,12 +849,21 @@ export const BentoGrid = () => {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [streak, setStreak] = useState(0);
     const [greeting, setGreeting] = useState('');
+    const [recentHistory, setRecentHistory] = useState<HistoryItem[]>([]);
+    const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
     useEffect(() => {
         const load = async () => {
             const u = await authService.getUser();
             setUser(u);
             setStreak(u?.currentStreak || 0);
+
+            const [history, favs] = await Promise.all([
+                userHistoryService.getRecentHistory(5),
+                userHistoryService.getFavorites(5),
+            ]);
+            setRecentHistory(history);
+            setFavorites(favs);
         };
         load();
         const h = new Date().getHours();
@@ -651,6 +873,10 @@ export const BentoGrid = () => {
     const handleSearch = (q: string) => {
         authService.addXP(20);
         navigate(`/search?initial=${encodeURIComponent(q)}`);
+    };
+
+    const handleHistoryItemClick = (slug: string) => {
+        navigate(`/symptom-detail?q=${encodeURIComponent(slug)}`);
     };
 
     const xpLevel = Math.floor((user?.xp || 0) / 100);
@@ -720,6 +946,10 @@ export const BentoGrid = () => {
                 </div>
 
                 <StatsCard level={xpLevel} streak={streak} />
+
+                <HistoryCard items={recentHistory} onItemClick={handleHistoryItemClick} />
+                <FavoritesCard items={favorites} onItemClick={handleHistoryItemClick} />
+
                 <DailyQuote />
 
                 <div className="text-center pb-6">
