@@ -245,7 +245,9 @@ export const SectionHeading: React.FC<{ text: string; color: string; first?: boo
 
 // ─── Inline formatter (bold, italic) ──────────────────
 // Bold → dorado uniforme. Italic → gris suave.
-const InlineMarkdown: React.FC<{ text: string; isStandalone?: boolean }> = ({ text, isStandalone }) => {
+const InlineMarkdown: React.FC<{ text: string }> = ({ text }) => {
+    const isEntireTextBold = /^\*\*[^*]+\*\*$/.test(text.trim()) ||
+                              /^\*\*[^*]+:\*\*$/.test(text.trim());
     const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
     return (
         <>
@@ -254,7 +256,7 @@ const InlineMarkdown: React.FC<{ text: string; isStandalone?: boolean }> = ({ te
                     return (
                         <span key={i} style={{
                             fontWeight: 600,
-                            color: isStandalone ? '#E8E0D0' : KEYWORD_GOLD
+                            color: isEntireTextBold ? '#E8E0D0' : KEYWORD_GOLD
                         }}>
                             {part.slice(2, -2)}
                         </span>
@@ -450,32 +452,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                     );
                 }
 
-                // Bold-only line: sub-label o transición narrativa (NO dorado)
-                // Ejemplo: **Zona Corporal:**, **No es solo físico**
-                if (/^\*\*[^*]+\*\*:?$/.test(trimmed)) {
-                    const labelText = trimmed.replace(/^\*\*/, '').replace(/\*\*:?$/, '');
-                    return (
-                        <p
-                            key={idx}
-                            style={{
-                                fontFamily: '"Outfit", "Inter", sans-serif',
-                                fontSize: '13px',
-                                fontWeight: 600,
-                                color: '#E8E0D0',
-                                margin: '16px 0 6px',
-                                lineHeight: 1.4,
-                            }}
-                        >
-                            {labelText}
-                        </p>
-                    );
-                }
-
                 // Párrafo normal
-                const isStandaloneBold = /^\*\*[^*]+\*\*$|^\*\*[^*]+:\*\*$/.test(trimmed);
                 return (
                     <p key={idx} style={{ ...bodyStyle, marginBottom: '14px' }}>
-                        <InlineMarkdown text={line} isStandalone={isStandaloneBold} />
+                        <InlineMarkdown text={line} />
                     </p>
                 );
             })}
