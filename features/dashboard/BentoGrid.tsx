@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import { UserProfile } from '../../types';
-import { userHistoryService, HistoryItem, FavoriteItem } from '../../services/userHistoryService';
+import { userHistoryService, FavoriteItem } from '../../services/userHistoryService';
 
 // ─── Sacred Noir · Tierra Dorada palette ────────────────
 const NAVY = '#0B1628';
@@ -541,112 +541,6 @@ const DailyQuote = () => {
     );
 };
 
-// ─── HISTORY CARD ────────────────────────────────────
-const HistoryCard = ({ items, onItemClick }: {
-    items: HistoryItem[];
-    onItemClick: (slug: string) => void;
-}) => {
-    if (items.length === 0) return null;
-
-    return (
-        <div
-            style={{
-                background: 'rgba(255,255,255,0.025)',
-                border: '1px solid rgba(201,168,76,0.12)',
-                borderLeft: `3px solid ${GOLD}`,
-                borderRadius: 16,
-                padding: '18px 20px',
-                marginBottom: 12,
-            }}
-        >
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 14,
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span
-                        className="material-symbols-outlined"
-                        style={{
-                            fontSize: 18,
-                            color: GOLD,
-                            fontVariationSettings: "'wght' 300",
-                        }}
-                    >history</span>
-                    <span
-                        style={{
-                            fontFamily: '"Outfit", sans-serif',
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: GOLD,
-                            letterSpacing: '0.08em',
-                            textTransform: 'uppercase',
-                        }}
-                    >Búsquedas recientes</span>
-                </div>
-            </div>
-
-            {items.map((item, idx) => (
-                <button
-                    key={item.id}
-                    onClick={() => onItemClick(item.slug || item.symptom_name)}
-                    style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        padding: '10px 0',
-                        background: 'none',
-                        cursor: 'pointer',
-                        borderLeft: 'none',
-                        borderRight: 'none',
-                        borderBottom: 'none',
-                        borderTopColor: idx > 0 ? 'rgba(255,255,255,0.05)' : 'transparent',
-                        borderTopStyle: idx > 0 ? 'solid' : 'none',
-                        borderTopWidth: idx > 0 ? 1 : 0,
-                    }}
-                >
-                    <span
-                        className="material-symbols-outlined"
-                        style={{
-                            fontSize: 16,
-                            color: 'rgba(201,168,76,0.4)',
-                            fontVariationSettings: "'wght' 300",
-                            flexShrink: 0,
-                        }}
-                    >search</span>
-                    <span
-                        style={{
-                            fontFamily: '"Outfit", sans-serif',
-                            fontSize: 13,
-                            color: '#C8BFB0',
-                            textAlign: 'left',
-                            flex: 1,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                        }}
-                    >
-                        {item.symptom_name}
-                    </span>
-                    <span
-                        className="material-symbols-outlined"
-                        style={{
-                            fontSize: 16,
-                            color: 'rgba(201,168,76,0.25)',
-                            fontVariationSettings: "'wght' 300",
-                            flexShrink: 0,
-                        }}
-                    >chevron_right</span>
-                </button>
-            ))}
-        </div>
-    );
-};
-
 // ─── FAVORITES CARD ──────────────────────────────────
 const FavoritesCard = ({ items, onItemClick }: {
     items: FavoriteItem[];
@@ -849,7 +743,6 @@ export const BentoGrid = () => {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [streak, setStreak] = useState(0);
     const [greeting, setGreeting] = useState('');
-    const [recentHistory, setRecentHistory] = useState<HistoryItem[]>([]);
     const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
     useEffect(() => {
@@ -858,11 +751,7 @@ export const BentoGrid = () => {
             setUser(u);
             setStreak(u?.currentStreak || 0);
 
-            const [history, favs] = await Promise.all([
-                userHistoryService.getRecentHistory(5),
-                userHistoryService.getFavorites(5),
-            ]);
-            setRecentHistory(history);
+            const favs = await userHistoryService.getFavorites(5);
             setFavorites(favs);
         };
         load();
@@ -947,8 +836,62 @@ export const BentoGrid = () => {
 
                 <StatsCard level={xpLevel} streak={streak} />
 
-                <HistoryCard items={recentHistory} onItemClick={handleHistoryItemClick} />
-                <FavoritesCard items={favorites} onItemClick={handleHistoryItemClick} />
+                <button
+                    onClick={() => navigate('/favorites')}
+                    style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 14,
+                        padding: '16px 20px',
+                        background: 'rgba(167,139,250,0.06)',
+                        border: '1px solid rgba(167,139,250,0.18)',
+                        borderLeft: '3px solid #A78BFA',
+                        borderRadius: 16,
+                        cursor: 'pointer',
+                        marginBottom: 12,
+                    }}
+                >
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 20,
+                            color: '#A78BFA',
+                            fontVariationSettings: "'wght' 300",
+                        }}
+                    >favorite</span>
+                    <div style={{ flex: 1, textAlign: 'left' }}>
+                        <p
+                            style={{
+                                fontFamily: '"Outfit", sans-serif',
+                                fontSize: 13,
+                                fontWeight: 600,
+                                color: '#C8BFB0',
+                                margin: 0,
+                            }}
+                        >Mis favoritos</p>
+                        <p
+                            style={{
+                                fontFamily: '"Outfit", sans-serif',
+                                fontSize: 11,
+                                color: 'rgba(167,139,250,0.6)',
+                                margin: '2px 0 0',
+                            }}
+                        >
+                            {favorites.length > 0
+                                ? `${favorites.length} síntoma${favorites.length > 1 ? 's' : ''} guardado${favorites.length > 1 ? 's' : ''}`
+                                : 'Guardá síntomas para volver a ellos'}
+                        </p>
+                    </div>
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            fontSize: 18,
+                            color: 'rgba(167,139,250,0.35)',
+                            fontVariationSettings: "'wght' 300",
+                        }}
+                    >chevron_right</span>
+                </button>
 
                 <DailyQuote />
 

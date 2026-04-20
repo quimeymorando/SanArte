@@ -58,14 +58,10 @@ const Navigation: React.FC = React.memo(function Navigation() {
             aria-current={active ? 'page' : undefined}
             style={{
               flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 3,
-              textDecoration: 'none',
               position: 'relative',
-              padding: '2px 0',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'stretch',
             }}
           >
             {active && (
@@ -76,56 +72,68 @@ const Navigation: React.FC = React.memo(function Navigation() {
                   top: 0,
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  width: 24,
+                  width: 20,
                   height: 2,
                   borderRadius: 999,
                   background: GOLD,
                 }}
               />
             )}
-            {isProfile ? (
-              <div
-                className="bg-cover bg-center"
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: '50%',
-                  backgroundImage: `url('${user.avatar}')`,
-                  opacity: active ? 1 : 0.55,
-                  border: active ? `1px solid ${GOLD}` : 'none',
-                }}
-              />
-            ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                paddingTop: 4,
+                flex: 1,
+              }}
+            >
+              {isProfile ? (
+                <div
+                  className="bg-cover bg-center"
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    backgroundImage: `url('${user.avatar}')`,
+                    opacity: active ? 1 : 0.55,
+                    border: active ? `1px solid ${GOLD}` : 'none',
+                  }}
+                />
+              ) : (
+                <span
+                  className="material-symbols-outlined"
+                  aria-hidden="true"
+                  style={{
+                    fontSize: 24,
+                    fontFamily: '"Material Symbols Outlined"',
+                    fontVariationSettings: active
+                      ? "'wght' 400, 'FILL' 0"
+                      : "'wght' 300, 'FILL' 0",
+                    color,
+                    lineHeight: 1,
+                    transition: 'color 0.2s ease',
+                  }}
+                >
+                  {icon}
+                </span>
+              )}
               <span
-                className="material-symbols-outlined"
-                aria-hidden="true"
                 style={{
-                  fontSize: 24,
-                  fontFamily: '"Material Symbols Outlined"',
-                  fontVariationSettings: active
-                    ? "'wght' 400, 'FILL' 0"
-                    : "'wght' 300, 'FILL' 0",
+                  fontFamily: 'Outfit, sans-serif',
+                  fontSize: 10,
+                  fontWeight: active ? 600 : 500,
+                  letterSpacing: '0.01em',
                   color,
-                  lineHeight: 1,
+                  lineHeight: 1.2,
                   transition: 'color 0.2s ease',
                 }}
               >
-                {icon}
+                {label}
               </span>
-            )}
-            <span
-              style={{
-                fontFamily: 'Outfit, sans-serif',
-                fontSize: 10,
-                fontWeight: active ? 600 : 500,
-                letterSpacing: '0.01em',
-                color,
-                lineHeight: 1.2,
-                transition: 'color 0.2s ease',
-              }}
-            >
-              {label}
-            </span>
+            </div>
           </Link>
         );
       })}
