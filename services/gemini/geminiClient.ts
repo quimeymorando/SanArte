@@ -177,6 +177,7 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
     .replace(/^-+|-+$/g, "");
 
   logger.log("🔍 Buscando:", normalizedName);
+  console.log('=== slug ===', slug);
 
   const adoptIfQualityPasses = (
     payload: Partial<SymptomDetail> | undefined,
@@ -220,6 +221,7 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
       .maybeSingle();
 
     const catalogContent = catalogEntry?.content as Partial<SymptomDetail> | undefined;
+    console.log('=== catalog result ===', catalogEntry);
     const fromCatalog = adoptIfQualityPasses(catalogContent, "catalogo");
     if (fromCatalog) return fromCatalog;
   } catch {
@@ -234,6 +236,7 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
       .maybeSingle();
 
     const cachedData = cached?.data as Partial<SymptomDetail> | undefined;
+    console.log('=== cache result ===', cached);
     const fromCache = adoptIfQualityPasses(cachedData, "cache");
     if (fromCache) return fromCache;
   } catch {
@@ -243,6 +246,7 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
   logger.log("✨ Generando con Gemini...");
 
   let detail = parseAndNormalizeDetail(await generateContentSafe(createMaestroPrompt(normalizedName), true), normalizedName);
+  console.log('=== gemini result (raw) ===', detail);
   let score = calculateDetailQualityScore(detail);
 
   if (score < MIN_DETAIL_QUALITY_SCORE || !hasHumanDepthSignals(detail)) {

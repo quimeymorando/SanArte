@@ -179,6 +179,9 @@ export const SymptomDetailPage: React.FC = () => {
             }).catch(logger.warn);
          }
       } catch (error: any) {
+         console.error('=== DETAIL FETCH ERROR ===', error);
+         console.error('=== ERROR MESSAGE ===', error?.message);
+         console.error('=== ERROR STACK ===', error?.stack);
          logger.error("Error fetching details:", error);
          setError(error.message || "No pudimos conectar con la fuente.");
       } finally {
