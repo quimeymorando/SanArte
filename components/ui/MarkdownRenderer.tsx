@@ -447,6 +447,27 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
                     );
                 }
 
+                // Bold-only line: sub-label o transición narrativa (NO dorado)
+                // Ejemplo: **Zona Corporal:**, **No es solo físico**
+                if (/^\*\*[^*]+\*\*:?$/.test(trimmed)) {
+                    const labelText = trimmed.replace(/^\*\*/, '').replace(/\*\*:?$/, '');
+                    return (
+                        <p
+                            key={idx}
+                            style={{
+                                fontFamily: '"Outfit", "Inter", sans-serif',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                color: '#E8E0D0',
+                                margin: '16px 0 6px',
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            {labelText}
+                        </p>
+                    );
+                }
+
                 // Párrafo normal
                 return (
                     <p key={idx} style={{ ...bodyStyle, marginBottom: '14px' }}>
