@@ -155,22 +155,27 @@ const normalizeForCompare = (text: string): string =>
 const dedupeConsecutiveHeadings = (markdown: string): string => {
     const lines = markdown.split('\n');
     const result: string[] = [];
-    const recentHeadings = new Set<string>();
+    const allHeadingsSeen = new Set<string>();
 
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+    for (const line of lines) {
         const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
 
         if (headingMatch) {
             const normalized = normalizeForCompare(headingMatch[2]);
-            if (recentHeadings.has(normalized)) {
+            if (allHeadingsSeen.has(normalized)) {
                 continue;
             }
-            recentHeadings.add(normalized);
+            allHeadingsSeen.add(normalized);
             result.push(line);
         } else {
-            if (line.trim().length > 20) {
-                recentHeadings.clear();
+            const emojiBoldMatch = line.match(
+                /^[\p{Emoji_Presentation}\p{Extended_Pictographic}]+\s+\*\*(.+?)\*\*/u
+            );
+            if (emojiBoldMatch) {
+                const normalized = normalizeForCompare(emojiBoldMatch[1]);
+                if (allHeadingsSeen.has(normalized)) {
+                    continue;
+                }
             }
             result.push(line);
         }

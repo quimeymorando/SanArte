@@ -566,39 +566,37 @@ export const CommunityPage: React.FC = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            zIndex: 100,
+            background: 'rgba(0,0,0,0.7)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 200,
             display: 'flex',
-            alignItems: 'flex-end',
+            alignItems: 'center',
             justifyContent: 'center',
+            padding: '20px',
           }}
+          onClick={(e) => { if (e.target === e.currentTarget) setComposeOpen(false); }}
         >
           <div
-            style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)' }}
-            onClick={() => setComposeOpen(false)}
-          />
-          <div
             style={{
-              position: 'relative',
               background: '#0E1420',
-              border: '1px solid rgba(201,168,76,0.12)',
-              borderRadius: '24px 24px 0 0',
+              borderRadius: 20,
               width: '100%',
-              maxWidth: 480,
-              maxHeight: '85vh',
-              overflow: 'hidden',
+              maxWidth: 440,
+              maxHeight: '80vh',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
+              overflow: 'hidden',
             }}
           >
-            {/* Modal Header — fijo arriba */}
+            {/* Modal Header */}
             <div
               style={{
+                flexShrink: 0,
+                padding: '20px 20px 16px',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '20px 24px 14px',
-                flexShrink: 0,
               }}
             >
               <h2
@@ -636,8 +634,8 @@ export const CommunityPage: React.FC = () => {
               style={{
                 flex: 1,
                 overflowY: 'auto',
+                padding: '16px 20px',
                 WebkitOverflowScrolling: 'touch',
-                padding: '0 24px 14px',
               }}
             >
               <p
@@ -722,11 +720,9 @@ export const CommunityPage: React.FC = () => {
             <div
               style={{
                 flexShrink: 0,
-                position: 'sticky',
-                bottom: 0,
-                background: '#0E1420',
-                padding: '12px 24px 20px',
+                padding: '16px 20px 20px',
                 borderTop: '1px solid rgba(255,255,255,0.06)',
+                background: '#0E1420',
               }}
             >
               <div
@@ -735,38 +731,38 @@ export const CommunityPage: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   marginBottom: 12,
+                  cursor: 'pointer',
                 }}
+                onClick={() => setShowName(!showName)}
               >
-                <button
-                  onClick={() => setShowName(!showName)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
-                >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span
                     className="material-symbols-outlined"
-                    style={{
-                      fontSize: 16,
-                      color: '#4A4840',
-                      fontVariationSettings: "'wght' 300",
-                      display: 'block',
-                      lineHeight: 1,
-                    }}
+                    style={{ fontSize: 16, color: '#6A6460' }}
                   >{showName ? 'person' : 'visibility_off'}</span>
-                  <span
-                    style={{
-                      fontFamily: '"Outfit", sans-serif',
-                      fontSize: 12,
-                      color: '#6A6460',
-                    }}
-                  >{showName ? (user?.name || 'Con mi nombre') : 'Anónimo'}</span>
-                </button>
+                  <div>
+                    <p style={{ fontFamily: 'Outfit', fontSize: 12, fontWeight: 600, color: '#C8BFB0', margin: 0 }}>
+                      {showName ? (user?.name || 'Con mi nombre') : 'Publicar anónimamente'}
+                    </p>
+                    <p style={{ fontFamily: 'Outfit', fontSize: 10, color: '#4A4840', margin: '1px 0 0' }}>
+                      {showName ? 'Tu nombre aparecerá en el post' : 'Tu nombre no será visible'}
+                    </p>
+                  </div>
+                </div>
+                <div style={{
+                  width: 36, height: 20, borderRadius: 999,
+                  background: showName ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)',
+                  border: showName ? '1px solid rgba(201,168,76,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                  position: 'relative', flexShrink: 0, transition: 'all 0.2s',
+                }}>
+                  <div style={{
+                    position: 'absolute', top: 2,
+                    left: showName ? 18 : 2,
+                    width: 14, height: 14, borderRadius: '50%',
+                    background: showName ? '#C9A84C' : 'rgba(255,255,255,0.3)',
+                    transition: 'left 0.2s',
+                  }} />
+                </div>
               </div>
 
               <button
@@ -774,18 +770,17 @@ export const CommunityPage: React.FC = () => {
                 disabled={!newIntention.trim()}
                 style={{
                   width: '100%',
-                  padding: '14px 24px',
-                  borderRadius: 999,
-                  background: newIntention.trim() ? GOLD_GRAD : 'rgba(255,255,255,0.06)',
-                  color: newIntention.trim() ? '#060D1B' : 'rgba(255,255,255,0.2)',
+                  background: newIntention.trim()
+                    ? 'linear-gradient(135deg, #C9A84C, #F0D080, #C9A84C)'
+                    : 'rgba(255,255,255,0.06)',
+                  color: newIntention.trim() ? '#060D1B' : '#4A4840',
                   border: 'none',
-                  fontFamily: '"Outfit", sans-serif',
-                  fontWeight: 700,
-                  fontSize: 13,
-                  letterSpacing: '0.04em',
+                  borderRadius: 999,
+                  padding: '14px',
+                  fontFamily: 'Outfit',
+                  fontSize: 14,
+                  fontWeight: 600,
                   cursor: newIntention.trim() ? 'pointer' : 'not-allowed',
-                  transition: 'all 0.2s',
-                  boxShadow: newIntention.trim() ? '0 8px 24px rgba(201,168,76,0.2)' : 'none',
                 }}
               >
                 Publicar
