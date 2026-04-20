@@ -124,20 +124,31 @@ const dedupeConsecutiveHeadings = (markdown: string): string => {
     if (!markdown) return markdown;
     const lines = markdown.split('\n');
     const result: string[] = [];
-    let lastHeadingNormalized: string | null = null;
+    const seenHeadings = new Set<string>();
+    let lastNonEmptyWasHeading = false;
 
     for (const line of lines) {
         const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
         if (headingMatch) {
-            const currentNormalized = normalizeForCompare(headingMatch[2]);
-            if (currentNormalized && currentNormalized === lastHeadingNormalized) {
+            const normalized = normalizeForCompare(headingMatch[2]);
+            if (seenHeadings.has(normalized)) {
                 continue;
             }
-            lastHeadingNormalized = currentNormalized;
-        } else if (line.trim() !== '') {
-            lastHeadingNormalized = null;
+            seenHeadings.add(normalized);
+            lastNonEmptyWasHeading = true;
+            result.push(line);
+        } else if (line.trim() === '') {
+            // Líneas vacías entre headings no resetean el tracker
+            if (!lastNonEmptyWasHeading) {
+                seenHeadings.clear();
+            }
+            result.push(line);
+        } else {
+            // Contenido real — resetear tracker
+            lastNonEmptyWasHeading = false;
+            seenHeadings.clear();
+            result.push(line);
         }
-        result.push(line);
     }
 
     return result.join('\n');

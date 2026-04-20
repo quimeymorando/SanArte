@@ -49,9 +49,9 @@ const Navigation: React.FC = React.memo(function Navigation() {
               justifyContent: 'center',
               textDecoration: 'none',
               position: 'relative',
-              paddingTop: 8,
-              paddingBottom: 4,
-              gap: 3,
+              paddingTop: 10,
+              paddingBottom: 8,
+              gap: 4,
               minWidth: 0,
             }}
           >
