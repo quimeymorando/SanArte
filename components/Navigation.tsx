@@ -1,19 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { authService } from '../services/authService';
-import { UserProfile } from '../types';
-
-const GOLD = '#C9A84C';
-const MUTED = '#5A6170';
 
 const Navigation: React.FC = React.memo(function Navigation() {
   const location = useLocation();
-  const [user, setUser] = useState<UserProfile | null>(null);
   const isActive = (path: string) => location.pathname === path;
-
-  useEffect(() => {
-    authService.getUser().then(setUser);
-  }, []);
 
   if (location.pathname === '/') return null;
 
@@ -33,24 +23,19 @@ const Navigation: React.FC = React.memo(function Navigation() {
         bottom: 0,
         left: 0,
         right: 0,
-        height: `calc(62px + env(safe-area-inset-bottom))`,
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingTop: 8,
-        background: 'rgba(6,13,27,0.94)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderTop: '1px solid rgba(201,168,76,0.10)',
         zIndex: 100,
+        background: 'rgba(6,13,27,0.95)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(201,168,76,0.10)',
         display: 'flex',
-        justifyContent: 'space-around',
+        height: 'calc(58px + env(safe-area-inset-bottom))',
+        paddingBottom: 'env(safe-area-inset-bottom)',
         alignItems: 'stretch',
       }}
     >
       {navItems.map(({ to, icon, label }) => {
         const active = isActive(to);
-        const color = active ? GOLD : MUTED;
-        const isProfile = to === '/profile' && user?.avatar;
-
         return (
           <Link
             key={to}
@@ -58,10 +43,16 @@ const Navigation: React.FC = React.memo(function Navigation() {
             aria-current={active ? 'page' : undefined}
             style={{
               flex: 1,
-              position: 'relative',
-              textDecoration: 'none',
               display: 'flex',
-              alignItems: 'stretch',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textDecoration: 'none',
+              position: 'relative',
+              paddingTop: 8,
+              paddingBottom: 4,
+              gap: 3,
+              minWidth: 0,
             }}
           >
             {active && (
@@ -75,65 +66,39 @@ const Navigation: React.FC = React.memo(function Navigation() {
                   width: 20,
                   height: 2,
                   borderRadius: 999,
-                  background: GOLD,
+                  background: '#C9A84C',
                 }}
               />
             )}
-            <div
+            <span
+              className="material-symbols-outlined"
+              aria-hidden="true"
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 3,
-                paddingTop: 4,
-                flex: 1,
+                fontSize: 23,
+                lineHeight: 1,
+                display: 'block',
+                textAlign: 'center',
+                width: '100%',
+                fontVariationSettings: "'wght' 300, 'FILL' 0",
+                color: active ? '#C9A84C' : '#5A6170',
               }}
             >
-              {isProfile ? (
-                <div
-                  className="bg-cover bg-center"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: '50%',
-                    backgroundImage: `url('${user.avatar}')`,
-                    opacity: active ? 1 : 0.55,
-                    border: active ? `1px solid ${GOLD}` : 'none',
-                  }}
-                />
-              ) : (
-                <span
-                  className="material-symbols-outlined"
-                  aria-hidden="true"
-                  style={{
-                    fontSize: 24,
-                    fontFamily: '"Material Symbols Outlined"',
-                    fontVariationSettings: active
-                      ? "'wght' 400, 'FILL' 0"
-                      : "'wght' 300, 'FILL' 0",
-                    color,
-                    lineHeight: 1,
-                    transition: 'color 0.2s ease',
-                  }}
-                >
-                  {icon}
-                </span>
-              )}
-              <span
-                style={{
-                  fontFamily: 'Outfit, sans-serif',
-                  fontSize: 10,
-                  fontWeight: active ? 600 : 500,
-                  letterSpacing: '0.01em',
-                  color,
-                  lineHeight: 1.2,
-                  transition: 'color 0.2s ease',
-                }}
-              >
-                {label}
-              </span>
-            </div>
+              {icon}
+            </span>
+            <span
+              style={{
+                fontFamily: 'Outfit, sans-serif',
+                fontSize: 10,
+                fontWeight: active ? 600 : 400,
+                color: active ? '#C9A84C' : '#5A6170',
+                lineHeight: 1,
+                textAlign: 'center',
+                width: '100%',
+                display: 'block',
+              }}
+            >
+              {label}
+            </span>
           </Link>
         );
       })}
