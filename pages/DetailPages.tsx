@@ -245,6 +245,11 @@ export const SymptomDetailPage: React.FC = () => {
 
    // ── Error ──
    if (error) {
+      const errorLower = error.toLowerCase();
+      const isRateLimit =
+         errorLower.includes('429') ||
+         errorLower.includes('sin cupo') ||
+         errorLower.includes('too many');
       return (
          <div
             className="flex flex-col items-center justify-center min-h-screen px-6 text-center"
@@ -258,7 +263,7 @@ export const SymptomDetailPage: React.FC = () => {
                   <span
                      className="material-symbols-outlined"
                      style={{ color: 'rgba(232,168,124,0.8)', fontSize: '28px' }}
-                  >cloud_off</span>
+                  >{isRateLimit ? 'hourglass_top' : 'cloud_off'}</span>
                </div>
                <h3
                   style={{
@@ -268,7 +273,7 @@ export const SymptomDetailPage: React.FC = () => {
                      color: '#F0EBE0',
                      marginBottom: '8px',
                   }}
-               >Conexión interrumpida</h3>
+               >{isRateLimit ? 'Un momento sagrado' : 'Conexión interrumpida'}</h3>
                <p
                   style={{
                      fontFamily: '"Outfit", "Inter", sans-serif',
@@ -277,7 +282,10 @@ export const SymptomDetailPage: React.FC = () => {
                      lineHeight: 1.75,
                      marginBottom: '32px',
                   }}
-               >No pudimos conectar con la fuente. Tu consulta es importante.</p>
+               >{isRateLimit
+                  ? 'La IA está recibiendo muchas consultas. Probá de nuevo en 30 segundos. Tu camino es valioso y vale la espera.'
+                  : 'No pudimos conectar con la fuente. Tu consulta es importante.'
+               }</p>
                <div className="space-y-3">
                   <button
                      onClick={fetchData}

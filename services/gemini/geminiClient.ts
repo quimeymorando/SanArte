@@ -35,6 +35,14 @@ async function retryWithBackoff<T>(
 
     if (error.message?.includes("API Key")) throw error;
 
+    const msg = (error?.message || '').toLowerCase();
+    const isRateLimited =
+      msg.includes('429') ||
+      msg.includes('sin cupo') ||
+      msg.includes('too many requests') ||
+      msg.includes('rate limit');
+    if (isRateLimited) throw error;
+
     logger.warn(`Retrying... attempts left: ${retries}. Waiting ${delay}ms`);
     await sleep(delay);
     return retryWithBackoff(fn, retries - 1, delay * factor, factor);
