@@ -56,7 +56,17 @@ const stripLeadingEmojis = (s: string) => s.replace(EMOJI_LEADING_RE, '').trim()
 // y elimina duplicados emoji + **bold** que aparecerían como párrafo extra.
 const preprocessMarkdown = (raw: string): string => {
     if (!raw) return raw;
-    const lines = raw.split('\n');
+    let markdown = raw;
+
+    // Eliminar primera línea si es titulo de sección (emoji + bold)
+    const firstLineMatch = markdown.match(
+        /^[\p{Emoji_Presentation}\p{Extended_Pictographic}]+\s+\*\*[^*]+\*\*\s*\n?/u
+    );
+    if (firstLineMatch) {
+        markdown = markdown.slice(firstLineMatch[0].length);
+    }
+
+    const lines = markdown.split('\n');
     const out: string[] = [];
 
     // Patterns para detectar "heading camuflado":
@@ -73,7 +83,14 @@ const preprocessMarkdown = (raw: string): string => {
         // Heading camuflado: "🌿 **Título**"
         const mBold = trimmed.match(boldHeadingRe);
         if (mBold) {
-            out.push(`### ${stripAllEmojis(mBold[1])}`);
+            const cleanText = stripAllEmojis(mBold[1]);
+            // Solo convertir a heading si NO termina en ":"
+            if (!trimmed.endsWith(':')) {
+                out.push(`### ${cleanText}`);
+            } else {
+                // Mantener como bold normal, sin heading
+                out.push(`**${cleanText}:**`);
+            }
             continue;
         }
 
