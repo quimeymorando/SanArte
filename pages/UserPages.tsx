@@ -5,10 +5,62 @@ import { getStoredRoutines, toggleRoutine, deleteRoutine } from '../services/rou
 import { historyService } from '../services/dataService';
 import { Routine, SymptomLogEntry, Favorite, UserProfile } from '../types';
 import { authService } from '../services/authService';
-import { supabase } from '../supabaseClient';
 import ManageSubscription from '../components/ManageSubscription';
 import { accountService } from '../services/accountService';
 import { clearConsent } from '../utils/consent';
+
+// ─── Paleta Sacred Noir ────────────────────────────
+const GOLD = '#C9A84C';
+const GOLD_GRAD = 'linear-gradient(135deg, #C9A84C, #F0D080)';
+const VIOLET = '#A78BFA';
+const SAGE = '#8BA888';
+const ROSE = '#F472B6';
+const SLATE = '#7B9BB5';
+
+// ─── Sticky Header común ───────────────────────────
+const StickyHeader: React.FC<{ kicker: string; title: string; subtitle?: React.ReactNode }> = ({ kicker, title, subtitle }) => (
+  <div
+    style={{
+      padding: '64px 20px 20px',
+      background: 'linear-gradient(to bottom, rgba(6,13,27,1) 0%, transparent 100%)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 10,
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+    }}
+  >
+    <p
+      style={{
+        fontFamily: '"Outfit", sans-serif',
+        fontSize: 10,
+        fontWeight: 500,
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        color: GOLD,
+        margin: '0 0 6px',
+      }}
+    >{kicker}</p>
+    <h1
+      style={{
+        fontFamily: '"Playfair Display", serif',
+        fontSize: 28,
+        fontWeight: 300,
+        color: '#F0EBE0',
+        margin: subtitle ? '0 0 6px' : 0,
+      }}
+    >{title}</h1>
+    {subtitle && (
+      <p
+        style={{
+          fontFamily: '"Outfit", sans-serif',
+          fontSize: 12,
+          margin: 0,
+        }}
+      >{subtitle}</p>
+    )}
+  </div>
+);
 
 // ═══════════════════════════════════════════════════════
 // ─── FAVORITES PAGE ─────────────────────────────────
@@ -30,35 +82,115 @@ export const FavoritesPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c0f] pb-28 pt-20 px-5">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-xl font-bold text-white mb-1">Favoritos</h1>
-        <p className="text-white/25 text-sm mb-6">Tus síntomas guardados</p>
+    <div style={{ background: '#060D1B', minHeight: '100dvh', paddingBottom: 100 }}>
+      <StickyHeader kicker="Tus sanaciones guardadas" title="Favoritos" />
 
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
         {favorites.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="size-14 rounded-full bg-white/[0.03] mx-auto mb-4 flex items-center justify-center">
-              <span className="material-symbols-outlined text-white/15 text-2xl">favorite</span>
+          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: '50%',
+                background: 'rgba(167,139,250,0.08)',
+                border: '1px solid rgba(167,139,250,0.15)',
+                margin: '0 auto 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: 28,
+                  color: 'rgba(167,139,250,0.5)',
+                  fontVariationSettings: "'wght' 300",
+                }}
+              >favorite_border</span>
             </div>
-            <p className="text-white/25 text-sm">Aún no tenés favoritos.</p>
+            <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 14, color: '#4A4840', margin: '0 0 6px' }}>
+              Aún no guardaste ningún síntoma
+            </p>
+            <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 12, color: '#3A3830', margin: 0 }}>
+              Tocá el ♥ en cualquier resultado para guardarlo
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-            {favorites.map((fav, i) => (
-              <button
-                key={i}
+          <div>
+            {favorites.map((fav) => (
+              <div
+                key={fav.id}
                 onClick={() => navigate(`/symptom-detail?q=${encodeURIComponent(fav.symptom_name)}`)}
-                className="text-left p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.05] transition-all group relative"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '16px 20px',
+                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  cursor: 'pointer',
+                }}
               >
-                <h3 className="text-sm font-medium text-white group-hover:text-teal-300 transition-colors pr-8">{fav.symptom_name}</h3>
-                <p className="text-[12px] text-white/25 line-clamp-2 mt-1">{fav.description}</p>
-                <div
-                  onClick={(e) => handleDelete(fav.id, e)}
-                  className="absolute top-4 right-4 p-1.5 rounded-lg text-white/0 group-hover:text-white/20 hover:!text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-base">close</span>
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: 18,
+                    color: 'rgba(167,139,250,0.5)',
+                    fontVariationSettings: "'wght' 300",
+                    flexShrink: 0,
+                  }}
+                >favorite</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: '#C8BFB0',
+                      margin: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >{fav.symptom_name}</p>
+                  {fav.description && (
+                    <p
+                      style={{
+                        fontFamily: '"Outfit", sans-serif',
+                        fontSize: 12,
+                        color: '#4A4840',
+                        margin: '3px 0 0',
+                        fontStyle: 'italic',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >{fav.description}</p>
+                  )}
                 </div>
-              </button>
+                <button
+                  onClick={(e) => handleDelete(fav.id, e)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 6,
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 18,
+                      color: 'rgba(255,255,255,0.2)',
+                      fontVariationSettings: "'wght' 300",
+                    }}
+                  >close</span>
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -98,86 +230,204 @@ export const RoutinesPage: React.FC = () => {
     if (success) setRoutines(prev => prev.filter(r => r.id !== id));
   };
 
-  const getIcon = (cat: string) => {
-    switch (cat) {
-      case 'meditation': return 'self_improvement';
-      case 'infusion': return 'local_cafe';
-      case 'spiritual': return 'volunteer_activism';
-      default: return 'check_circle';
-    }
-  };
+  const completedCount = routines.filter(r => r.completed).length;
+  const total = routines.length;
+
+  const subtitle = total === 0
+    ? <span style={{ color: '#4A4840' }}>Construí tu bienestar día a día</span>
+    : completedCount === total
+      ? <span style={{ color: SAGE }}>✓ {total} completadas hoy</span>
+      : <span style={{ color: SAGE }}>{completedCount} de {total} completadas hoy</span>;
 
   return (
-    <div className="min-h-screen bg-[#080c0f] pb-28 pt-20 px-5">
-      <div className="max-w-xl mx-auto">
-        {xpAdded && (
-          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-teal-500 text-black px-4 py-2 rounded-full font-semibold text-sm animate-bounce">
-            +{xpAdded} XP
-          </div>
-        )}
+    <div style={{ background: '#060D1B', minHeight: '100dvh', paddingBottom: 100 }}>
+      {xpAdded && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 96,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 50,
+            background: GOLD_GRAD,
+            color: '#060D1B',
+            padding: '8px 16px',
+            borderRadius: 999,
+            fontFamily: '"Outfit", sans-serif',
+            fontSize: 13,
+            fontWeight: 700,
+            boxShadow: '0 8px 24px rgba(201,168,76,0.25)',
+          }}
+        >
+          +{xpAdded} XP
+        </div>
+      )}
 
-        <h1 className="text-xl font-bold text-white mb-1">Rutinas</h1>
-        <p className="text-white/25 text-sm mb-6">Hábitos que transforman tu vida</p>
+      <StickyHeader kicker="Tus hábitos diarios" title="Rutinas" subtitle={subtitle} />
 
-        <div className="space-y-2.5">
-          {routines.map((routine) => (
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        {routines.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div
-              key={routine.id}
-              onClick={() => handleToggle(routine.id)}
-              className={`flex items-center gap-4 p-4 rounded-2xl transition-all cursor-pointer border group ${
-                routine.completed
-                  ? 'bg-white/[0.01] border-white/[0.04] opacity-40'
-                  : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.05]'
-              }`}
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: '50%',
+                background: 'rgba(139,168,136,0.08)',
+                border: '1px solid rgba(139,168,136,0.15)',
+                margin: '0 auto 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              <div className={`size-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-                routine.completed
-                  ? 'bg-emerald-500/10 text-emerald-400'
-                  : 'bg-white/[0.05] text-white/40'
-              }`}>
-                <span className="material-symbols-outlined text-xl">
-                  {routine.completed ? 'check_circle' : getIcon(routine.category)}
-                </span>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <h3 className={`text-sm font-medium ${routine.completed ? 'text-white/40 line-through' : 'text-white'}`}>
-                  {routine.text}
-                </h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] text-white/20">{routine.time}</span>
-                  {routine.source && (
-                    <span className="text-[10px] text-teal-400/40 font-medium">{routine.source}</span>
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: 28,
+                  color: 'rgba(139,168,136,0.5)',
+                  fontVariationSettings: "'wght' 300",
+                }}
+              >routine</span>
+            </div>
+            <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 14, color: '#4A4840', margin: '0 0 6px' }}>
+              Aún no tenés rutinas
+            </p>
+            <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 12, color: '#3A3830', margin: 0 }}>
+              Cuando explorés un síntoma, podés añadir su ritual diario
+            </p>
+          </div>
+        ) : (
+          <div>
+            {routines.map((routine) => (
+              <div
+                key={routine.id}
+                onClick={() => handleToggle(routine.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 14,
+                  padding: '16px 20px',
+                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  cursor: 'pointer',
+                  opacity: routine.completed ? 0.5 : 1,
+                  transition: 'opacity 0.2s',
+                }}
+              >
+                <div
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 6,
+                    flexShrink: 0,
+                    marginTop: 1,
+                    border: routine.completed ? `2px solid ${SAGE}` : '2px solid rgba(255,255,255,0.15)',
+                    background: routine.completed ? 'rgba(139,168,136,0.15)' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {routine.completed && (
+                    <span
+                      className="material-symbols-outlined"
+                      style={{
+                        fontSize: 14,
+                        color: SAGE,
+                        fontVariationSettings: "'wght' 400",
+                      }}
+                    >check</span>
                   )}
                 </div>
-              </div>
 
-              <button
-                onClick={(e) => handleDelete(routine.id, e)}
-                className="p-1.5 rounded-lg text-white/0 group-hover:text-white/20 hover:!text-red-400 hover:bg-red-500/10 transition-all flex-shrink-0"
-              >
-                <span className="material-symbols-outlined text-base">close</span>
-              </button>
-            </div>
-          ))}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p
+                    style={{
+                      fontFamily: '"Outfit", sans-serif',
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: routine.completed ? '#4A4840' : '#C8BFB0',
+                      textDecoration: routine.completed ? 'line-through' : 'none',
+                      margin: 0,
+                    }}
+                  >{routine.text}</p>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      marginTop: 6,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    {routine.time && (
+                      <span
+                        style={{
+                          fontFamily: '"Outfit", sans-serif',
+                          fontSize: 11,
+                          color: '#4A4840',
+                        }}
+                      >{routine.time}</span>
+                    )}
+                    {routine.category && (
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          fontFamily: '"Outfit", sans-serif',
+                          fontSize: 10,
+                          fontWeight: 500,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                          color: GOLD,
+                          border: '1px solid rgba(201,168,76,0.2)',
+                          borderRadius: 999,
+                          padding: '2px 8px',
+                        }}
+                      >{routine.category}</span>
+                    )}
+                    {routine.source && (
+                      <span
+                        style={{
+                          fontFamily: '"Outfit", sans-serif',
+                          fontSize: 10,
+                          color: 'rgba(201,168,76,0.45)',
+                        }}
+                      >{routine.source}</span>
+                    )}
+                  </div>
+                </div>
 
-          {routines.length === 0 && (
-            <div className="text-center py-20">
-              <div className="size-14 rounded-full bg-white/[0.03] mx-auto mb-4 flex items-center justify-center">
-                <span className="material-symbols-outlined text-white/15 text-2xl">routine</span>
+                <button
+                  onClick={(e) => handleDelete(routine.id, e)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 6,
+                    flexShrink: 0,
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 18,
+                      color: 'rgba(255,255,255,0.2)',
+                      fontVariationSettings: "'wght' 300",
+                    }}
+                  >close</span>
+                </button>
               </div>
-              <p className="text-white/25 text-sm">Sin rutinas activas.</p>
-              <p className="text-white/15 text-xs mt-1">Buscá un síntoma para agregar recomendaciones.</p>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 // ═══════════════════════════════════════════════════════
-// ─── HISTORY PAGE ───────────────────────────────────
+// ─── HISTORY PAGE (sin cambios de estilo mayor) ─────
 // ═══════════════════════════════════════════════════════
 
 export const HistoryPage: React.FC = () => {
@@ -193,30 +443,65 @@ export const HistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c0f] pb-28 pt-20 px-5">
-      <div className="max-w-xl mx-auto">
-        <h1 className="text-xl font-bold text-white mb-6">Historial</h1>
+    <div style={{ background: '#060D1B', minHeight: '100dvh', paddingBottom: 100 }}>
+      <StickyHeader kicker="Tus consultas" title="Historial" />
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
         {items.length === 0 ? (
-          <p className="text-center py-20 text-white/25 text-sm">Sin registros.</p>
+          <p style={{ textAlign: 'center', padding: '80px 20px', color: '#4A4840', fontFamily: '"Outfit", sans-serif', fontSize: 14 }}>
+            Sin registros.
+          </p>
         ) : (
-          <div className="space-y-2.5">
+          <div>
             {items.map((item) => {
               const name = item.notes?.replace('Consulta: ', '').trim();
               return (
                 <div
                   key={item.id}
-                  onClick={() => name ? navigate(`/symptom-detail?q=${encodeURIComponent(name)}`) : null}
-                  className={`p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] group transition-all ${name ? 'cursor-pointer hover:bg-white/[0.04]' : ''}`}
+                  onClick={() => name ? navigate(`/symptom-detail?q=${encodeURIComponent(name)}`) : undefined}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '14px 20px',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    cursor: name ? 'pointer' : 'default',
+                  }}
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm text-white font-medium">{item.notes}</p>
-                      <span className="text-[11px] text-white/20 mt-0.5 block">{new Date(item.date).toLocaleDateString('es-AR')}</span>
-                    </div>
-                    <button onClick={(e) => handleDelete(item.id, e)} className="p-1.5 text-white/0 group-hover:text-white/20 hover:!text-red-400 transition-all">
-                      <span className="material-symbols-outlined text-base">close</span>
-                    </button>
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: 18, color: 'rgba(201,168,76,0.4)', fontVariationSettings: "'wght' 300", flexShrink: 0 }}
+                  >history</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontFamily: '"Outfit", sans-serif',
+                        fontSize: 13,
+                        fontWeight: 500,
+                        color: '#C8BFB0',
+                        margin: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >{name || item.notes}</p>
+                    <p
+                      style={{
+                        fontFamily: '"Outfit", sans-serif',
+                        fontSize: 11,
+                        color: '#4A4840',
+                        margin: '3px 0 0',
+                      }}
+                    >{new Date(item.date).toLocaleDateString('es-AR')}</p>
                   </div>
+                  <button
+                    onClick={(e) => handleDelete(item.id, e)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, flexShrink: 0 }}
+                  >
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: 18, color: 'rgba(255,255,255,0.2)', fontVariationSettings: "'wght' 300" }}
+                    >close</span>
+                  </button>
                 </div>
               );
             })}
@@ -230,6 +515,111 @@ export const HistoryPage: React.FC = () => {
 // ═══════════════════════════════════════════════════════
 // ─── PROFILE PAGE ───────────────────────────────────
 // ═══════════════════════════════════════════════════════
+
+const SectionLabel: React.FC<{ children: React.ReactNode; faint?: boolean }> = ({ children, faint = false }) => (
+  <p
+    style={{
+      fontFamily: '"Outfit", sans-serif',
+      fontSize: 10,
+      fontWeight: 500,
+      letterSpacing: '0.18em',
+      textTransform: 'uppercase',
+      color: faint ? '#3A3830' : GOLD,
+      margin: '0 0 12px',
+    }}
+  >{children}</p>
+);
+
+const StatCard: React.FC<{ icon: string; iconColor: string; value: number | string; label: string }> = ({ icon, iconColor, value, label }) => (
+  <div
+    style={{
+      background: 'rgba(255,255,255,0.025)',
+      border: '1px solid rgba(201,168,76,0.12)',
+      borderRadius: 14,
+      padding: '16px 14px',
+      textAlign: 'center',
+    }}
+  >
+    <span
+      className="material-symbols-outlined"
+      style={{
+        fontSize: 20,
+        color: iconColor,
+        fontVariationSettings: "'wght' 300",
+        display: 'block',
+        marginBottom: 4,
+      }}
+    >{icon}</span>
+    <p
+      style={{
+        fontFamily: '"Playfair Display", serif',
+        fontSize: 24,
+        fontWeight: 300,
+        color: GOLD,
+        margin: '4px 0',
+        lineHeight: 1,
+      }}
+    >{value}</p>
+    <p
+      style={{
+        fontFamily: '"Outfit", sans-serif',
+        fontSize: 9,
+        fontWeight: 500,
+        letterSpacing: '0.15em',
+        textTransform: 'uppercase',
+        color: '#4A4840',
+        margin: 0,
+      }}
+    >{label}</p>
+  </div>
+);
+
+const ActionCard: React.FC<{ icon: string; accent: string; title: string; desc: string; onClick: () => void }> = ({ icon, accent, title, desc, onClick }) => (
+  <button
+    onClick={onClick}
+    style={{
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 14,
+      padding: '14px 18px',
+      marginBottom: 10,
+      background: 'rgba(255,255,255,0.025)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      borderLeft: `3px solid ${accent}`,
+      borderRadius: 14,
+      cursor: 'pointer',
+      textAlign: 'left',
+    }}
+  >
+    <div
+      style={{
+        width: 40,
+        height: 40,
+        borderRadius: '50%',
+        background: `${accent}1F`,
+        border: `1px solid ${accent}40`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <span
+        className="material-symbols-outlined"
+        style={{ fontSize: 20, color: accent, fontVariationSettings: "'wght' 300" }}
+      >{icon}</span>
+    </div>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 14, fontWeight: 500, color: '#C8BFB0', margin: 0 }}>{title}</p>
+      <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 11, color: '#4A4840', margin: '2px 0 0' }}>{desc}</p>
+    </div>
+    <span
+      className="material-symbols-outlined"
+      style={{ fontSize: 18, color: 'rgba(255,255,255,0.25)', fontVariationSettings: "'wght' 300" }}
+    >chevron_right</span>
+  </button>
+);
 
 export const ProfilePage: React.FC = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -285,179 +675,399 @@ export const ProfilePage: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#080c0f] flex items-center justify-center">
-        <span className="material-symbols-outlined text-white/10 text-3xl animate-pulse">self_improvement</span>
+      <div style={{ background: '#060D1B', minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span
+          className="material-symbols-outlined animate-pulse"
+          style={{ fontSize: 32, color: 'rgba(201,168,76,0.2)' }}
+        >self_improvement</span>
       </div>
     );
   }
 
-  const getSoulTitle = (level: number) => {
-    if (level < 3) return "Semilla Cósmica";
-    if (level < 6) return "Brote de Luz";
-    if (level < 10) return "Guerrero Espejo";
-    return "Maestro del Loto";
-  };
+  const level = user.level || 1;
+  const soulTitle =
+    level < 3 ? 'Semilla Despierta' :
+    level < 6 ? 'Brote de Luz' :
+    'Loto en Expansión';
+  const soulColor =
+    level < 3 ? SAGE :
+    level < 6 ? GOLD :
+    VIOLET;
 
-  const progressPercent = Math.min(100, ((user.xp || 0) % 100));
   const allBadges = [
-    { name: "Despertar", icon: "visibility", color: "text-teal-400" },
-    { name: "Constancia", icon: "local_fire_department", color: "text-orange-400" },
-    { name: "Sabiduría", icon: "psychology", color: "text-violet-400" },
-    { name: "Alquimista", icon: "science", color: "text-emerald-400" },
+    { name: "Despertar", icon: "visibility", color: GOLD },
+    { name: "Constancia", icon: "local_fire_department", color: ROSE },
+    { name: "Sabiduría", icon: "psychology", color: VIOLET },
+    { name: "Alquimista", icon: "science", color: SAGE },
   ];
 
+  const initial = user.name ? user.name.charAt(0).toUpperCase() : 'S';
+
   return (
-    <div className="min-h-screen bg-[#080c0f] pb-28 pt-20 px-5">
-      <div className="max-w-md mx-auto">
+    <div style={{ background: '#060D1B', minHeight: '100dvh', paddingBottom: 100 }}>
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '72px 20px 0' }}>
 
         {/* Avatar + Name */}
-        <div className="text-center mb-8">
-          <div className="relative inline-block mb-4">
-            {/* Progress ring */}
-            <svg className="size-24 -rotate-90">
-              <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-white/[0.06]" />
-              <circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-teal-500 transition-all duration-1000" strokeDasharray="276.5" strokeDashoffset={276.5 - (276.5 * progressPercent) / 100} strokeLinecap="round" />
-            </svg>
-
-            <div
-              className="absolute inset-2 rounded-full overflow-hidden bg-white/[0.05] flex items-center justify-center cursor-pointer group"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {user.avatar ? (
-                <img src={user.avatar} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-2xl font-bold text-white/30">{user.name.charAt(0).toUpperCase()}</span>
-              )}
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                {isUploading ? (
-                  <span className="material-symbols-outlined animate-spin text-white text-xl">progress_activity</span>
-                ) : (
-                  <span className="material-symbols-outlined text-white text-xl">photo_camera</span>
-                )}
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            style={{
+              position: 'relative',
+              width: 72,
+              height: 72,
+              borderRadius: '50%',
+              margin: '0 auto 16px',
+              border: `2px solid ${GOLD}`,
+              padding: 3,
+              cursor: 'pointer',
+              background: 'rgba(201,168,76,0.08)',
+            }}
+          >
+            {user.avatar ? (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  backgroundImage: `url('${user.avatar}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  background: 'rgba(201,168,76,0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: '"Playfair Display", serif',
+                  fontSize: 26,
+                  color: GOLD,
+                }}
+              >{initial}</div>
+            )}
+            {isUploading && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <span
+                  className="material-symbols-outlined animate-spin"
+                  style={{ fontSize: 20, color: '#fff' }}
+                >progress_activity</span>
               </div>
-              <input type="file" ref={fileInputRef} onChange={handleAvatarChange} className="hidden" accept="image/*" />
-            </div>
-
-            <div className="absolute -bottom-1 -right-1 bg-[#080c0f] text-teal-400 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/[0.08]">
-              Lv{user.level}
-            </div>
+            )}
+            <input type="file" ref={fileInputRef} onChange={handleAvatarChange} style={{ display: 'none' }} accept="image/*" />
           </div>
-
-          <h2 className="text-xl font-bold text-white">{user.name}</h2>
-          <p className="text-sm text-teal-400/50 mt-0.5">{getSoulTitle(user.level || 1)}</p>
+          <h1
+            style={{
+              fontFamily: '"Playfair Display", serif',
+              fontSize: 22,
+              fontWeight: 300,
+              color: '#F0EBE0',
+              margin: '0 0 4px',
+            }}
+          >{user.name}</h1>
+          <p
+            style={{
+              fontFamily: '"Outfit", sans-serif',
+              fontStyle: 'italic',
+              fontSize: 12,
+              color: soulColor,
+              margin: '0 0 4px',
+            }}
+          >{soulTitle}</p>
+          <p
+            style={{
+              fontFamily: '"Outfit", sans-serif',
+              fontSize: 11,
+              color: '#4A4840',
+              margin: 0,
+            }}
+          >{user.email}</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-2.5 mb-8">
-          {[
-            { icon: 'local_fire_department', label: 'Racha', value: user.currentStreak || 0, color: 'text-orange-400' },
-            { icon: 'diamond', label: 'XP', value: user.xp || 0, color: 'text-teal-400' },
-            { icon: 'spa', label: 'Sanaciones', value: user.healingMoments || 0, color: 'text-violet-400' },
-          ].map(s => (
-            <div key={s.label} className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
-              <span className={`material-symbols-outlined text-xl ${s.color} opacity-60`}>{s.icon}</span>
-              <p className="text-lg font-semibold text-white mt-1 tabular-nums">{s.value}</p>
-              <p className="text-[10px] text-white/20 uppercase tracking-wider">{s.label}</p>
-            </div>
-          ))}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: 10,
+            marginBottom: 36,
+          }}
+        >
+          <StatCard icon="local_fire_department" iconColor={ROSE} value={user.currentStreak || 0} label="Racha" />
+          <StatCard icon="diamond" iconColor={GOLD} value={user.xp || 0} label="XP Total" />
+          <StatCard icon="search" iconColor={SLATE} value={user.healingMoments || 0} label="Sanaciones" />
         </div>
 
-        {/* Badges */}
-        <div className="mb-8">
-          <p className="text-sm font-medium text-white/40 mb-3">Logros</p>
-          <div className="flex gap-3">
-            {allBadges.map((badge) => {
-              const unlocked = (user.badges || []).includes(badge.name);
-              return (
-                <div key={badge.name} className={`flex-1 p-3 rounded-xl border text-center transition-all ${
-                  unlocked
-                    ? 'bg-white/[0.03] border-white/[0.08]'
-                    : 'bg-white/[0.01] border-white/[0.04] opacity-30'
-                }`}>
-                  <span className={`material-symbols-outlined text-xl ${unlocked ? badge.color : 'text-white/20'}`}>{badge.icon}</span>
-                  <p className="text-[10px] text-white/30 mt-1">{badge.name}</p>
-                </div>
-              );
-            })}
-          </div>
+        {/* Mi camino */}
+        <div style={{ marginBottom: 36 }}>
+          <SectionLabel>Mi camino</SectionLabel>
+          <ActionCard icon="wb_sunny" accent={GOLD} title="Mis rutinas" desc="Hábitos que transforman" onClick={() => navigate('/routines')} />
+          <ActionCard icon="edit_note" accent={VIOLET} title="Mis reflexiones" desc="Tu diario íntimo" onClick={() => navigate('/journal')} />
+          <ActionCard icon="favorite" accent={ROSE} title="Mis favoritos" desc="Síntomas guardados" onClick={() => navigate('/favorites')} />
         </div>
 
         {/* Subscription */}
-        <div className="mb-6" ref={subscriptionRef}>
-          <p className="text-sm font-medium text-white/40 mb-3">Suscripción</p>
+        <div ref={subscriptionRef} style={{ marginBottom: 36 }}>
+          <SectionLabel>Suscripción</SectionLabel>
           <ManageSubscription isPremium={user.isPremium} userEmail={user.email} />
           {!user.isPremium && (
             <button
               onClick={() => navigate('/upgrade')}
-              className="w-full mt-3 py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-semibold text-sm transition-all active:scale-[0.98]"
+              style={{
+                width: '100%',
+                marginTop: 12,
+                padding: 14,
+                borderRadius: 999,
+                background: GOLD_GRAD,
+                color: '#060D1B',
+                border: 'none',
+                fontFamily: '"Outfit", sans-serif',
+                fontWeight: 700,
+                fontSize: 13,
+                letterSpacing: '0.04em',
+                cursor: 'pointer',
+                boxShadow: '0 8px 24px rgba(201,168,76,0.2)',
+              }}
             >
               Conocer Premium
             </button>
           )}
         </div>
 
-        {/* Privacy */}
-        <div className="mb-6">
-          <p className="text-sm font-medium text-white/40 mb-3">Privacidad</p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] divide-y divide-white/[0.06]">
+        {/* Logros */}
+        <div style={{ marginBottom: 36 }}>
+          <SectionLabel>Logros</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8 }}>
+            {allBadges.map((badge) => {
+              const unlocked = (user.badges || []).includes(badge.name);
+              return (
+                <div
+                  key={badge.name}
+                  style={{
+                    padding: '12px 6px',
+                    borderRadius: 12,
+                    background: 'rgba(255,255,255,0.025)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    textAlign: 'center',
+                    opacity: unlocked ? 1 : 0.3,
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 20,
+                      color: unlocked ? badge.color : 'rgba(255,255,255,0.2)',
+                      fontVariationSettings: "'wght' 300",
+                    }}
+                  >{badge.icon}</span>
+                  <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 10, color: '#4A4840', margin: '4px 0 0' }}>
+                    {badge.name}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Privacidad */}
+        <div style={{ marginBottom: 36 }}>
+          <SectionLabel>Privacidad</SectionLabel>
+          <div
+            style={{
+              borderRadius: 14,
+              background: 'rgba(255,255,255,0.025)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              overflow: 'hidden',
+            }}
+          >
             <button
               onClick={handleExportData}
               disabled={isExportingData}
-              className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-sm text-white/50 hover:text-white/70 hover:bg-white/[0.03] transition-all disabled:opacity-50"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '14px 18px',
+                background: 'none',
+                border: 'none',
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                cursor: isExportingData ? 'not-allowed' : 'pointer',
+                textAlign: 'left',
+                fontFamily: '"Outfit", sans-serif',
+                fontSize: 13,
+                color: '#8B7A6A',
+                opacity: isExportingData ? 0.5 : 1,
+              }}
             >
-              <span className="material-symbols-outlined text-lg text-white/20">download</span>
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', fontVariationSettings: "'wght' 300" }}
+              >download</span>
               {isExportingData ? 'Generando...' : 'Descargar mis datos'}
             </button>
             <button
-              onClick={handleDeleteAccount}
-              disabled={isDeletingAccount}
-              className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-sm text-red-400/60 hover:text-red-400 hover:bg-red-500/[0.04] transition-all disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined text-lg">delete</span>
-              {isDeletingAccount ? 'Eliminando...' : 'Eliminar mi cuenta'}
-            </button>
-            <button
               onClick={() => { clearConsent(); alert('Preferencias de cookies reiniciadas.'); }}
-              className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-sm text-white/30 hover:text-white/50 hover:bg-white/[0.03] transition-all"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '14px 18px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: '"Outfit", sans-serif',
+                fontSize: 13,
+                color: '#8B7A6A',
+              }}
             >
-              <span className="material-symbols-outlined text-lg text-white/15">cookie</span>
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', fontVariationSettings: "'wght' 300" }}
+              >cookie</span>
               Revisar consentimiento
             </button>
           </div>
         </div>
 
-        {/* Settings */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] divide-y divide-white/[0.06] mb-8">
+        {/* Notificaciones */}
+        <div style={{ marginBottom: 36 }}>
           <button
             onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-            className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/[0.03] transition-all"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 18px',
+              borderRadius: 14,
+              background: 'rgba(255,255,255,0.025)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              cursor: 'pointer',
+            }}
           >
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-lg text-white/20">notifications</span>
-              <div className="text-left">
-                <span className="text-sm text-white/60 block">Notificaciones</span>
-                <span className="text-[11px] text-white/20">{notificationsEnabled ? 'Activadas' : 'Pausadas'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', fontVariationSettings: "'wght' 300" }}
+              >notifications</span>
+              <div style={{ textAlign: 'left' }}>
+                <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 13, color: '#8B7A6A', margin: 0 }}>Notificaciones</p>
+                <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 11, color: '#4A4840', margin: '2px 0 0' }}>
+                  {notificationsEnabled ? 'Activadas' : 'Pausadas'}
+                </p>
               </div>
             </div>
-            <div className={`w-10 h-5 rounded-full p-0.5 transition-colors ${notificationsEnabled ? 'bg-teal-500/50' : 'bg-white/10'}`}>
-              <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-200 ${notificationsEnabled ? 'translate-x-5' : ''}`} />
+            <div
+              style={{
+                width: 40,
+                height: 22,
+                borderRadius: 999,
+                padding: 2,
+                background: notificationsEnabled ? 'rgba(201,168,76,0.35)' : 'rgba(255,255,255,0.1)',
+                transition: 'background 0.2s',
+              }}
+            >
+              <div
+                style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: '50%',
+                  background: '#fff',
+                  transform: notificationsEnabled ? 'translateX(18px)' : 'translateX(0)',
+                  transition: 'transform 0.2s',
+                }}
+              />
             </div>
           </button>
+        </div>
 
+        {/* CUENTA */}
+        <div style={{ marginBottom: 24 }}>
+          <SectionLabel faint>Cuenta</SectionLabel>
           <button
             onClick={() => { authService.logout(); navigate('/'); }}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left text-sm text-red-400/60 hover:text-red-400 hover:bg-red-500/[0.04] transition-all"
+            style={{
+              width: '100%',
+              padding: 14,
+              borderRadius: 999,
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: '#8B7A6A',
+              fontFamily: '"Outfit", sans-serif',
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: 'pointer',
+              marginBottom: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
           >
-            <span className="material-symbols-outlined text-lg">logout</span>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 16, fontVariationSettings: "'wght' 300" }}
+            >logout</span>
             Cerrar sesión
+          </button>
+          <button
+            onClick={handleDeleteAccount}
+            disabled={isDeletingAccount}
+            style={{
+              width: '100%',
+              padding: 14,
+              borderRadius: 999,
+              background: 'none',
+              border: '1px solid rgba(232,100,100,0.2)',
+              color: 'rgba(232,100,100,0.7)',
+              fontFamily: '"Outfit", sans-serif',
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: isDeletingAccount ? 'not-allowed' : 'pointer',
+              opacity: isDeletingAccount ? 0.5 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 16, fontVariationSettings: "'wght' 300" }}
+            >delete</span>
+            {isDeletingAccount ? 'Eliminando...' : 'Eliminar cuenta'}
           </button>
         </div>
 
         {/* Feedback link */}
-        <div className="text-center pb-8">
-          <a href="/community?theme=feedback" className="text-xs text-white/20 hover:text-teal-400 transition-colors">
-            ¿Cómo podemos mejorar?
-          </a>
+        <div style={{ textAlign: 'center', paddingTop: 8 }}>
+          <a
+            href="/community?theme=feedback"
+            style={{
+              fontFamily: '"Outfit", sans-serif',
+              fontSize: 11,
+              color: '#4A4840',
+              textDecoration: 'none',
+              letterSpacing: '0.02em',
+            }}
+          >¿Cómo podemos mejorar?</a>
         </div>
       </div>
     </div>
