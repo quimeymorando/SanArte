@@ -288,8 +288,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ text, classN
     if (!text) return null;
 
     const processed = dedupeConsecutiveHeadings(preprocessMarkdown(text));
-    console.log('=== MARKDOWN RAW ===', text.substring(0, 2000));
-    console.log('=== MARKDOWN PROCESSED ===', processed.substring(0, 2000));
     let headingCount = 0;
 
     return (

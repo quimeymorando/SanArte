@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '../utils/logger';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SymptomDetail } from '../types';
@@ -144,12 +144,19 @@ export const SymptomDetailPage: React.FC = () => {
    const [addedToRoutine, setAddedToRoutine] = useState(false);
    const [user, setUser] = useState<any>(null);
 
+   const fetchedQueryRef = useRef<string | null>(null);
+   const isFetchingRef = useRef(false);
+
    useEffect(() => {
       authService.getUser().then(setUser);
    }, []);
 
    const fetchData = async () => {
       if (!query) return;
+      if (isFetchingRef.current) return;
+
+      isFetchingRef.current = true;
+      fetchedQueryRef.current = query;
       setIsLoading(true);
       setError(null);
 
@@ -179,20 +186,80 @@ export const SymptomDetailPage: React.FC = () => {
             }).catch(logger.warn);
          }
       } catch (error: any) {
-         console.error('=== DETAIL FETCH ERROR ===', error);
-         console.error('=== ERROR MESSAGE ===', error?.message);
-         console.error('=== ERROR STACK ===', error?.stack);
          logger.error("Error fetching details:", error);
          setError(error.message || "No pudimos conectar con la fuente.");
+         fetchedQueryRef.current = null;
       } finally {
          clearInterval(interval);
          setIsLoading(false);
+         isFetchingRef.current = false;
       }
    };
 
-   useEffect(() => {
+   const handleRetry = () => {
+      fetchedQueryRef.current = null;
       fetchData();
-      return () => { window.speechSynthesis.cancel(); };
+   };
+
+   useEffect(() => {
+      if (!query) return;
+      if (fetchedQueryRef.current === query) return;
+      if (isFetchingRef.current) return;
+
+      let cancelled = false;
+
+      const doFetch = async () => {
+         isFetchingRef.current = true;
+         fetchedQueryRef.current = query;
+         setIsLoading(true);
+         setError(null);
+
+         const interval = setInterval(() => {
+            setLoadingMsgIndex(prev => (prev + 1) % loadingMessages.length);
+         }, 3000);
+
+         try {
+            const detail = await getFullSymptomDetails(query);
+            if (cancelled) return;
+            if (detail) {
+               setData(detail);
+               const currentUser = await authService.getUser();
+               if (cancelled) return;
+               if (currentUser) {
+                  const { data: fav } = await supabase
+                     .from('favorites')
+                     .select('id')
+                     .eq('user_id', currentUser.id)
+                     .eq('symptom_name', detail.name)
+                     .single();
+                  if (!cancelled) setIsFavorite(!!fav);
+               }
+               historyService.saveSymptomLog({
+                  date: new Date().toISOString(),
+                  intensity: 0,
+                  duration: 'Consulta',
+                  notes: `Consulta: ${detail.name}`
+               }).catch(logger.warn);
+            }
+         } catch (error: any) {
+            if (!cancelled) {
+               logger.error("Error fetching details:", error);
+               setError(error.message || "No pudimos conectar con la fuente.");
+               fetchedQueryRef.current = null;
+            }
+         } finally {
+            clearInterval(interval);
+            if (!cancelled) setIsLoading(false);
+            isFetchingRef.current = false;
+         }
+      };
+
+      doFetch();
+
+      return () => {
+         cancelled = true;
+         window.speechSynthesis.cancel();
+      };
    }, [query]);
 
    const handleShare = async () => {
@@ -288,7 +355,7 @@ export const SymptomDetailPage: React.FC = () => {
                }</p>
                <div className="space-y-3">
                   <button
-                     onClick={fetchData}
+                     onClick={handleRetry}
                      className="w-full active:scale-95 transition-transform"
                      style={{
                         padding: '14px',

@@ -35,6 +35,7 @@ export const SearchPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [phraseIndex, setPhraseIndex] = useState(0);
+  const [isRateLimited, setIsRateLimited] = useState(false);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -53,11 +54,26 @@ export const SearchPage: React.FC = () => {
     setIsLoading(true);
     setHasSearched(true);
     setResults([]);
+    setIsRateLimited(false);
     try {
       const data = await searchCatalog(searchTerm);
-      setResults(data);
-    } catch (error) {
+      const firstErr = ((data?.[0] as any)?.errorMessage || '').toLowerCase();
+      const isRateLimit =
+        firstErr.includes('429') ||
+        firstErr.includes('sin cupo') ||
+        firstErr.includes('too many');
+      if (isRateLimit) {
+        setIsRateLimited(true);
+        setResults([]);
+      } else {
+        setResults(data);
+      }
+    } catch (error: any) {
       logger.error("Search failed", error);
+      const msg = (error?.message || '').toLowerCase();
+      if (msg.includes('429') || msg.includes('sin cupo') || msg.includes('too many')) {
+        setIsRateLimited(true);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -125,8 +141,21 @@ export const SearchPage: React.FC = () => {
           </div>
         )}
 
+        {/* Rate limit — mensaje sagrado */}
+        {!isLoading && isRateLimited && results.length === 0 && hasSearched && (
+          <div className="text-center py-20">
+            <div className="size-16 rounded-full mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.05)' }}>
+              <span className="material-symbols-outlined text-3xl" style={{ color: 'rgba(232,168,124,0.8)' }}>hourglass_top</span>
+            </div>
+            <h3 style={{ fontFamily: '"Playfair Display", serif', fontWeight: 400, fontSize: '22px', color: '#F0EBE0', marginBottom: '8px' }}>Un momento sagrado</h3>
+            <p style={{ fontFamily: '"Outfit", "Inter", sans-serif', fontSize: '13px', color: '#8B7A6A', lineHeight: 1.75, maxWidth: '340px', margin: '0 auto' }}>
+              La IA está recibiendo muchas consultas. Probá de nuevo en 30 segundos. Tu camino es valioso y vale la espera.
+            </p>
+          </div>
+        )}
+
         {/* No results */}
-        {!isLoading && results.length === 0 && hasSearched && (
+        {!isLoading && !isRateLimited && results.length === 0 && hasSearched && (
           <div className="text-center py-20">
             <div className="size-16 rounded-full mx-auto mb-5 flex items-center justify-center" style={{ background: 'rgba(201,168,76,0.05)' }}>
               <span className="material-symbols-outlined text-3xl" style={{ color: 'rgba(201,168,76,0.3)' }}>search_off</span>
