@@ -141,19 +141,6 @@ export const SearchPage: React.FC = () => {
         {/* Results */}
         {!isLoading && results.length > 0 && (
           <div className="space-y-3">
-            {/* Fallback warning */}
-            {results[0]?.isFallback && (
-              <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/[0.06] border border-amber-500/10 mb-4">
-                <span className="material-symbols-outlined text-amber-400/60 text-xl mt-0.5">cloud_off</span>
-                <div>
-                  <p className="text-amber-300/70 text-sm font-medium">Conexión limitada</p>
-                  <p className="text-amber-200/30 text-xs mt-0.5">
-                    Mostrando resultados básicos. La IA se reconectará pronto.
-                  </p>
-                </div>
-              </div>
-            )}
-
             {results.map((result, index) => {
               if (!result) return null;
               return (

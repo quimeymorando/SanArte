@@ -18,6 +18,90 @@ const loadingMessages = [
    "Buscando las hierbas sanadoras...",
 ];
 
+// ─── Sacred Loading — espera cálida mientras la IA piensa ──────
+const SacredLoading: React.FC = () => {
+   const [messageIndex, setMessageIndex] = useState(0);
+
+   const messages = [
+      { label: 'RESPIRÁ PROFUNDO', text: 'Tu cuerpo tiene un mensaje para vos. Estoy escuchándolo con atención.' },
+      { label: 'DESCIFRANDO', text: 'Cada síntoma guarda una historia. Tomate este momento para vos.' },
+      { label: 'TEJIENDO LA RESPUESTA', text: 'Las respuestas profundas requieren tiempo. Gracias por tu paciencia.' },
+      { label: 'CASI LISTO', text: 'Tu guía de sanación está cobrando forma. Un respiro más.' },
+   ];
+
+   useEffect(() => {
+      const interval = setInterval(() => {
+         setMessageIndex(prev => (prev + 1) % messages.length);
+      }, 4000);
+      return () => clearInterval(interval);
+   }, []);
+
+   const current = messages[messageIndex];
+
+   return (
+      <div style={{
+         minHeight: '100dvh',
+         background: '#060D1B',
+         display: 'flex',
+         flexDirection: 'column',
+         alignItems: 'center',
+         justifyContent: 'center',
+         padding: '40px 24px',
+         textAlign: 'center',
+      }}>
+         <div style={{
+            width: 80, height: 80, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(201,168,76,0.3) 0%, transparent 70%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: 32,
+            animation: 'sacred-pulse 2.5s ease-in-out infinite',
+         }}>
+            <div style={{
+               width: 40, height: 40, borderRadius: '50%',
+               background: 'linear-gradient(135deg, #F5E4B3, #C9A84C, #F0D080)',
+               boxShadow: '0 0 30px rgba(201,168,76,0.5)',
+            }} />
+         </div>
+
+         <p
+            key={`label-${messageIndex}`}
+            style={{
+               fontFamily: 'Outfit', fontSize: 10, fontWeight: 600,
+               letterSpacing: '0.25em', textTransform: 'uppercase',
+               color: '#C9A84C', marginBottom: 16,
+               animation: 'fade-in 0.6s ease-out',
+            }}
+         >
+            {current.label}
+         </p>
+
+         <p
+            key={`text-${messageIndex}`}
+            style={{
+               fontFamily: 'Playfair Display, serif', fontSize: 18,
+               fontWeight: 300, fontStyle: 'italic',
+               color: '#E8E0D0', maxWidth: 340,
+               lineHeight: 1.6, marginBottom: 0,
+               animation: 'fade-in 0.6s ease-out',
+            }}
+         >
+            "{current.text}"
+         </p>
+
+         <div style={{ display: 'flex', gap: 6, marginTop: 40 }}>
+            {[0, 1, 2].map(i => (
+               <div key={i} style={{
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#C9A84C',
+                  opacity: 0.4,
+                  animation: `sacred-dot 1.4s ease-in-out ${i * 0.2}s infinite`,
+               }} />
+            ))}
+         </div>
+      </div>
+   );
+};
+
 // ─── Paleta por dimensión ─────────────────────────────
 const DIM_ALMA    = '#C9A84C'; // Mensaje del Alma
 const DIM_ESPEJO  = '#B5A4DB'; // Espejo Interno — lavanda
@@ -153,36 +237,7 @@ export const SymptomDetailPage: React.FC = () => {
 
    // ── Loading ──
    if (isLoading) {
-      return (
-         <div
-            className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-            style={{ background: '#060D1B' }}
-         >
-            <div className="relative size-16 mb-8">
-               <div
-                  className="absolute inset-0 rounded-full border-2 animate-[spin_6s_linear_infinite]"
-                  style={{ borderColor: 'rgba(201,168,76,0.2)' }}
-               />
-               <div className="absolute inset-0 flex items-center justify-center">
-                  <span
-                     className="material-symbols-outlined text-2xl animate-pulse"
-                     style={{ color: '#C9A84C' }}
-                  >self_improvement</span>
-               </div>
-            </div>
-            <p
-               style={{
-                  fontFamily: '"Playfair Display", serif',
-                  fontStyle: 'italic',
-                  fontSize: '14px',
-                  color: '#6A6460',
-                  maxWidth: '280px',
-               }}
-            >
-               {loadingMessages[loadingMsgIndex]}
-            </p>
-         </div>
-      );
+      return <SacredLoading />;
    }
 
    // ── Error ──

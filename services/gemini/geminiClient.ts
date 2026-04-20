@@ -26,7 +26,7 @@ async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   retries = 3,
   delay = 1000,
-  factor = 2
+  factor = 1.5
 ): Promise<T> {
   try {
     return await fn();
@@ -43,7 +43,7 @@ async function retryWithBackoff<T>(
 
 const callGeminiDirect = async (messages: any[], jsonMode = false) => {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 45000);
+  const timeoutId = setTimeout(() => controller.abort(), 75000);
 
   try {
     const {
@@ -88,7 +88,7 @@ const callGeminiDirect = async (messages: any[], jsonMode = false) => {
 };
 
 const generateContentSafe = async (prompt: string, jsonMode = false): Promise<string> => {
-  return retryWithBackoff(() => callGeminiDirect([{ role: "user", content: prompt }], jsonMode), 2, 2000);
+  return retryWithBackoff(() => callGeminiDirect([{ role: "user", content: prompt }], jsonMode), 4, 3000);
 };
 
 const parseAndNormalizeDetail = (rawText: string, symptomName: string): SymptomDetail => {
@@ -108,7 +108,7 @@ export const sendMessageToChat = async (history: any[], newMessage: string): Pro
       { role: "user", content: newMessage },
     ];
 
-    return await retryWithBackoff(() => callGeminiDirect(messages), 1, 1000);
+    return await retryWithBackoff(() => callGeminiDirect(messages), 4, 3000);
   } catch (error) {
     logger.error("Chat Error:", error);
     return "Siento una interferencia en nuestra conexion. Respira profundo e intenta escribirme nuevamente.";
