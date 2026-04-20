@@ -195,8 +195,13 @@ const countBullets = (text: string): number => {
 export const hasHumanDepthSignals = (detail: SymptomDetail): boolean => {
   if (detail.zona_detalle.length < 300) return false;
   if (detail.emociones_detalle.length < 700) return false;
-  if (!detail.emociones_detalle.includes("💔 **Lectura de fondo**")) return false;
-  if (!detail.emociones_detalle.includes("🔍 **Posibles conflictos emocionales**")) return false;
+  // Verificar presencia de al menos uno de los headings clave
+  // (flexible con variantes de formato)
+  const hasLecturaFondo = detail.emociones_detalle.includes("Lectura de fondo") ||
+    detail.emociones_detalle.includes("lectura de fondo");
+  const hasConflictos = detail.emociones_detalle.includes("conflictos emocionales") ||
+    detail.emociones_detalle.includes("Posibles conflictos");
+  if (!hasLecturaFondo && !hasConflictos) return false;
   if (countBullets(detail.emociones_detalle) < 4) return false;
   if (hasPlaceholderArtifacts(detail.emociones_detalle)) return false;
   return true;

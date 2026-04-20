@@ -103,7 +103,7 @@ export const FALLBACK_SYMPTOMS = [
   },
 ];
 
-export const MIN_DETAIL_QUALITY_SCORE = 82;
+export const MIN_DETAIL_QUALITY_SCORE = 60;
 
 export const createMaestroPrompt = (symptomName: string): string => `
 Actua como una terapeuta integrativa con base en biodescodificacion, narrativa terapeutica y regulacion emocional.
