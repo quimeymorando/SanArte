@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { searchCatalog } from '../services/geminiService';
 import { authService } from '../services/authService';
@@ -37,6 +37,9 @@ export const SearchPage: React.FC = () => {
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [isRateLimited, setIsRateLimited] = useState(false);
 
+  const searchedQueryRef = useRef<string | null>(null);
+  const isSearchingRef = useRef(false);
+
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
     if (isLoading) {
@@ -46,17 +49,28 @@ export const SearchPage: React.FC = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (initialQuery && !hasSearched) handleSearch(initialQuery);
+    if (!initialQuery) return;
+    if (searchedQueryRef.current === initialQuery) return;
+    if (isSearchingRef.current) return;
+    handleSearch(initialQuery);
   }, [initialQuery]);
 
   const handleSearch = async (searchTerm: string = query) => {
-    if (!searchTerm.trim()) return;
+    const term = searchTerm.trim();
+    if (!term) return;
+
+    if (searchedQueryRef.current === term) return;
+    if (isSearchingRef.current) return;
+
+    isSearchingRef.current = true;
+    searchedQueryRef.current = term;
+
     setIsLoading(true);
     setHasSearched(true);
     setResults([]);
     setIsRateLimited(false);
     try {
-      const data = await searchCatalog(searchTerm);
+      const data = await searchCatalog(term);
       const firstErr = ((data?.[0] as any)?.errorMessage || '').toLowerCase();
       const isRateLimit =
         firstErr.includes('429') ||
@@ -65,6 +79,7 @@ export const SearchPage: React.FC = () => {
       if (isRateLimit) {
         setIsRateLimited(true);
         setResults([]);
+        searchedQueryRef.current = null;
       } else {
         setResults(data);
       }
@@ -74,8 +89,10 @@ export const SearchPage: React.FC = () => {
       if (msg.includes('429') || msg.includes('sin cupo') || msg.includes('too many')) {
         setIsRateLimited(true);
       }
+      searchedQueryRef.current = null;
     } finally {
       setIsLoading(false);
+      isSearchingRef.current = false;
     }
   };
 
