@@ -236,9 +236,9 @@ const PROVIDERS = [
         run: (ctx) => callGemini({ ...ctx, model: 'gemini-2.0-flash', apiKey: GEMINI_API_KEY_3 }),
     },
     {
-        name: 'gemini-1.5-flash',
+        name: 'gemini-flash-latest',
         enabled: !!GEMINI_API_KEY,
-        run: (ctx) => callGemini({ ...ctx, model: 'gemini-1.5-flash', apiKey: GEMINI_API_KEY }),
+        run: (ctx) => callGemini({ ...ctx, model: 'gemini-flash-latest', apiKey: GEMINI_API_KEY }),
     },
     {
         name: 'groq-llama-3.3-70b',
@@ -295,6 +295,14 @@ export default async function handler(req, res) {
         return res.status(originValidation.status).json({ message: originValidation.message });
     }
 
+    console.log('[SanArte] Providers enabled:', JSON.stringify({
+      gemini_key_1: !!process.env.GEMINI_API_KEY,
+      gemini_key_2: !!process.env.GEMINI_API_KEY_2,
+      gemini_key_3: !!process.env.GEMINI_API_KEY_3,
+      groq: !!process.env.GROQ_API_KEY,
+      openrouter: !!process.env.OPENROUTER_API_KEY
+    }));
+
     const contentLength = Number(getHeaderValue(req.headers['content-length']) || 0);
     if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BYTES) {
         return res.status(413).json({ message: 'Payload too large' });
@@ -343,6 +351,13 @@ export default async function handler(req, res) {
             return res.status(503).json({
                 message: 'Todos los proveedores de IA estan temporalmente no disponibles. Intenta de nuevo en 1 minuto.',
                 details: err.details,
+                providersEnabled: {
+                    gemini_key_1: !!process.env.GEMINI_API_KEY,
+                    gemini_key_2: !!process.env.GEMINI_API_KEY_2,
+                    gemini_key_3: !!process.env.GEMINI_API_KEY_3,
+                    groq: !!process.env.GROQ_API_KEY,
+                    openrouter: !!process.env.OPENROUTER_API_KEY,
+                },
             });
         }
         if (err?.status === 500 && err?.message === 'No AI providers configured') {
