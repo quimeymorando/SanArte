@@ -252,6 +252,127 @@ const PROVIDERS = [
     },
 ];
 
+// ═══════════════════════════════════════════════════════
+// Diagnostic ping helpers (temporary — for /api/gemini diagnostic mode)
+// ═══════════════════════════════════════════════════════
+
+async function pingGemini(model, apiKey) {
+    if (!apiKey) return { ok: false, status: 0, error: 'no_api_key' };
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const response = await fetch(url, { method: 'GET' });
+        if (!response.ok) {
+            let errorBody = '';
+            try {
+                const j = await response.json();
+                errorBody = j?.error?.status || j?.error?.message || '';
+            } catch {
+                errorBody = await response.text().catch(() => '');
+            }
+            return { ok: false, status: response.status, error: String(errorBody).slice(0, 200) };
+        }
+        return { ok: true, status: response.status, model };
+    } catch (err) {
+        return { ok: false, status: 0, error: err?.message || 'fetch_failed' };
+    }
+}
+
+async function pingGroq(apiKey) {
+    if (!apiKey) return { ok: false, status: 0, error: 'no_api_key' };
+    try {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+            body: JSON.stringify({
+                model: 'llama-3.3-70b-versatile',
+                messages: [{ role: 'user', content: 'ping' }],
+                max_tokens: 1,
+            }),
+        });
+        if (!response.ok) {
+            let errorBody = '';
+            try {
+                const j = await response.json();
+                errorBody = j?.error?.code || j?.error?.type || j?.error?.message || '';
+            } catch {
+                errorBody = await response.text().catch(() => '');
+            }
+            return { ok: false, status: response.status, error: String(errorBody).slice(0, 200) };
+        }
+        return { ok: true, status: response.status, model: 'llama-3.3-70b-versatile' };
+    } catch (err) {
+        return { ok: false, status: 0, error: err?.message || 'fetch_failed' };
+    }
+}
+
+async function pingOpenRouter(apiKey) {
+    if (!apiKey) return { ok: false, status: 0, error: 'no_api_key' };
+    try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+                'HTTP-Referer': 'https://sanarte.vercel.app',
+                'X-Title': 'SanArte Debug',
+            },
+            body: JSON.stringify({
+                model: 'meta-llama/llama-3.3-70b-instruct:free',
+                messages: [{ role: 'user', content: 'ping' }],
+                max_tokens: 1,
+            }),
+        });
+        if (!response.ok) {
+            let errorBody = '';
+            try {
+                const j = await response.json();
+                errorBody = j?.error?.code || j?.error?.message || '';
+            } catch {
+                errorBody = await response.text().catch(() => '');
+            }
+            return { ok: false, status: response.status, error: String(errorBody).slice(0, 200) };
+        }
+        return { ok: true, status: response.status, model: 'meta-llama/llama-3.3-70b-instruct:free' };
+    } catch (err) {
+        return { ok: false, status: 0, error: err?.message || 'fetch_failed' };
+    }
+}
+
+async function runDiagnostics() {
+    const envVars = {
+        GEMINI_API_KEY: !!process.env.GEMINI_API_KEY,
+        GEMINI_API_KEY_2: !!process.env.GEMINI_API_KEY_2,
+        GEMINI_API_KEY_3: !!process.env.GEMINI_API_KEY_3,
+        GROQ_API_KEY: !!process.env.GROQ_API_KEY,
+        OPENROUTER_API_KEY: !!process.env.OPENROUTER_API_KEY,
+    };
+
+    const envVarLengths = {
+        GEMINI_API_KEY: (process.env.GEMINI_API_KEY || '').length,
+        GEMINI_API_KEY_2: (process.env.GEMINI_API_KEY_2 || '').length,
+        GEMINI_API_KEY_3: (process.env.GEMINI_API_KEY_3 || '').length,
+        GROQ_API_KEY: (process.env.GROQ_API_KEY || '').length,
+        OPENROUTER_API_KEY: (process.env.OPENROUTER_API_KEY || '').length,
+    };
+
+    const [gemini_key_1, gemini_key_2, gemini_key_3, gemini_flash_latest, groq, openrouter] = await Promise.all([
+        pingGemini('gemini-2.0-flash', process.env.GEMINI_API_KEY),
+        pingGemini('gemini-2.0-flash', process.env.GEMINI_API_KEY_2),
+        pingGemini('gemini-2.0-flash', process.env.GEMINI_API_KEY_3),
+        pingGemini('gemini-flash-latest', process.env.GEMINI_API_KEY),
+        pingGroq(process.env.GROQ_API_KEY),
+        pingOpenRouter(process.env.OPENROUTER_API_KEY),
+    ]);
+
+    return {
+        envVars,
+        envVarLengths,
+        providerTests: { gemini_key_1, gemini_key_2, gemini_key_3, gemini_flash_latest, groq, openrouter },
+    };
+}
+
+const DEBUG_KEY = 'sanarte-debug-2026';
+
 async function generateWithFallback(ctx) {
     const enabledProviders = PROVIDERS.filter((p) => p.enabled);
 
@@ -293,6 +414,12 @@ export default async function handler(req, res) {
     const originValidation = validateOriginRequest({ origin, allowedOrigins, isProduction });
     if (!originValidation.ok) {
         return res.status(originValidation.status).json({ message: originValidation.message });
+    }
+
+    // Diagnostic mode: bypass auth/rate-limit/cascade and return provider health
+    if (req.body && req.body.diagnostic === true && req.body.debugKey === DEBUG_KEY) {
+        const diagnostics = await runDiagnostics();
+        return res.status(200).json(diagnostics);
     }
 
     console.log('[SanArte] Providers enabled:', JSON.stringify({
@@ -351,13 +478,6 @@ export default async function handler(req, res) {
             return res.status(503).json({
                 message: 'Todos los proveedores de IA estan temporalmente no disponibles. Intenta de nuevo en 1 minuto.',
                 details: err.details,
-                providersEnabled: {
-                    gemini_key_1: !!process.env.GEMINI_API_KEY,
-                    gemini_key_2: !!process.env.GEMINI_API_KEY_2,
-                    gemini_key_3: !!process.env.GEMINI_API_KEY_3,
-                    groq: !!process.env.GROQ_API_KEY,
-                    openrouter: !!process.env.OPENROUTER_API_KEY,
-                },
             });
         }
         if (err?.status === 500 && err?.message === 'No AI providers configured') {
