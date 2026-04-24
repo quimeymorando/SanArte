@@ -97,7 +97,7 @@ ESTADO GLOBAL: `LISTO CON RESERVAS`
 - `npm run build` -> build OK y salida a `dist/`.
 - `npx license-checker --production --failOn "GPL;AGPL"` -> sin bloqueo por licencias GPL/AGPL.
 - `vercel link --yes --team tierra-doradas-projects --project sanarte` -> proyecto linkeado correctamente.
-- `vercel env add ALLOWED_ORIGINS production --value "https://sanarte.app,https://www.sanarte.app,https://sanarte.vercel.app" --force --yes` -> variable guardada en `production`.
+- `vercel env add ALLOWED_ORIGINS production --value "https://sanarte-two.vercel.app" --force --yes` -> variable guardada en `production`.
 - `vercel env ls production` -> confirma `ALLOWED_ORIGINS` activo en `Production`.
 
 ### Bloqueantes abiertos (prioridad alta)
@@ -161,7 +161,7 @@ ESTADO GLOBAL: `LISTO CON RESERVAS`
 - Cambios realizados:
   - Se relinkeo el repo local al proyecto Vercel `tierra-doradas-projects/sanarte`.
   - Se configuro `ALLOWED_ORIGINS` en entorno `production` con valor:
-    - `https://sanarte.app,https://www.sanarte.app,https://sanarte.vercel.app`
+    - `https://sanarte-two.vercel.app`
 - Comandos de verificacion ejecutados:
   - `vercel env ls production`
   - `node --test "api/securityPolicy.test.js"`
@@ -395,7 +395,7 @@ Configura en el proyecto de Vercel:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `LEMON_SQUEEZY_WEBHOOK_SECRET`
 - `GEMINI_API_KEY`
-- `ALLOWED_ORIGINS` (ej. `https://sanarte.app,https://www.sanarte.app`)
+- `ALLOWED_ORIGINS` (ej. `https://sanarte-two.vercel.app`)
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 

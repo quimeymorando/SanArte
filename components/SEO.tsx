@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-const BASE_URL = 'https://sanarte.app';
+const BASE_URL = 'https://sanarte-two.vercel.app';
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-default.png`;
 const SITE_NAME = 'SanArte';
 

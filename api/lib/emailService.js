@@ -11,7 +11,7 @@ import { logger } from './logger.js';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.EMAIL_FROM || 'SanArte <hola@sanarte.app>';
-const BASE_URL   = process.env.APP_URL    || 'https://sanarte.app';
+const BASE_URL   = process.env.APP_URL    || 'https://sanarte-two.vercel.app';
 
 const isDev = process.env.NODE_ENV !== 'production';
 

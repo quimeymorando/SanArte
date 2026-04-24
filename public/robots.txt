@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /auth/
 
-Sitemap: https://sanarte.app/sitemap.xml
+Sitemap: https://sanarte-two.vercel.app/sitemap.xml

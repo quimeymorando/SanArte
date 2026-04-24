@@ -18,6 +18,6 @@ git push origin main
 echo.
 echo ===================================================
 echo      LISTO! TU CAMBIO ESTA EN CAMINO
-echo      Verifica en: https://sanarte.vercel.app
+echo      Verifica en: https://sanarte-two.vercel.app
 echo ===================================================
 pause

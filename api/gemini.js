@@ -200,7 +200,7 @@ async function callOpenRouter({ messages, jsonMode, systemInstruction, apiKey })
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': 'https://sanarte.vercel.app',
+            'HTTP-Referer': 'https://sanarte-two.vercel.app',
             'X-Title': 'SanArte',
         },
         body: JSON.stringify(body),
@@ -313,7 +313,7 @@ async function pingOpenRouter(apiKey) {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${apiKey}`,
-                'HTTP-Referer': 'https://sanarte.vercel.app',
+                'HTTP-Referer': 'https://sanarte-two.vercel.app',
                 'X-Title': 'SanArte Debug',
             },
             body: JSON.stringify({

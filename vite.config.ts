@@ -11,7 +11,7 @@ export default defineConfig(() => {
       host: '0.0.0.0',
       proxy: {
         '/api': {
-          target: 'https://sanarte.vercel.app',
+          target: 'https://sanarte-two.vercel.app',
           changeOrigin: true,
           secure: true,
         }
