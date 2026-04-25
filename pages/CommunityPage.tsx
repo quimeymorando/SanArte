@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { communityService } from '../services/dataService';
+import {
+  emptyReactionCounts,
+  emptyUserReactions,
+  type ReactionCounts,
+  type UserReactions,
+} from '../services/communityReactions';
 import { logger } from '../utils/logger';
 
 interface Comment {
@@ -22,6 +28,8 @@ interface Intention {
   timestamp: Date;
   comments: Comment[];
   user_id?: string;
+  reactionCounts: ReactionCounts;
+  userReactions: UserReactions;
 }
 
 const GOLD = '#C9A84C';
@@ -101,6 +109,8 @@ export const CommunityPage: React.FC = () => {
       id: tempId, text: newIntention, authorName: showName ? user?.name : undefined,
       candles: 0, loves: 0, isUser: true, theme: selectedTheme,
       timestamp: new Date(), comments: [],
+      reactionCounts: emptyReactionCounts(),
+      userReactions: emptyUserReactions(),
     };
     setIntentions([optimistic, ...intentions]);
     setNewIntention('');

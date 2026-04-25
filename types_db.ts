@@ -276,6 +276,30 @@ export interface Database {
         }
         Relationships: []
       }
+      intention_reactions: {
+        Row: {
+          id: string
+          user_id: string
+          intention_id: string
+          type: 'love' | 'hug' | 'accompany' | 'reverence'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          intention_id: string
+          type: 'love' | 'hug' | 'accompany' | 'reverence'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          intention_id?: string
+          type?: 'love' | 'hug' | 'accompany' | 'reverence'
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -286,6 +310,16 @@ export interface Database {
           field_name: string
         }
         Returns: number
+      }
+      toggle_intention_reaction: {
+        Args: {
+          p_intention_id: string
+          p_type: string
+        }
+        Returns: {
+          active: boolean
+          total_count: number
+        }[]
       }
     }
     Enums: Record<string, never>

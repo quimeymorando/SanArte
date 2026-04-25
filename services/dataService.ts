@@ -2,6 +2,14 @@
 import { supabase } from '../supabaseClient';
 import { SymptomLogEntry } from '../types';
 import { logger } from '../utils/logger';
+import {
+    REACTION_TYPES,
+    emptyReactionCounts,
+    emptyUserReactions,
+    type ReactionCounts,
+    type ReactionType,
+    type UserReactions,
+} from './communityReactions';
 
 type CommunityTheme = 'healing' | 'gratitude' | 'release' | 'feedback';
 
@@ -17,6 +25,8 @@ export interface IntentionData {
     theme: 'healing' | 'gratitude' | 'release' | 'feedback';
     timestamp: Date;
     comments?: any[];
+    reactionCounts: ReactionCounts;
+    userReactions: UserReactions;
 }
 
 export const communityService = {
@@ -35,18 +45,52 @@ export const communityService = {
             return [];
         }
 
-        return data.map((item: any) => ({
-            id: item.id,
-            text: item.text,
-            authorName: item.author_name || 'Anónimo',
-            candles: item.candles,
-            loves: item.loves,
-            isUser: user ? item.user_id === user.id : false,
-            user_id: item.user_id, // Map the ID
-            theme: item.theme,
-            timestamp: new Date(item.created_at),
-            comments: item.comments || []
-        }));
+        const intentionIds = data.map((item: any) => item.id);
+
+        // Reacciones agregadas: 1 sola query por todos los intentions de la página
+        const reactionsByIntention = new Map<string, { counts: ReactionCounts; user: UserReactions }>();
+        intentionIds.forEach((id) => {
+            reactionsByIntention.set(id, { counts: emptyReactionCounts(), user: emptyUserReactions() });
+        });
+
+        if (intentionIds.length > 0) {
+            const { data: reactionRows, error: reactionsError } = await supabase
+                .from('intention_reactions')
+                .select('intention_id, type, user_id')
+                .in('intention_id', intentionIds);
+
+            if (reactionsError) {
+                logger.warn('intention_reactions fetch failed:', reactionsError.message);
+            } else if (reactionRows) {
+                for (const r of reactionRows as any[]) {
+                    const bucket = reactionsByIntention.get(r.intention_id);
+                    if (!bucket) continue;
+                    if ((REACTION_TYPES as readonly string[]).includes(r.type)) {
+                        const t = r.type as ReactionType;
+                        bucket.counts[t] += 1;
+                        if (user && r.user_id === user.id) bucket.user[t] = true;
+                    }
+                }
+            }
+        }
+
+        return data.map((item: any) => {
+            const bucket = reactionsByIntention.get(item.id);
+            return {
+                id: item.id,
+                text: item.text,
+                authorName: item.author_name || 'Anónimo',
+                candles: item.candles,
+                loves: item.loves,
+                isUser: user ? item.user_id === user.id : false,
+                user_id: item.user_id, // Map the ID
+                theme: item.theme,
+                timestamp: new Date(item.created_at),
+                comments: item.comments || [],
+                reactionCounts: bucket?.counts ?? emptyReactionCounts(),
+                userReactions: bucket?.user ?? emptyUserReactions(),
+            };
+        });
     },
 
     createIntention: async (text: string, theme: CommunityTheme, authorName: string) => {
