@@ -26,32 +26,44 @@ async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   retries = 3,
   delay = 1000,
-  factor = 1.5
+  factor = 1.5,
+  signal?: AbortSignal
 ): Promise<T> {
+  if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
   try {
     return await fn();
   } catch (error: any) {
+    if (signal?.aborted) throw error;
     if (retries <= 0) throw error;
 
     if (error.message?.includes("API Key")) throw error;
+    if (error?.name === 'AbortError') throw error;
 
     const msg = (error?.message || '').toLowerCase();
-    const isRateLimited =
+    const isTerminalServerError =
       msg.includes('429') ||
       msg.includes('sin cupo') ||
-      msg.includes('too many requests') ||
-      msg.includes('rate limit');
-    if (isRateLimited) throw error;
+      msg.includes('too many') ||
+      msg.includes('rate limit') ||
+      msg.includes('503') ||
+      msg.includes('proveedores de ia') ||
+      msg.includes('temporalmente no disponibles');
+    if (isTerminalServerError) throw error;
 
     logger.warn(`Retrying... attempts left: ${retries}. Waiting ${delay}ms`);
     await sleep(delay);
-    return retryWithBackoff(fn, retries - 1, delay * factor, factor);
+    return retryWithBackoff(fn, retries - 1, delay * factor, factor, signal);
   }
 }
 
-const callGeminiDirect = async (messages: any[], jsonMode = false) => {
+const callGeminiDirect = async (messages: any[], jsonMode = false, externalSignal?: AbortSignal) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 75000);
+
+  if (externalSignal) {
+    if (externalSignal.aborted) controller.abort();
+    else externalSignal.addEventListener('abort', () => controller.abort(), { once: true });
+  }
 
   try {
     const {
@@ -95,8 +107,14 @@ const callGeminiDirect = async (messages: any[], jsonMode = false) => {
   }
 };
 
-const generateContentSafe = async (prompt: string, jsonMode = false): Promise<string> => {
-  return retryWithBackoff(() => callGeminiDirect([{ role: "user", content: prompt }], jsonMode), 4, 3000);
+const generateContentSafe = async (prompt: string, jsonMode = false, signal?: AbortSignal): Promise<string> => {
+  return retryWithBackoff(
+    () => callGeminiDirect([{ role: "user", content: prompt }], jsonMode, signal),
+    1,
+    2000,
+    1.5,
+    signal
+  );
 };
 
 const parseAndNormalizeDetail = (rawText: string, symptomName: string): SymptomDetail => {
@@ -176,7 +194,7 @@ Reglas:
   }
 };
 
-export const getFullSymptomDetails = async (symptomName: string): Promise<SymptomDetail> => {
+export const getFullSymptomDetails = async (symptomName: string, signal?: AbortSignal): Promise<SymptomDetail> => {
   const normalizedName = normalizeText(symptomName) || symptomName;
   const slug = normalizedName
     .trim()
@@ -250,13 +268,20 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
 
   logger.log("✨ Generando con Gemini...");
 
-  let detail = parseAndNormalizeDetail(await generateContentSafe(createMaestroPrompt(normalizedName), true), normalizedName);
+  let detail: SymptomDetail;
+  try {
+    const rawText = await generateContentSafe(createMaestroPrompt(normalizedName), true, signal);
+    detail = parseAndNormalizeDetail(rawText, normalizedName);
+  } catch (err) {
+    logger.warn("⚠️ Primer intento falló — saltando boosters de calidad");
+    throw err;
+  }
   let score = calculateDetailQualityScore(detail);
 
   if (score < MIN_DETAIL_QUALITY_SCORE || !hasHumanDepthSignals(detail)) {
     logger.warn(`⚠️ Primera generacion insuficiente (${score}). Reintentando con refuerzo...`);
     detail = parseAndNormalizeDetail(
-      await generateContentSafe(createDepthBoosterPrompt(normalizedName), true),
+      await generateContentSafe(createDepthBoosterPrompt(normalizedName), true, signal),
       normalizedName
     );
     score = calculateDetailQualityScore(detail);
@@ -265,7 +290,7 @@ export const getFullSymptomDetails = async (symptomName: string): Promise<Sympto
   if (score < MIN_DETAIL_QUALITY_SCORE || !hasHumanDepthSignals(detail)) {
     logger.warn(`⚠️ Segunda generacion insuficiente (${score}). Intento final...`);
     detail = parseAndNormalizeDetail(
-      await generateContentSafe(createDepthBoosterPrompt(normalizedName), true),
+      await generateContentSafe(createDepthBoosterPrompt(normalizedName), true, signal),
       normalizedName
     );
     score = calculateDetailQualityScore(detail);

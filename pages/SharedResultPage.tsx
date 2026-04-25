@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { logger } from '../utils/logger';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SymptomDetail } from '../types';
@@ -135,24 +135,41 @@ export const SharedResultPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [openSections, setOpenSections] = useState<Set<string>>(new Set(['meaning']));
 
+    const fetchedIdRef = useRef<string | null>(null);
+    const isFetchingRef = useRef(false);
+
     useEffect(() => {
+        if (!id) return;
+        if (fetchedIdRef.current === id) return;
+        if (isFetchingRef.current) return;
+
+        let cancelled = false;
+        const controller = new AbortController();
+
         const fetchData = async () => {
-            if (!id) return;
+            isFetchingRef.current = true;
+            fetchedIdRef.current = id;
             setIsLoading(true);
             try {
-                // Treat the ID as the query
-                const detail = await getFullSymptomDetails(decodeURIComponent(id));
-                if (detail) {
-                    setData(detail);
-                }
+                const detail = await getFullSymptomDetails(decodeURIComponent(id), controller.signal);
+                if (cancelled) return;
+                if (detail) setData(detail);
             } catch (error: any) {
+                if (cancelled || error?.name === 'AbortError') return;
                 logger.error(error);
                 setError("No se pudo cargar la información compartida.");
+                fetchedIdRef.current = null;
             } finally {
-                setIsLoading(false);
+                if (!cancelled) setIsLoading(false);
+                isFetchingRef.current = false;
             }
         };
         fetchData();
+
+        return () => {
+            cancelled = true;
+            controller.abort();
+        };
     }, [id]);
 
     const toggleSection = (sectionId: string) => {

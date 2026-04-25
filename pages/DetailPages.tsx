@@ -207,6 +207,7 @@ export const SymptomDetailPage: React.FC = () => {
       if (isFetchingRef.current) return;
 
       let cancelled = false;
+      const controller = new AbortController();
 
       const doFetch = async () => {
          isFetchingRef.current = true;
@@ -219,7 +220,7 @@ export const SymptomDetailPage: React.FC = () => {
          }, 3000);
 
          try {
-            const detail = await getFullSymptomDetails(query);
+            const detail = await getFullSymptomDetails(query, controller.signal);
             if (cancelled) return;
             if (detail) {
                setData(detail);
@@ -242,11 +243,10 @@ export const SymptomDetailPage: React.FC = () => {
                }).catch(logger.warn);
             }
          } catch (error: any) {
-            if (!cancelled) {
-               logger.error("Error fetching details:", error);
-               setError(error.message || "No pudimos conectar con la fuente.");
-               fetchedQueryRef.current = null;
-            }
+            if (cancelled || error?.name === 'AbortError') return;
+            logger.error("Error fetching details:", error);
+            setError(error.message || "No pudimos conectar con la fuente.");
+            fetchedQueryRef.current = null;
          } finally {
             clearInterval(interval);
             if (!cancelled) setIsLoading(false);
@@ -258,6 +258,7 @@ export const SymptomDetailPage: React.FC = () => {
 
       return () => {
          cancelled = true;
+         controller.abort();
          window.speechSynthesis.cancel();
       };
    }, [query]);
