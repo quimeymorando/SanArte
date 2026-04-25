@@ -7,6 +7,9 @@ import {
 } from './securityPolicy.js';
 import { geminiRequestSchema, validateBody } from './lib/schemas.js';
 
+const PER_PROVIDER_TIMEOUT_MS = 4500;
+const TOTAL_BUDGET_MS = 8500;
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_KEY_2 = process.env.GEMINI_API_KEY_2;
 const GEMINI_API_KEY_3 = process.env.GEMINI_API_KEY_3;
@@ -118,7 +121,7 @@ const buildOpenAIStyleMessages = (messages, systemInstruction) => {
     return out;
 };
 
-async function callGemini({ messages, jsonMode, systemInstruction, model, apiKey }) {
+async function callGemini({ messages, jsonMode, systemInstruction, model, apiKey, signal }) {
     const conversationMessages = messages.filter((m) => m?.role !== 'system');
     const contents = conversationMessages.map((m) => ({
         role: m?.role === 'assistant' ? 'model' : 'user',
@@ -139,7 +142,8 @@ async function callGemini({ messages, jsonMode, systemInstruction, model, apiKey
     const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal,
     });
 
     if (!response.ok) {
@@ -155,7 +159,7 @@ async function callGemini({ messages, jsonMode, systemInstruction, model, apiKey
     return text;
 }
 
-async function callGroq({ messages, jsonMode, systemInstruction, apiKey }) {
+async function callGroq({ messages, jsonMode, systemInstruction, apiKey, signal }) {
     const body = {
         model: 'llama-3.3-70b-versatile',
         messages: buildOpenAIStyleMessages(messages, systemInstruction),
@@ -171,6 +175,7 @@ async function callGroq({ messages, jsonMode, systemInstruction, apiKey }) {
             'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify(body),
+        signal,
     });
 
     if (!response.ok) {
@@ -186,7 +191,7 @@ async function callGroq({ messages, jsonMode, systemInstruction, apiKey }) {
     return text;
 }
 
-async function callOpenRouter({ messages, jsonMode, systemInstruction, apiKey }) {
+async function callOpenRouter({ messages, jsonMode, systemInstruction, apiKey, signal }) {
     const body = {
         model: 'meta-llama/llama-3.3-70b-instruct:free',
         messages: buildOpenAIStyleMessages(messages, systemInstruction),
@@ -204,6 +209,7 @@ async function callOpenRouter({ messages, jsonMode, systemInstruction, apiKey })
             'X-Title': 'SanArte',
         },
         body: JSON.stringify(body),
+        signal,
     });
 
     if (!response.ok) {
@@ -220,6 +226,11 @@ async function callOpenRouter({ messages, jsonMode, systemInstruction, apiKey })
 }
 
 const PROVIDERS = [
+    {
+        name: 'groq-llama-3.3-70b',
+        enabled: !!GROQ_API_KEY,
+        run: (ctx) => callGroq({ ...ctx, apiKey: GROQ_API_KEY }),
+    },
     {
         name: 'gemini-2.0-flash-key1',
         enabled: !!GEMINI_API_KEY,
@@ -239,11 +250,6 @@ const PROVIDERS = [
         name: 'gemini-flash-latest',
         enabled: !!GEMINI_API_KEY,
         run: (ctx) => callGemini({ ...ctx, model: 'gemini-flash-latest', apiKey: GEMINI_API_KEY }),
-    },
-    {
-        name: 'groq-llama-3.3-70b',
-        enabled: !!GROQ_API_KEY,
-        run: (ctx) => callGroq({ ...ctx, apiKey: GROQ_API_KEY }),
     },
     {
         name: 'openrouter-llama-3.3',
@@ -382,17 +388,44 @@ async function generateWithFallback(ctx) {
         throw err;
     }
 
+    const startTime = Date.now();
     const errors = [];
 
     for (const provider of enabledProviders) {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > TOTAL_BUDGET_MS) {
+            console.warn(`[SanArte] Budget exhausted (${elapsed}ms) — skipping ${provider.name}`);
+            errors.push({
+                provider: provider.name,
+                error: 'skipped_budget_exhausted',
+                elapsedMs: elapsed,
+            });
+            break;
+        }
+
+        const providerStart = Date.now();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), PER_PROVIDER_TIMEOUT_MS);
+
         try {
             console.log(`[SanArte] Trying provider: ${provider.name}`);
-            const text = await provider.run(ctx);
-            console.log(`[SanArte] Success with: ${provider.name}`);
+            const text = await provider.run({ ...ctx, signal: controller.signal });
+            clearTimeout(timeoutId);
+            const tookMs = Date.now() - providerStart;
+            console.log(`[SanArte] Success with: ${provider.name} (${tookMs}ms)`);
             return { text, provider: provider.name };
         } catch (err) {
-            console.warn(`[SanArte] Provider ${provider.name} failed:`, err?.message);
-            errors.push({ provider: provider.name, error: err?.message });
+            clearTimeout(timeoutId);
+            const tookMs = Date.now() - providerStart;
+            const aborted = err?.name === 'AbortError' || controller.signal.aborted;
+            const errorLabel = aborted ? 'timeout_per_provider' : (err?.message || 'unknown_error');
+            console.warn(`[SanArte] Provider ${provider.name} failed (${tookMs}ms): ${errorLabel}`);
+            errors.push({
+                provider: provider.name,
+                error: errorLabel,
+                tookMs,
+                status: err?.status,
+            });
             continue;
         }
     }
