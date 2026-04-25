@@ -16,7 +16,14 @@ const GEMINI_API_KEY_3 = process.env.GEMINI_API_KEY_3;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+console.log('[SanArte] Providers enabled:', JSON.stringify({
+  gemini_key_1: !!GEMINI_API_KEY,
+  gemini_key_2: !!GEMINI_API_KEY_2,
+  gemini_key_3: !!GEMINI_API_KEY_3,
+  groq: !!GROQ_API_KEY,
+  openrouter: !!OPENROUTER_API_KEY
+}));
+
 const GEMINI_MAX_OUTPUT_TOKENS = Math.min(
     4096,
     Math.max(128, Number(process.env.GEMINI_MAX_OUTPUT_TOKENS || 2048))
@@ -32,8 +39,6 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPA
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 200;
 const MAX_REQUEST_BYTES = 60_000;
-const MAX_MESSAGES = 20;
-const MAX_CHARS_PER_MESSAGE = 4000;
 const MAX_TOTAL_CHARS = 15000;
 
 const rateLimitStore = new Map();
@@ -408,11 +413,8 @@ async function generateWithFallback(ctx) {
         const timeoutId = setTimeout(() => controller.abort(), PER_PROVIDER_TIMEOUT_MS);
 
         try {
-            console.log(`[SanArte] Trying provider: ${provider.name}`);
             const text = await provider.run({ ...ctx, signal: controller.signal });
             clearTimeout(timeoutId);
-            const tookMs = Date.now() - providerStart;
-            console.log(`[SanArte] Success with: ${provider.name} (${tookMs}ms)`);
             return { text, provider: provider.name };
         } catch (err) {
             clearTimeout(timeoutId);
@@ -454,14 +456,6 @@ export default async function handler(req, res) {
         const diagnostics = await runDiagnostics();
         return res.status(200).json(diagnostics);
     }
-
-    console.log('[SanArte] Providers enabled:', JSON.stringify({
-      gemini_key_1: !!process.env.GEMINI_API_KEY,
-      gemini_key_2: !!process.env.GEMINI_API_KEY_2,
-      gemini_key_3: !!process.env.GEMINI_API_KEY_3,
-      groq: !!process.env.GROQ_API_KEY,
-      openrouter: !!process.env.OPENROUTER_API_KEY
-    }));
 
     const contentLength = Number(getHeaderValue(req.headers['content-length']) || 0);
     if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BYTES) {

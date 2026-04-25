@@ -264,7 +264,6 @@ export const historyService = {
             }
             return (data as import('../types').Favorite[]) || [];
         } catch (error) {
-            // console.log("Network error or offline, serving cached favorites", error);
             const cached = localStorage.getItem('sanarte_favorites_cache');
             if (cached) {
                 return JSON.parse(cached);

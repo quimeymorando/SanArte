@@ -12,12 +12,6 @@ import { MarkdownRenderer, SectionHeading, DimensionAccentProvider } from '../co
 import { MagicalCard } from '../components/ui/MagicalCard';
 import { AudioVisualizer } from '../components/AudioVisualizer';
 
-const loadingMessages = [
-   "Conectando con la sabiduría de tu cuerpo...",
-   "Interpretando el mensaje oculto...",
-   "Buscando las hierbas sanadoras...",
-];
-
 // ─── Sacred Loading — espera cálida mientras la IA piensa ──────
 const SacredLoading: React.FC = () => {
    const [messageIndex, setMessageIndex] = useState(0);
@@ -139,36 +133,31 @@ export const SymptomDetailPage: React.FC = () => {
    const [isLoading, setIsLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
    const [openSections, setOpenSections] = useState<Set<string>>(new Set(['meaning']));
-   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
    const [isFavorite, setIsFavorite] = useState(false);
    const [addedToRoutine, setAddedToRoutine] = useState(false);
    const [user, setUser] = useState<any>(null);
 
    const fetchedQueryRef = useRef<string | null>(null);
    const isFetchingRef = useRef(false);
+   const retryControllerRef = useRef<AbortController | null>(null);
 
    useEffect(() => {
       authService.getUser().then(setUser);
    }, []);
 
-   const fetchData = async () => {
-      if (!query) return;
-      if (isFetchingRef.current) return;
-
+   const fetchSymptomDetail = async (q: string, signal: AbortSignal) => {
       isFetchingRef.current = true;
-      fetchedQueryRef.current = query;
+      fetchedQueryRef.current = q;
       setIsLoading(true);
       setError(null);
 
-      const interval = setInterval(() => {
-         setLoadingMsgIndex(prev => (prev + 1) % loadingMessages.length);
-      }, 3000);
-
       try {
-         const detail = await getFullSymptomDetails(query);
+         const detail = await getFullSymptomDetails(q, signal);
+         if (signal.aborted) return;
          if (detail) {
             setData(detail);
             const currentUser = await authService.getUser();
+            if (signal.aborted) return;
             if (currentUser) {
                const { data: fav } = await supabase
                   .from('favorites')
@@ -176,7 +165,7 @@ export const SymptomDetailPage: React.FC = () => {
                   .eq('user_id', currentUser.id)
                   .eq('symptom_name', detail.name)
                   .maybeSingle();
-               setIsFavorite(!!fav);
+               if (!signal.aborted) setIsFavorite(!!fav);
             }
             historyService.saveSymptomLog({
                date: new Date().toISOString(),
@@ -185,20 +174,25 @@ export const SymptomDetailPage: React.FC = () => {
                notes: `Consulta: ${detail.name}`
             }).catch(logger.warn);
          }
-      } catch (error: any) {
-         logger.error("Error fetching details:", error);
-         setError(error.message || "No pudimos conectar con la fuente.");
+      } catch (err: any) {
+         if (signal.aborted || err?.name === 'AbortError') return;
+         logger.error("Error fetching details:", err);
+         setError(err.message || "No pudimos conectar con la fuente.");
          fetchedQueryRef.current = null;
       } finally {
-         clearInterval(interval);
-         setIsLoading(false);
+         if (!signal.aborted) setIsLoading(false);
          isFetchingRef.current = false;
       }
    };
 
    const handleRetry = () => {
+      if (!query) return;
+      if (isFetchingRef.current) return;
+      retryControllerRef.current?.abort();
+      const controller = new AbortController();
+      retryControllerRef.current = controller;
       fetchedQueryRef.current = null;
-      fetchData();
+      fetchSymptomDetail(query, controller.signal);
    };
 
    useEffect(() => {
@@ -206,59 +200,12 @@ export const SymptomDetailPage: React.FC = () => {
       if (fetchedQueryRef.current === query) return;
       if (isFetchingRef.current) return;
 
-      let cancelled = false;
       const controller = new AbortController();
-
-      const doFetch = async () => {
-         isFetchingRef.current = true;
-         fetchedQueryRef.current = query;
-         setIsLoading(true);
-         setError(null);
-
-         const interval = setInterval(() => {
-            setLoadingMsgIndex(prev => (prev + 1) % loadingMessages.length);
-         }, 3000);
-
-         try {
-            const detail = await getFullSymptomDetails(query, controller.signal);
-            if (cancelled) return;
-            if (detail) {
-               setData(detail);
-               const currentUser = await authService.getUser();
-               if (cancelled) return;
-               if (currentUser) {
-                  const { data: fav } = await supabase
-                     .from('favorites')
-                     .select('id')
-                     .eq('user_id', currentUser.id)
-                     .eq('symptom_name', detail.name)
-                     .maybeSingle();
-                  if (!cancelled) setIsFavorite(!!fav);
-               }
-               historyService.saveSymptomLog({
-                  date: new Date().toISOString(),
-                  intensity: 0,
-                  duration: 'Consulta',
-                  notes: `Consulta: ${detail.name}`
-               }).catch(logger.warn);
-            }
-         } catch (error: any) {
-            if (cancelled || error?.name === 'AbortError') return;
-            logger.error("Error fetching details:", error);
-            setError(error.message || "No pudimos conectar con la fuente.");
-            fetchedQueryRef.current = null;
-         } finally {
-            clearInterval(interval);
-            if (!cancelled) setIsLoading(false);
-            isFetchingRef.current = false;
-         }
-      };
-
-      doFetch();
+      fetchSymptomDetail(query, controller.signal);
 
       return () => {
-         cancelled = true;
          controller.abort();
+         retryControllerRef.current?.abort();
          window.speechSynthesis.cancel();
       };
    }, [query]);

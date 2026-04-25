@@ -69,7 +69,6 @@ const callGeminiDirect = async (messages: any[], jsonMode = false, externalSigna
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    console.log('[SanArte] Session:', session ? 'OK' : 'NULL');
 
     const response = await fetch("/api/gemini", {
       method: "POST",
@@ -96,7 +95,7 @@ const callGeminiDirect = async (messages: any[], jsonMode = false, externalSigna
     if (error.name === "AbortError") {
       throw new Error("La conexion tardo demasiado. Por favor intenta de nuevo.");
     }
-    console.error('[SanArte] Gemini error:', {
+    logger.error('[SanArte] Gemini error:', {
       message: error?.message,
       status: (error as any)?.status,
       stack: error?.stack?.split('\n')[0]
