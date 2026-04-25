@@ -175,7 +175,7 @@ export const SymptomDetailPage: React.FC = () => {
                   .select('id')
                   .eq('user_id', currentUser.id)
                   .eq('symptom_name', detail.name)
-                  .single();
+                  .maybeSingle();
                setIsFavorite(!!fav);
             }
             historyService.saveSymptomLog({
@@ -232,7 +232,7 @@ export const SymptomDetailPage: React.FC = () => {
                      .select('id')
                      .eq('user_id', currentUser.id)
                      .eq('symptom_name', detail.name)
-                     .single();
+                     .maybeSingle();
                   if (!cancelled) setIsFavorite(!!fav);
                }
                historyService.saveSymptomLog({

@@ -149,7 +149,7 @@ export const searchSymptomsWithAI = async (query: string): Promise<SearchResult[
       .from("search_cache")
       .select("results")
       .eq("query", cacheKey)
-      .single();
+      .maybeSingle();
 
     if (Array.isArray(cached?.results)) {
       const sanitized = cached.results.map(sanitizeSearchResult).filter(Boolean) as SearchResult[];

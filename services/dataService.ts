@@ -232,7 +232,7 @@ export const historyService = {
             .select('id')
             .eq('user_id', user.id)
             .eq('symptom_name', symptomName)
-            .single();
+            .maybeSingle();
 
         if (existing) {
             await supabase.from('favorites').delete().eq('id', existing.id);
