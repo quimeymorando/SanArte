@@ -11,6 +11,9 @@ import { PremiumLock } from '../components/PremiumLock';
 import { MarkdownRenderer, SectionHeading, DimensionAccentProvider } from '../components/ui/MarkdownRenderer';
 import { MagicalCard } from '../components/ui/MagicalCard';
 import { AudioVisualizer } from '../components/AudioVisualizer';
+import { ComposeModal } from '../components/community/ComposeModal';
+import { communityService } from '../services/dataService';
+import type { ThemeKey } from '../components/community/types';
 
 // ─── Sacred Loading — espera cálida mientras la IA piensa ──────
 const SacredLoading: React.FC = () => {
@@ -136,6 +139,8 @@ export const SymptomDetailPage: React.FC = () => {
    const [isFavorite, setIsFavorite] = useState(false);
    const [addedToRoutine, setAddedToRoutine] = useState(false);
    const [user, setUser] = useState<any>(null);
+   const [shareSheetOpen, setShareSheetOpen] = useState(false);
+   const [tribeComposeOpen, setTribeComposeOpen] = useState(false);
 
    const fetchedQueryRef = useRef<string | null>(null);
    const isFetchingRef = useRef(false);
@@ -210,8 +215,14 @@ export const SymptomDetailPage: React.FC = () => {
       };
    }, [query]);
 
+   const handleOpenShareSheet = () => {
+      if (!data) return;
+      setShareSheetOpen(true);
+   };
+
    const handleShare = async () => {
       if (!data) return;
+      setShareSheetOpen(false);
       const shareData = {
          title: `SanArte: ${data.name}`,
          text: `Descubrí el mensaje emocional de "${data.name}" en SanArte:\n\n"${data.shortDefinition}"`,
@@ -386,7 +397,7 @@ export const SymptomDetailPage: React.FC = () => {
                <div className="flex gap-2">
                   <button
                      aria-label="Compartir"
-                     onClick={handleShare}
+                     onClick={handleOpenShareSheet}
                      style={{ ...HEADER_BTN_STYLE, cursor: 'pointer' }}
                   >
                      <span className="material-symbols-outlined" style={HEADER_ICON_STYLE}>share</span>
@@ -725,6 +736,84 @@ export const SymptomDetailPage: React.FC = () => {
                )}
             </div>
          </div>
+
+         {/* ─── Share sheet: link vs tribu ──────────────────── */}
+         {shareSheetOpen && (
+            <div
+               onClick={(e) => { if (e.target === e.currentTarget) setShareSheetOpen(false); }}
+               style={{
+                  position: 'fixed', inset: 0, background: 'rgba(6,13,27,0.85)',
+                  backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                  zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 20,
+               }}
+            >
+               <div style={{
+                  background: '#0E1420', borderRadius: 20, width: '100%', maxWidth: 360,
+                  padding: 24, animation: 'community-modal-enter 250ms ease-out',
+                  border: '1px solid rgba(201,168,76,0.08)',
+               }}>
+                  <h3 style={{
+                     fontFamily: '"Playfair Display", serif', fontSize: 20, fontWeight: 300,
+                     fontStyle: 'italic', color: '#F0EBE0', margin: '0 0 16px',
+                  }}>¿Cómo querés compartir?</h3>
+
+                  <button
+                     onClick={handleShare}
+                     style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '14px 16px', borderRadius: 12,
+                        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                        cursor: 'pointer', textAlign: 'left', marginBottom: 10,
+                     }}
+                  >
+                     <span className="material-symbols-outlined" style={{ fontSize: 22, color: '#C9A84C', fontVariationSettings: "'wght' 300" }}>link</span>
+                     <div style={{ flex: 1 }}>
+                        <p style={{ fontFamily: 'Outfit', fontSize: 13, fontWeight: 600, color: '#F0EBE0', margin: 0 }}>Compartir link</p>
+                        <p style={{ fontFamily: 'Outfit', fontSize: 11, color: '#6A6460', margin: '2px 0 0' }}>Por WhatsApp, mail u otra app</p>
+                     </div>
+                  </button>
+
+                  <button
+                     onClick={() => { setShareSheetOpen(false); setTribeComposeOpen(true); }}
+                     style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '14px 16px', borderRadius: 12,
+                        background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.2)',
+                        cursor: 'pointer', textAlign: 'left',
+                     }}
+                  >
+                     <span className="material-symbols-outlined" style={{ fontSize: 22, color: '#C9A84C', fontVariationSettings: "'wght' 300" }}>diversity_1</span>
+                     <div style={{ flex: 1 }}>
+                        <p style={{ fontFamily: 'Outfit', fontSize: 13, fontWeight: 600, color: '#F0EBE0', margin: 0 }}>Compartir con la tribu</p>
+                        <p style={{ fontFamily: 'Outfit', fontSize: 11, color: '#6A6460', margin: '2px 0 0' }}>Publicá una intención en Comunidad</p>
+                     </div>
+                  </button>
+               </div>
+            </div>
+         )}
+
+         {/* ─── Compose modal pre-rellenado ──────────────────── */}
+         <ComposeModal
+            open={tribeComposeOpen}
+            initialTheme={'healing' as ThemeKey}
+            initialText={data ? `Estoy explorando: ${data.name}.${data.shortDefinition ? ` ${data.shortDefinition}` : ''}` : ''}
+            defaultAuthorName={user?.name}
+            onClose={() => setTribeComposeOpen(false)}
+            onSubmit={async ({ text, theme, anonymous }) => {
+               try {
+                  await communityService.createIntention(
+                     text, theme,
+                     anonymous ? 'Anónimo' : (user?.name || 'Usuario')
+                  );
+                  setTribeComposeOpen(false);
+                  navigate('/community');
+               } catch (err) {
+                  logger.error(err);
+                  alert('No pudimos publicar. Probá de nuevo.');
+               }
+            }}
+         />
       </div>
    );
 };

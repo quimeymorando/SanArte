@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { authService } from '../services/authService';
-import { communityService } from '../services/dataService';
+import { communityService, type IntentionData } from '../services/dataService';
 import {
   emptyReactionCounts,
   emptyUserReactions,
@@ -9,232 +10,257 @@ import {
 } from '../services/communityReactions';
 import { logger } from '../utils/logger';
 
-interface Comment {
-  id: string;
-  authorName?: string;
-  text: string;
-  timestamp: Date;
-  userId?: string;
-}
+import { ComposeModal } from '../components/community/ComposeModal';
+import { IntentionCard, type CardIntention } from '../components/community/IntentionCard';
+import { IntentionDetailModal, type DetailIntention } from '../components/community/IntentionDetailModal';
+import { EmptyState } from '../components/community/EmptyState';
+import { SkeletonCard } from '../components/community/SkeletonCard';
+import { ThreadComment } from '../components/community/CommentThread';
+import { GOLD, GOLD_GRAD, NAVY, THEMES, type ThemeKey } from '../components/community/types';
 
-interface Intention {
-  id: string;
-  text: string;
-  authorName?: string;
-  candles: number;
-  loves: number;
-  isUser: boolean;
-  theme: 'healing' | 'gratitude' | 'release' | 'feedback';
-  timestamp: Date;
-  comments: Comment[];
-  user_id?: string;
-  reactionCounts: ReactionCounts;
-  userReactions: UserReactions;
-}
+type Order = 'recent' | 'accompanied';
+type FeedItem = IntentionData & { commentsTyped: ThreadComment[] };
 
-const GOLD = '#C9A84C';
-const GOLD_GRAD = 'linear-gradient(135deg, #C9A84C, #F0D080)';
-const VIOLET = '#A78BFA';
-const SAGE = '#8BA888';
-const SLATE = '#7B9BB5';
+const ORDER_TABS: { key: Order; label: string }[] = [
+  { key: 'recent', label: 'Recientes' },
+  { key: 'accompanied', label: 'Acompañadas' },
+];
 
-const THEMES = [
-  { key: 'gratitude', label: 'Gratitud', icon: 'spa', color: SAGE, rgb: '139,168,136' },
-  { key: 'healing', label: 'Sanación', icon: 'healing', color: GOLD, rgb: '201,168,76' },
-  { key: 'release', label: 'Soltar', icon: 'air', color: SLATE, rgb: '123,155,181' },
-  { key: 'feedback', label: 'Testimonio', icon: 'reviews', color: VIOLET, rgb: '167,139,250' },
-] as const;
+const FILTER_TABS: { key: ThemeKey | 'all'; label: string }[] = [
+  { key: 'all', label: 'Todas' },
+  ...THEMES.map((t) => ({ key: t.key, label: t.label })),
+];
 
-const TABS = [
-  { key: 'all', label: 'Todos' },
-  { key: 'healing', label: 'Sanación' },
-  { key: 'gratitude', label: 'Gratitud' },
-  { key: 'release', label: 'Soltar' },
-  { key: 'feedback', label: 'Testimonios' },
-] as const;
+const totalReactions = (c: ReactionCounts) => c.love + c.hug + c.accompany + c.reverence;
 
-const themeConfig = (theme: string) => THEMES.find(t => t.key === theme) || THEMES[0];
-
-const formatRelativeTime = (date: Date): string => {
-  const diff = Date.now() - date.getTime();
-  const mins = Math.floor(diff / 60000);
-  const hours = Math.floor(mins / 60);
-  const days = Math.floor(hours / 24);
-  if (mins < 1) return 'ahora';
-  if (mins < 60) return `hace ${mins}m`;
-  if (hours < 24) return `hace ${hours}h`;
-  if (days < 7) return `hace ${days}d`;
-  return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
-};
+const mapToFeedItem = (item: IntentionData): FeedItem => ({
+  ...item,
+  commentsTyped: (item.comments || []).map((c: any) => ({
+    id: c.id,
+    text: c.text,
+    authorName: c.author_name,
+    userId: c.user_id,
+    timestamp: new Date(c.created_at || Date.now()),
+  })),
+});
 
 export const CommunityPage: React.FC = () => {
-  const [intentions, setIntentions] = useState<Intention[]>([]);
-  const [newIntention, setNewIntention] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState<Intention['theme']>('gratitude');
-  const [activeTab, setActiveTab] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState(true);
-  const [showName, setShowName] = useState(false);
-  const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
-  const [newComment, setNewComment] = useState('');
-  const [user, setUser] = useState<import('../types').UserProfile | null>(null);
-  const [composeOpen, setComposeOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const initialTheme = searchParams.get('theme') as ThemeKey | null;
 
+  const [intentions, setIntentions] = useState<FeedItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<import('../types').UserProfile | null>(null);
+  const [activeTab, setActiveTab] = useState<ThemeKey | 'all'>(
+    initialTheme && THEMES.some((t) => t.key === initialTheme) ? initialTheme : 'all'
+  );
+  const [order, setOrder] = useState<Order>('recent');
+
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [detailId, setDetailId] = useState<string | null>(null);
+
+  const fetchedRef = useRef(false);
+  const isFetchingRef = useRef(false);
+
+  // Initial load
   useEffect(() => {
-    const loadData = async () => {
+    if (fetchedRef.current) return;
+    if (isFetchingRef.current) return;
+
+    let cancelled = false;
+    isFetchingRef.current = true;
+    fetchedRef.current = true;
+
+    const load = async () => {
       setIsLoading(true);
       try {
         const u = await authService.getUser();
+        if (cancelled) return;
         setUser(u);
+
         const data = await communityService.getIntentions();
-        const mapped: Intention[] = data.map(item => ({
-          ...item,
-          isUser: item.user_id === u?.id,
-          comments: item.comments?.map((c: any) => ({
-            id: c.id, text: c.text, authorName: c.author_name,
-            userId: c.user_id, timestamp: new Date(c.created_at || Date.now()),
-          })) || [],
-        }));
-        mapped.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-        setIntentions(mapped);
-      } catch (error) { logger.error("Community load error:", error); }
-      finally { setIsLoading(false); }
+        if (cancelled) return;
+        setIntentions(data.map(mapToFeedItem));
+      } catch (err) {
+        if (!cancelled) logger.error('Community load error:', err);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+        isFetchingRef.current = false;
+      }
     };
-    loadData();
+    load();
+
+    return () => { cancelled = true; };
   }, []);
 
-  const handlePost = async () => {
-    if (!newIntention.trim()) return;
-    const tempId = Date.now().toString();
-    const optimistic: Intention = {
-      id: tempId, text: newIntention, authorName: showName ? user?.name : undefined,
-      candles: 0, loves: 0, isUser: true, theme: selectedTheme,
-      timestamp: new Date(), comments: [],
-      reactionCounts: emptyReactionCounts(),
-      userReactions: emptyUserReactions(),
-    };
-    setIntentions([optimistic, ...intentions]);
-    setNewIntention('');
-    setComposeOpen(false);
+  const reload = async () => {
     try {
-      await communityService.createIntention(newIntention, selectedTheme, showName ? (user?.name || 'Usuario') : 'Anónimo');
       const fresh = await communityService.getIntentions();
-      setIntentions(fresh.map(item => ({
-        ...item,
-        comments: item.comments?.map((c: any) => ({
-          id: c.id, text: c.text, authorName: c.author_name, timestamp: new Date(c.created_at || Date.now()),
-        })) || [],
-      })));
+      setIntentions(fresh.map(mapToFeedItem));
     } catch (err) {
       logger.error(err);
-      alert("Error al publicar.");
-      setIntentions(intentions.filter(i => i.id !== tempId));
     }
   };
 
-  const handleComment = async (postId: string) => {
-    if (!newComment.trim()) return;
-    const comment: Comment = { id: Date.now().toString(), text: newComment, authorName: showName ? user?.name : undefined, userId: user?.id, timestamp: new Date() };
-    setIntentions(prev => prev.map(p => p.id === postId ? { ...p, comments: [...p.comments, comment] } : p));
-    setNewComment('');
-    try { await communityService.addComment(postId, newComment, showName ? (user?.name || 'Usuario') : 'Anónimo'); }
-    catch (err) { logger.error(err); }
+  // ─── Filtros + orden ─────────────────────────────────
+  const filtered = useMemo(() => {
+    const base = activeTab === 'all' ? intentions : intentions.filter((i) => i.theme === activeTab);
+    const sorted = [...base];
+    if (order === 'recent') {
+      sorted.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    } else {
+      sorted.sort((a, b) => totalReactions(b.reactionCounts) - totalReactions(a.reactionCounts));
+    }
+    return sorted;
+  }, [intentions, activeTab, order]);
+
+  // ─── Handlers ────────────────────────────────────────
+  const handleReactionChange = (id: string, next: { counts: ReactionCounts; active: UserReactions }) => {
+    setIntentions((prev) =>
+      prev.map((p) => p.id === id ? { ...p, reactionCounts: next.counts, userReactions: next.active } : p)
+    );
+  };
+
+  const handlePost = async ({ text, theme, anonymous }: { text: string; theme: ThemeKey; anonymous: boolean }) => {
+    const tempId = `tmp-${Date.now()}`;
+    const optimistic: FeedItem = {
+      id: tempId, text,
+      authorName: anonymous ? 'Anónimo' : (user?.name || 'Usuario'),
+      candles: 0, loves: 0,
+      isUser: true, theme, timestamp: new Date(),
+      comments: [], commentsTyped: [],
+      reactionCounts: emptyReactionCounts(),
+      userReactions: emptyUserReactions(),
+    };
+    setIntentions((prev) => [optimistic, ...prev]);
+    setComposeOpen(false);
+    try {
+      await communityService.createIntention(text, theme, anonymous ? 'Anónimo' : (user?.name || 'Usuario'));
+      await reload();
+    } catch (err) {
+      logger.error(err);
+      alert('No pudimos publicar. Probá de nuevo.');
+      setIntentions((prev) => prev.filter((p) => p.id !== tempId));
+    }
+  };
+
+  const handleAddComment = async (intentionId: string, text: string) => {
+    const tempId = `tmp-c-${Date.now()}`;
+    const optimistic: ThreadComment = {
+      id: tempId, text,
+      authorName: user?.name || 'Anónimo',
+      userId: user?.id, timestamp: new Date(),
+    };
+    setIntentions((prev) => prev.map((p) =>
+      p.id === intentionId ? { ...p, commentsTyped: [...p.commentsTyped, optimistic] } : p
+    ));
+    try {
+      await communityService.addComment(intentionId, text, user?.name || 'Anónimo');
+    } catch (err) {
+      logger.error(err);
+      setIntentions((prev) => prev.map((p) =>
+        p.id === intentionId ? { ...p, commentsTyped: p.commentsTyped.filter((c) => c.id !== tempId) } : p
+      ));
+    }
   };
 
   const handleDeleteComment = async (intentionId: string, commentId: string) => {
-    if (!window.confirm("¿Borrar comentario?")) return;
-    setIntentions(prev => prev.map(p => p.id === intentionId ? { ...p, comments: p.comments.filter(c => c.id !== commentId) } : p));
-    try { await communityService.deleteComment(commentId); } catch (err) { logger.error(err); }
+    if (!window.confirm('¿Borrar comentario?')) return;
+    const snapshot = intentions;
+    setIntentions((prev) => prev.map((p) =>
+      p.id === intentionId ? { ...p, commentsTyped: p.commentsTyped.filter((c) => c.id !== commentId) } : p
+    ));
+    try {
+      await communityService.deleteComment(commentId);
+    } catch (err) {
+      logger.error(err);
+      setIntentions(snapshot);
+    }
   };
 
-  const lightCandle = async (id: string) => {
-    setIntentions(prev => prev.map(i => i.id === id ? { ...i, candles: i.candles + 1 } : i));
-    try { await communityService.lightCandle(id); } catch (err) { logger.error(err); }
+  const handleDeleteIntention = async (intentionId: string) => {
+    const snapshot = intentions;
+    setIntentions((prev) => prev.filter((p) => p.id !== intentionId));
+    try {
+      await communityService.deleteIntention(intentionId);
+    } catch (err) {
+      logger.error(err);
+      alert('Error al borrar.');
+      setIntentions(snapshot);
+    }
   };
 
-  const sendLove = async (id: string) => {
-    setIntentions(prev => prev.map(i => i.id === id ? { ...i, loves: i.loves + 1 } : i));
-    try { await communityService.sendLove(id); } catch (err) { logger.error(err); }
-  };
-
-  const filtered = activeTab === 'all' ? intentions : intentions.filter(i => i.theme === activeTab);
-
-  const canDelete = (item: Intention) => user?.role === 'admin' || item.isUser || (user ? item.user_id === user.id : false);
+  const detailIntention: DetailIntention | null = useMemo(() => {
+    if (!detailId) return null;
+    const it = intentions.find((i) => i.id === detailId);
+    if (!it) return null;
+    return {
+      id: it.id, text: it.text, authorName: it.authorName, theme: it.theme as ThemeKey,
+      timestamp: it.timestamp,
+      reactionCounts: it.reactionCounts, userReactions: it.userReactions,
+      comments: it.commentsTyped,
+      isUser: it.isUser, user_id: it.user_id,
+    };
+  }, [detailId, intentions]);
 
   return (
-    <div style={{ background: '#060D1B', minHeight: '100dvh', paddingBottom: 100 }}>
-      {/* Sticky Header */}
-      <div
-        style={{
-          padding: '64px 20px 20px',
-          background: 'linear-gradient(to bottom, rgba(6,13,27,1) 0%, transparent 100%)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-        }}
-      >
-        <p
-          style={{
-            fontFamily: '"Outfit", sans-serif',
-            fontSize: 10,
-            fontWeight: 500,
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            color: GOLD,
-            margin: '0 0 6px',
-          }}
-        >Sanando juntas</p>
-        <h1
-          style={{
-            fontFamily: '"Playfair Display", serif',
-            fontSize: 28,
-            fontWeight: 300,
-            color: '#F0EBE0',
-            margin: '0 0 6px',
-          }}
-        >Comunidad</h1>
-        <p
-          style={{
-            fontFamily: '"Outfit", sans-serif',
-            fontSize: 12,
-            color: '#4A4840',
-            margin: '0 0 16px',
-          }}
-        >Un espacio para compartir tu camino</p>
+    <div style={{ background: NAVY, minHeight: '100dvh', paddingBottom: 100 }}>
+      {/* Header sticky */}
+      <div style={{
+        padding: '64px 20px 20px',
+        background: 'linear-gradient(to bottom, rgba(6,13,27,1) 0%, transparent 100%)',
+        position: 'sticky', top: 0, zIndex: 10,
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+      }}>
+        <p style={{
+          fontFamily: 'Outfit', fontSize: 10, fontWeight: 500,
+          letterSpacing: '0.18em', textTransform: 'uppercase',
+          color: GOLD, margin: '0 0 6px',
+        }}>Sanando juntas</p>
+        <h1 style={{
+          fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 300,
+          color: '#F0EBE0', margin: '0 0 6px',
+        }}>Comunidad</h1>
+        <p style={{ fontFamily: 'Outfit', fontSize: 12, color: '#4A4840', margin: '0 0 16px' }}>
+          Un espacio para compartir tu camino
+        </p>
 
-        {/* Tabs */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 4,
-            background: 'rgba(255,255,255,0.04)',
-            borderRadius: 12,
-            padding: 4,
-            overflowX: 'auto',
-          }}
-        >
-          {TABS.map(t => (
+        {/* Order selector */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+          {ORDER_TABS.map((o) => (
+            <button
+              key={o.key}
+              onClick={() => setOrder(o.key)}
+              style={{
+                padding: '6px 12px', borderRadius: 999,
+                border: order === o.key ? `1px solid ${GOLD}66` : '1px solid rgba(255,255,255,0.08)',
+                background: order === o.key ? 'rgba(201,168,76,0.15)' : 'transparent',
+                color: order === o.key ? GOLD : '#5A6170',
+                fontFamily: 'Outfit', fontSize: 11, fontWeight: 500,
+                cursor: 'pointer', transition: 'all 0.2s',
+              }}
+            >{o.label}</button>
+          ))}
+        </div>
+
+        {/* Theme tabs */}
+        <div style={{
+          display: 'flex', gap: 4, background: 'rgba(255,255,255,0.04)',
+          borderRadius: 12, padding: 4, overflowX: 'auto',
+        }}>
+          {FILTER_TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
               style={{
-                flex: '1 0 auto',
-                padding: '8px 14px',
-                borderRadius: 10,
-                border: 'none',
+                flex: '1 0 auto', padding: '8px 14px', borderRadius: 10, border: 'none',
                 cursor: 'pointer',
                 background: activeTab === t.key ? 'rgba(201,168,76,0.12)' : 'transparent',
-                fontFamily: '"Outfit", sans-serif',
-                fontSize: 12,
-                fontWeight: 500,
+                fontFamily: 'Outfit', fontSize: 12, fontWeight: 500,
                 color: activeTab === t.key ? GOLD : '#5A6170',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s',
+                whiteSpace: 'nowrap', transition: 'all 0.2s',
               }}
-            >
-              {t.label}
-            </button>
+            >{t.label}</button>
           ))}
         </div>
       </div>
@@ -242,563 +268,69 @@ export const CommunityPage: React.FC = () => {
       {/* Feed */}
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '16px 20px 0' }}>
         {isLoading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 80 }}>
-            <span
-              className="material-symbols-outlined animate-pulse"
-              style={{ fontSize: 32, color: 'rgba(201,168,76,0.2)' }}
-            >self_improvement</span>
-          </div>
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', paddingTop: 80 }}>
-            <div
-              style={{
-                width: 64,
-                height: 64,
-                borderRadius: '50%',
-                background: 'rgba(201,168,76,0.08)',
-                border: '1px solid rgba(201,168,76,0.15)',
-                margin: '0 auto 20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ fontSize: 28, color: 'rgba(201,168,76,0.5)', fontVariationSettings: "'wght' 300" }}
-              >diversity_1</span>
-            </div>
-            <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 14, color: '#4A4840', margin: '0 0 6px' }}>
-              Sé la primera chispa
-            </p>
-            <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 12, color: '#3A3830', margin: 0 }}>
-              Compartí tu intención, gratitud o testimonio
-            </p>
-          </div>
+          <EmptyState onCompose={() => setComposeOpen(true)} />
         ) : (
-          filtered.map(item => {
-            const cfg = themeConfig(item.theme);
+          filtered.map((item, idx) => {
+            const card: CardIntention = {
+              id: item.id, text: item.text, authorName: item.authorName,
+              theme: item.theme as ThemeKey, timestamp: item.timestamp,
+              commentsCount: item.commentsTyped.length,
+              reactionCounts: item.reactionCounts, userReactions: item.userReactions,
+            };
             return (
-              <div
+              <IntentionCard
                 key={item.id}
-                style={{
-                  background: 'rgba(255,255,255,0.025)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  borderLeft: `3px solid ${cfg.color}`,
-                  borderRadius: 16,
-                  padding: '18px 20px',
-                  marginBottom: 12,
-                }}
-              >
-                {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      background: `rgba(${cfg.rgb}, 0.12)`,
-                      border: `1px solid rgba(${cfg.rgb}, 0.25)`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: 16, color: cfg.color, fontVariationSettings: "'wght' 300" }}
-                    >{cfg.icon}</span>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p
-                      style={{
-                        fontFamily: '"Outfit", sans-serif',
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: '#C8BFB0',
-                        margin: 0,
-                      }}
-                    >{item.authorName || 'Alma Anónima'}</p>
-                    <p
-                      style={{
-                        fontFamily: '"Outfit", sans-serif',
-                        fontSize: 10,
-                        color: '#4A4840',
-                        margin: 0,
-                      }}
-                    >{formatRelativeTime(item.timestamp)}</p>
-                  </div>
-                  <span
-                    style={{
-                      fontFamily: '"Outfit", sans-serif',
-                      fontSize: 9,
-                      fontWeight: 600,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      color: cfg.color,
-                      border: `1px solid rgba(${cfg.rgb}, 0.2)`,
-                      borderRadius: 999,
-                      padding: '2px 8px',
-                      flexShrink: 0,
-                    }}
-                  >{cfg.label}</span>
-                  {canDelete(item) && (
-                    <button
-                      onClick={() => { if (window.confirm('¿Eliminar?')) communityService.deleteIntention(item.id).then(() => setIntentions(prev => prev.filter(i => i.id !== item.id))).catch(() => alert('Error')); }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: 4,
-                        flexShrink: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <span
-                        className="material-symbols-outlined"
-                        style={{ fontSize: 16, color: 'rgba(232,100,100,0.5)', fontVariationSettings: "'wght' 300" }}
-                      >close</span>
-                    </button>
-                  )}
-                </div>
-
-                {/* Texto */}
-                <p
-                  style={{
-                    fontFamily: '"Outfit", sans-serif',
-                    fontSize: 13,
-                    color: '#8B7A6A',
-                    lineHeight: 1.75,
-                    margin: '0 0 14px',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >{item.text}</p>
-
-                {/* Reacciones */}
-                <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
-                  <button
-                    onClick={() => lightCandle(item.id)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: 0,
-                      fontFamily: '"Outfit", sans-serif',
-                      fontSize: 12,
-                      color: item.candles > 0 ? GOLD : 'rgba(201,168,76,0.5)',
-                    }}
-                  >
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: 16, fontVariationSettings: "'wght' 300" }}
-                    >light_mode</span>
-                    {item.candles || 0}
-                  </button>
-                  <button
-                    onClick={() => sendLove(item.id)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: 0,
-                      fontFamily: '"Outfit", sans-serif',
-                      fontSize: 12,
-                      color: item.loves > 0 ? '#F472B6' : 'rgba(244,114,182,0.5)',
-                    }}
-                  >
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: 16, fontVariationSettings: item.loves > 0 ? "'wght' 400, 'FILL' 1" : "'wght' 300" }}
-                    >favorite</span>
-                    {item.loves || 0}
-                  </button>
-                  <button
-                    onClick={() => setActiveCommentId(activeCommentId === item.id ? null : item.id)}
-                    style={{
-                      marginLeft: 'auto',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: 0,
-                      fontFamily: '"Outfit", sans-serif',
-                      fontSize: 12,
-                      color: activeCommentId === item.id ? GOLD : 'rgba(255,255,255,0.3)',
-                    }}
-                  >
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: 16, fontVariationSettings: "'wght' 300" }}
-                    >chat_bubble_outline</span>
-                    {item.comments.length || 0}
-                  </button>
-                </div>
-
-                {/* Comments */}
-                {activeCommentId === item.id && (
-                  <div
-                    style={{
-                      marginTop: 16,
-                      paddingTop: 14,
-                      borderTop: '1px solid rgba(255,255,255,0.05)',
-                    }}
-                  >
-                    {item.comments.map(c => (
-                      <div key={c.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0' }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p
-                            style={{
-                              fontFamily: '"Outfit", sans-serif',
-                              fontSize: 11,
-                              fontWeight: 600,
-                              color: GOLD,
-                              margin: 0,
-                              opacity: 0.8,
-                            }}
-                          >{c.authorName || 'Anónimo'}</p>
-                          <p
-                            style={{
-                              fontFamily: '"Outfit", sans-serif',
-                              fontSize: 12,
-                              color: '#8B7A6A',
-                              margin: '3px 0 0',
-                              lineHeight: 1.6,
-                            }}
-                          >{c.text}</p>
-                        </div>
-                        {user && (user.role === 'admin' || c.userId === user.id) && (
-                          <button
-                            onClick={() => handleDeleteComment(item.id, c.id)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0 }}
-                          >
-                            <span
-                              className="material-symbols-outlined"
-                              style={{ fontSize: 14, color: 'rgba(232,100,100,0.5)', fontVariationSettings: "'wght' 300" }}
-                            >close</span>
-                          </button>
-                        )}
-                      </div>
-                    ))}
-
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10 }}>
-                      <input
-                        type="text"
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleComment(item.id)}
-                        placeholder="Escribí un mensaje de apoyo..."
-                        style={{
-                          flex: 1,
-                          background: 'rgba(255,255,255,0.03)',
-                          border: '1px solid rgba(201,168,76,0.1)',
-                          borderRadius: 10,
-                          padding: '8px 12px',
-                          fontFamily: '"Outfit", sans-serif',
-                          fontSize: 12,
-                          color: '#F0EBE0',
-                          outline: 'none',
-                        }}
-                      />
-                      <button
-                        onClick={() => handleComment(item.id)}
-                        disabled={!newComment.trim()}
-                        style={{
-                          width: 34,
-                          height: 34,
-                          borderRadius: 10,
-                          background: newComment.trim() ? GOLD_GRAD : 'rgba(255,255,255,0.05)',
-                          color: newComment.trim() ? '#060D1B' : 'rgba(255,255,255,0.2)',
-                          border: 'none',
-                          cursor: newComment.trim() ? 'pointer' : 'not-allowed',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <span
-                          className="material-symbols-outlined"
-                          style={{ fontSize: 16, fontVariationSettings: "'wght' 400" }}
-                        >send</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+                intention={card}
+                index={idx}
+                onOpen={(id) => setDetailId(id)}
+                onReactionChange={handleReactionChange}
+              />
             );
           })
         )}
       </div>
 
-      {/* FAB Compartir */}
+      {/* FAB */}
       <button
         onClick={() => setComposeOpen(true)}
+        aria-label="Compartir"
         style={{
-          position: 'fixed',
-          bottom: 90,
-          right: 20,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          padding: '14px 24px',
-          background: GOLD_GRAD,
-          color: '#060D1B',
-          border: 'none',
-          borderRadius: 999,
-          cursor: 'pointer',
-          zIndex: 50,
-          boxShadow: '0 8px 24px rgba(201,168,76,0.25)',
-          fontFamily: '"Outfit", sans-serif',
-          fontSize: 13,
-          fontWeight: 600,
+          position: 'fixed', bottom: 90, right: 20,
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '14px 24px', background: GOLD_GRAD, color: NAVY,
+          border: 'none', borderRadius: 999, cursor: 'pointer',
+          zIndex: 50, boxShadow: '0 8px 24px rgba(201,168,76,0.25)',
+          fontFamily: 'Outfit', fontSize: 13, fontWeight: 600,
         }}
       >
-        <span
-          className="material-symbols-outlined"
-          style={{ fontSize: 18, fontVariationSettings: "'wght' 400", lineHeight: 1 }}
-        >edit</span>
+        <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'wght' 400", lineHeight: 1 }}>edit</span>
         Compartir
       </button>
 
-      {/* Modal Compose */}
-      {composeOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.7)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 200,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-          }}
-          onClick={(e) => { if (e.target === e.currentTarget) setComposeOpen(false); }}
-        >
-          <div
-            style={{
-              background: '#0E1420',
-              borderRadius: 20,
-              width: '100%',
-              maxWidth: 440,
-              maxHeight: '80vh',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Modal Header */}
-            <div
-              style={{
-                flexShrink: 0,
-                padding: '20px 20px 16px',
-                borderBottom: '1px solid rgba(255,255,255,0.06)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <h2
-                style={{
-                  fontFamily: '"Playfair Display", serif',
-                  fontSize: 20,
-                  fontWeight: 400,
-                  color: '#F0EBE0',
-                  margin: 0,
-                }}
-              >Compartir con la tribu</h2>
-              <button
-                onClick={() => setComposeOpen(false)}
-                style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '50%',
-                  width: 32,
-                  height: 32,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontSize: 18, color: 'rgba(232,100,100,0.5)', fontVariationSettings: "'wght' 300" }}
-                >close</span>
-              </button>
-            </div>
+      {/* Modals */}
+      <ComposeModal
+        open={composeOpen}
+        defaultAuthorName={user?.name}
+        onClose={() => setComposeOpen(false)}
+        onSubmit={handlePost}
+      />
 
-            {/* Área scrollable */}
-            <div
-              style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '16px 20px',
-                WebkitOverflowScrolling: 'touch',
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: '"Outfit", sans-serif',
-                  fontSize: 10,
-                  fontWeight: 500,
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: '#4A4840',
-                  margin: '0 0 10px',
-                }}
-              >Elegí un tema</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
-                {THEMES.map(t => {
-                  const selected = selectedTheme === t.key;
-                  return (
-                    <button
-                      key={t.key}
-                      onClick={() => setSelectedTheme(t.key as Intention['theme'])}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                        padding: '10px 16px',
-                        borderRadius: 999,
-                        border: selected ? `1px solid ${t.color}66` : '1px solid rgba(255,255,255,0.08)',
-                        background: selected ? `rgba(${t.rgb},0.15)` : 'rgba(255,255,255,0.04)',
-                        cursor: 'pointer',
-                        fontFamily: '"Outfit", sans-serif',
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: selected ? t.color : '#5A6170',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      <span
-                        className="material-symbols-outlined"
-                        style={{
-                          fontSize: 16,
-                          color: selected ? t.color : '#5A6170',
-                          fontVariationSettings: "'wght' 300",
-                          display: 'block',
-                          lineHeight: 1,
-                        }}
-                      >{t.icon}</span>
-                      <span>{t.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <textarea
-                value={newIntention}
-                onChange={(e) => setNewIntention(e.target.value)}
-                rows={4}
-                placeholder={
-                  selectedTheme === 'feedback' ? '¿Cómo te ha ayudado SanArte?' :
-                  selectedTheme === 'gratitude' ? 'Hoy agradezco por...' :
-                  selectedTheme === 'release' ? 'Hoy suelto...' :
-                  'Compartí tu intención o mensaje...'
-                }
-                style={{
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(201,168,76,0.1)',
-                  borderRadius: 12,
-                  padding: '12px 16px',
-                  fontFamily: '"Outfit", sans-serif',
-                  fontSize: 13,
-                  color: '#F0EBE0',
-                  outline: 'none',
-                  resize: 'none',
-                  lineHeight: 1.6,
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            {/* Footer — siempre visible */}
-            <div
-              style={{
-                flexShrink: 0,
-                padding: '16px 20px 20px',
-                borderTop: '1px solid rgba(255,255,255,0.06)',
-                background: '#0E1420',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: 12,
-                  cursor: 'pointer',
-                }}
-                onClick={() => setShowName(!showName)}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ fontSize: 16, color: '#6A6460' }}
-                  >{showName ? 'person' : 'visibility_off'}</span>
-                  <div>
-                    <p style={{ fontFamily: 'Outfit', fontSize: 12, fontWeight: 600, color: '#C8BFB0', margin: 0 }}>
-                      {showName ? (user?.name || 'Con mi nombre') : 'Publicar anónimamente'}
-                    </p>
-                    <p style={{ fontFamily: 'Outfit', fontSize: 10, color: '#4A4840', margin: '1px 0 0' }}>
-                      {showName ? 'Tu nombre aparecerá en el post' : 'Tu nombre no será visible'}
-                    </p>
-                  </div>
-                </div>
-                <div style={{
-                  width: 36, height: 20, borderRadius: 999,
-                  background: showName ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)',
-                  border: showName ? '1px solid rgba(201,168,76,0.4)' : '1px solid rgba(255,255,255,0.1)',
-                  position: 'relative', flexShrink: 0, transition: 'all 0.2s',
-                }}>
-                  <div style={{
-                    position: 'absolute', top: 2,
-                    left: showName ? 18 : 2,
-                    width: 14, height: 14, borderRadius: '50%',
-                    background: showName ? '#C9A84C' : 'rgba(255,255,255,0.3)',
-                    transition: 'left 0.2s',
-                  }} />
-                </div>
-              </div>
-
-              <button
-                onClick={handlePost}
-                disabled={!newIntention.trim()}
-                style={{
-                  width: '100%',
-                  background: newIntention.trim()
-                    ? 'linear-gradient(135deg, #C9A84C, #F0D080, #C9A84C)'
-                    : 'rgba(255,255,255,0.06)',
-                  color: newIntention.trim() ? '#060D1B' : '#4A4840',
-                  border: 'none',
-                  borderRadius: 999,
-                  padding: '14px',
-                  fontFamily: 'Outfit',
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: newIntention.trim() ? 'pointer' : 'not-allowed',
-                }}
-              >
-                Publicar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <IntentionDetailModal
+        intention={detailIntention}
+        currentUserId={user?.id}
+        isAdmin={user?.role === 'admin'}
+        onClose={() => setDetailId(null)}
+        onReactionChange={handleReactionChange}
+        onAddComment={handleAddComment}
+        onDeleteComment={handleDeleteComment}
+        onDeleteIntention={handleDeleteIntention}
+      />
     </div>
   );
 };
