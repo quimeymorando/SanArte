@@ -216,7 +216,7 @@ export const CommunityPage: React.FC = () => {
           fontFamily: 'Outfit', fontSize: 10, fontWeight: 500,
           letterSpacing: '0.18em', textTransform: 'uppercase',
           color: GOLD, margin: '0 0 6px',
-        }}>Sanando juntas</p>
+        }}>Sanando en comunidad</p>
         <h1 style={{
           fontFamily: '"Playfair Display", serif', fontSize: 28, fontWeight: 300,
           color: '#F0EBE0', margin: '0 0 6px',
@@ -243,17 +243,28 @@ export const CommunityPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Theme tabs */}
-        <div style={{
-          display: 'flex', gap: 4, background: 'rgba(255,255,255,0.04)',
-          borderRadius: 12, padding: 4, overflowX: 'auto',
+        {/* Theme tabs — 2 filas en mobile, 1 fila en >= 520px */}
+        <style>{`
+          .sa-theme-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+          }
+          @media (min-width: 520px) {
+            .sa-theme-tabs { display: flex; }
+            .sa-theme-tabs > button { flex: 1 0 auto; }
+          }
+        `}</style>
+        <div className="sa-theme-tabs" style={{
+          background: 'rgba(255,255,255,0.04)',
+          borderRadius: 12, padding: 4,
         }}>
           {FILTER_TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}
               style={{
-                flex: '1 0 auto', padding: '8px 14px', borderRadius: 10, border: 'none',
+                padding: '8px 14px', borderRadius: 10, border: 'none',
                 cursor: 'pointer',
                 background: activeTab === t.key ? 'rgba(201,168,76,0.12)' : 'transparent',
                 fontFamily: 'Outfit', fontSize: 12, fontWeight: 500,

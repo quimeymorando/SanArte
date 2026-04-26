@@ -29,10 +29,10 @@ export interface ReactionMeta {
 }
 
 export const REACTIONS: ReadonlyArray<ReactionMeta> = [
-  { type: 'love',       label: 'Te quiero',  icon: 'favorite',           color: '#F472B6', rgb: '244,114,182' },
-  { type: 'hug',        label: 'Te abrazo',  icon: 'volunteer_activism', color: '#E8A87C', rgb: '232,168,124' },
-  { type: 'accompany',  label: 'Te acompaño',icon: 'flutter_dash',       color: '#8BA888', rgb: '139,168,136' },
-  { type: 'reverence',  label: 'Reverencia', icon: 'self_improvement',   color: '#C9A84C', rgb: '201,168,76'  },
+  { type: 'love',       label: 'Te leo',         icon: 'favorite',           color: '#F472B6', rgb: '244,114,182' },
+  { type: 'hug',        label: 'Te abrazo',      icon: 'volunteer_activism', color: '#E8A87C', rgb: '232,168,124' },
+  { type: 'accompany',  label: 'Estoy con vos',  icon: 'flutter_dash',       color: '#8BA888', rgb: '139,168,136' },
+  { type: 'reverence',  label: 'Gracias',        icon: 'self_improvement',   color: '#C9A84C', rgb: '201,168,76'  },
 ] as const;
 
 export const COMPOSE_PROMPTS: ReadonlyArray<string> = [

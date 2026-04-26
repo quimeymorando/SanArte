@@ -75,7 +75,7 @@ export const IntentionCard: React.FC<Props> = ({ intention, index = 0, onOpen, o
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 14, fontWeight: 500, color: '#C8BFB0', margin: 0 }}>
-            {intention.authorName || 'Alma Anónima'}
+            {intention.authorName || 'Alma anónima'}
           </p>
           <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 11, color: '#4A4840', margin: 0 }}>
             {formatRelativeTime(intention.timestamp)}

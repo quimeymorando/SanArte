@@ -52,7 +52,7 @@ export const CommentThread: React.FC<Props> = ({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                 <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 11, fontWeight: 600, color: GOLD, margin: 0, opacity: 0.85 }}>
-                  {c.authorName || 'Anónima'}
+                  {c.authorName || 'Anónimo'}
                 </p>
                 <p style={{ fontFamily: '"Outfit", sans-serif', fontSize: 10, color: '#4A4840', margin: 0 }}>
                   {formatRelativeTime(c.timestamp)}
@@ -75,7 +75,7 @@ export const CommentThread: React.FC<Props> = ({
         );
       })}
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 14 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 14, minWidth: 0 }}>
         <input
           type="text"
           value={text}
@@ -84,6 +84,8 @@ export const CommentThread: React.FC<Props> = ({
           placeholder={inputPlaceholder}
           style={{
             flex: 1,
+            minWidth: 0,
+            boxSizing: 'border-box',
             background: 'rgba(255,255,255,0.03)',
             border: '1px solid rgba(201,168,76,0.1)',
             borderRadius: 10,

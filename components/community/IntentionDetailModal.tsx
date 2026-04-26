@@ -62,6 +62,7 @@ export const IntentionDetailModal: React.FC<Props> = ({
           background: PANEL,
           borderRadius: 20,
           width: '100%', maxWidth: 480, maxHeight: '90vh',
+          boxSizing: 'border-box',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
           animation: 'community-modal-enter 250ms ease-out',
           border: `1px solid rgba(${cfg.rgb},0.15)`,
@@ -89,7 +90,7 @@ export const IntentionDetailModal: React.FC<Props> = ({
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontFamily: 'Outfit', fontSize: 14, fontWeight: 600, color: '#C8BFB0', margin: 0 }}>
-              {intention.authorName || 'Alma Anónima'}
+              {intention.authorName || 'Alma anónima'}
             </p>
             <p style={{ fontFamily: 'Outfit', fontSize: 11, color: '#4A4840', margin: 0 }}>
               {formatRelativeTime(intention.timestamp)} · {cfg.label}
@@ -125,7 +126,7 @@ export const IntentionDetailModal: React.FC<Props> = ({
         </div>
 
         {/* Scroll: texto + reactions + comments */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 22px 24px', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '20px 22px 24px', WebkitOverflowScrolling: 'touch', boxSizing: 'border-box' }}>
           <p style={{
             fontFamily: '"Outfit", sans-serif', fontSize: 15, color: CREMA,
             lineHeight: 1.7, margin: '0 0 24px', whiteSpace: 'pre-wrap', wordBreak: 'break-word',

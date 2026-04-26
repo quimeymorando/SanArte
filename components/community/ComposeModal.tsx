@@ -67,6 +67,7 @@ export const ComposeModal: React.FC<Props> = ({
           background: PANEL,
           borderRadius: 20,
           width: '100%', maxWidth: 480, maxHeight: '90vh',
+          boxSizing: 'border-box',
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
           animation: 'community-modal-enter 250ms ease-out',
           border: '1px solid rgba(201,168,76,0.08)',
@@ -101,7 +102,7 @@ export const ComposeModal: React.FC<Props> = ({
         </div>
 
         {/* Scroll area */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 22px', WebkitOverflowScrolling: 'touch' }}>
+        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '16px 22px', WebkitOverflowScrolling: 'touch', boxSizing: 'border-box' }}>
           <p style={{
             fontFamily: '"Outfit", sans-serif', fontSize: 10, fontWeight: 500,
             letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4A4840', margin: '0 0 10px',
@@ -168,7 +169,7 @@ export const ComposeModal: React.FC<Props> = ({
               </span>
               <div>
                 <p style={{ fontFamily: 'Outfit', fontSize: 12, fontWeight: 600, color: '#C8BFB0', margin: 0 }}>
-                  {anon ? 'Compartir como anónima' : (defaultAuthorName || 'Con mi nombre')}
+                  {anon ? 'Compartir de forma anónima' : (defaultAuthorName || 'Con mi nombre')}
                 </p>
                 <p style={{ fontFamily: 'Outfit', fontSize: 10, color: '#4A4840', margin: '1px 0 0' }}>
                   {anon ? 'Tu nombre no será visible' : 'Tu nombre aparecerá en el post'}
