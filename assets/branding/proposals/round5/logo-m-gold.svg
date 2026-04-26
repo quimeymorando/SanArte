@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+  <defs>
+    <radialGradient id="haloM" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.45"/>
+      <stop offset="40%"  stop-color="#C9A84C" stop-opacity="0.18"/>
+      <stop offset="80%"  stop-color="#C9A84C" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldM" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="50%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+    <radialGradient id="irisM" cx="50%" cy="40%" r="55%">
+      <stop offset="0%"   stop-color="#FFF6D6"/>
+      <stop offset="55%"  stop-color="#F0D080"/>
+      <stop offset="100%" stop-color="#9C7A2C"/>
+    </radialGradient>
+    <radialGradient id="irisGlowM">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Halo aura -->
+  <circle cx="100" cy="120" r="105" fill="url(#haloM)"/>
+
+  <!-- Silueta Hamsa (5 dedos: 2 pulgares laterales + 3 dedos centrales) -->
+  <path d="M 100,38
+           C 96,40 94,48 94,62
+           C 94,82 90,100 88,112
+           C 86,120 82,120 82,112
+           C 82,95 80,75 77,66
+           C 74,57 67,57 65,68
+           C 63,82 65,100 65,118
+           C 65,128 62,134 56,130
+           C 48,126 40,118 36,110
+           C 30,98 26,108 30,122
+           C 35,138 42,148 54,156
+           C 60,160 64,168 66,180
+           C 68,194 70,206 76,212
+           L 124,212
+           C 130,206 132,194 134,180
+           C 136,168 140,160 146,156
+           C 158,148 165,138 170,122
+           C 174,108 170,98 164,110
+           C 160,118 152,126 144,130
+           C 138,134 135,128 135,118
+           C 135,100 137,82 135,68
+           C 133,57 126,57 123,66
+           C 120,75 118,95 118,112
+           C 118,120 114,120 112,112
+           C 110,100 106,82 106,62
+           C 106,48 104,40 100,38 Z"
+        fill="none" stroke="url(#goldM)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Llama coronando arriba (encima del dedo central) -->
+  <path d="M 100,38 C 97,32 97,26 100,20 C 103,26 103,32 100,38 Z"
+        fill="url(#goldM)"/>
+
+  <!-- Pequeña llama en la frente del ojo (donde iría el OM) -->
+  <path d="M 100,108 C 98,104 98,100 100,96 C 102,100 102,104 100,108 Z"
+        fill="url(#goldM)" opacity="0.85"/>
+
+  <!-- 7 pestañas/rayos alrededor del ojo -->
+  <g stroke="url(#goldM)" stroke-width="0.8" stroke-linecap="round" opacity="0.55">
+    <g transform="rotate(-60 100 142)"><line x1="100" y1="125" x2="100" y2="116"/></g>
+    <g transform="rotate(-40 100 142)"><line x1="100" y1="125" x2="100" y2="115"/></g>
+    <g transform="rotate(-20 100 142)"><line x1="100" y1="125" x2="100" y2="114"/></g>
+    <line x1="100" y1="125" x2="100" y2="114"/>
+    <g transform="rotate(20 100 142)"><line x1="100" y1="125" x2="100" y2="114"/></g>
+    <g transform="rotate(40 100 142)"><line x1="100" y1="125" x2="100" y2="115"/></g>
+    <g transform="rotate(60 100 142)"><line x1="100" y1="125" x2="100" y2="116"/></g>
+  </g>
+
+  <!-- Ojo central — almendra horizontal -->
+  <path d="M 78,142 C 86,128 114,128 122,142"
+        fill="none" stroke="url(#goldM)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 78,142 C 86,156 114,156 122,142"
+        fill="none" stroke="url(#goldM)" stroke-width="1.4" stroke-linecap="round"/>
+
+  <!-- Iris glow + iris + pupila + reflejo -->
+  <circle cx="100" cy="142" r="18" fill="url(#irisGlowM)"/>
+  <circle cx="100" cy="142" r="11" fill="url(#irisM)"/>
+  <circle cx="100" cy="142" r="3.2" fill="#060D1B"/>
+  <circle cx="98" cy="140" r="0.9" fill="#F5E4B3" opacity="0.85"/>
+
+  <!-- 1 punto ornamental por dedo (tips) -->
+  <circle cx="100" cy="42"  r="1.6" fill="url(#goldM)"/>
+  <circle cx="71"  cy="62"  r="1.4" fill="url(#goldM)"/>
+  <circle cx="129" cy="62"  r="1.4" fill="url(#goldM)"/>
+  <circle cx="33"  cy="106" r="1.4" fill="url(#goldM)"/>
+  <circle cx="167" cy="106" r="1.4" fill="url(#goldM)"/>
+
+  <!-- Loto pequeño en la base (3 pétalos simples) -->
+  <g transform="translate(100 192)">
+    <path d="M 0,0 C -3,-4 -3,-10 0,-14 C 3,-10 3,-4 0,0 Z"
+          fill="none" stroke="url(#goldM)" stroke-width="1.2" stroke-linejoin="round"/>
+    <g transform="rotate(-35)">
+      <path d="M 0,0 C -2.5,-4 -2.5,-9 0,-12 C 2.5,-9 2.5,-4 0,0 Z"
+            fill="none" stroke="url(#goldM)" stroke-width="1.1" stroke-linejoin="round" opacity="0.85"/>
+    </g>
+    <g transform="rotate(35)">
+      <path d="M 0,0 C -2.5,-4 -2.5,-9 0,-12 C 2.5,-9 2.5,-4 0,0 Z"
+            fill="none" stroke="url(#goldM)" stroke-width="1.1" stroke-linejoin="round" opacity="0.85"/>
+    </g>
+  </g>
+</svg>

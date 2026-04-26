@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="haloI" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.38"/>
+      <stop offset="50%"  stop-color="#C9A84C" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="irisI" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="50%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+    <linearGradient id="goldI" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="55%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+    <radialGradient id="irisGlowI">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Halo suave -->
+  <circle cx="100" cy="100" r="90" fill="url(#haloI)"/>
+
+  <!-- Ceja sutil arriba (arco protector) -->
+  <path d="M 64,52 C 84,40 116,40 136,52"
+        fill="none" stroke="url(#goldI)" stroke-width="1" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Almendra del ojo: lado izquierdo más fino, lado derecho más grueso -->
+  <path d="M 100,55 C 60,82 60,128 100,155"
+        fill="none" stroke="url(#goldI)" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M 100,55 C 140,82 140,128 100,155"
+        fill="none" stroke="url(#goldI)" stroke-width="2.7" stroke-linecap="round"/>
+
+  <!-- Glow detrás del iris -->
+  <circle cx="100" cy="105" r="32" fill="url(#irisGlowI)"/>
+
+  <!-- Iris dorado completo con gradient real -->
+  <circle cx="100" cy="105" r="22" fill="url(#irisI)"/>
+
+  <!-- Pupila como gota/llama navy -->
+  <path d="M 100,93 C 110,100 110,114 100,121 C 90,114 90,100 100,93 Z"
+        fill="#060D1B"/>
+
+  <!-- Punto dorado dentro de la pupila (alma adentro del alma) -->
+  <circle cx="100" cy="109" r="1.8" fill="#F5E4B3"/>
+
+  <!-- Lágrima de luz debajo del ojo -->
+  <path d="M 100,165 C 102.5,168 102.5,172 100,174 C 97.5,172 97.5,168 100,165 Z"
+        fill="url(#goldI)" opacity="0.75"/>
+</svg>

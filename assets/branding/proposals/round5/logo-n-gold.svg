@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+  <defs>
+    <radialGradient id="haloN" cx="50%" cy="50%" r="55%">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.55"/>
+      <stop offset="35%"  stop-color="#C9A84C" stop-opacity="0.22"/>
+      <stop offset="80%"  stop-color="#C9A84C" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flameHaloN">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldN" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="50%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+    <radialGradient id="irisN" cx="50%" cy="40%" r="55%">
+      <stop offset="0%"   stop-color="#FFF6D6"/>
+      <stop offset="55%"  stop-color="#F0D080"/>
+      <stop offset="100%" stop-color="#9C7A2C"/>
+    </radialGradient>
+    <radialGradient id="irisGlowN">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Halo aura más intenso -->
+  <circle cx="100" cy="120" r="110" fill="url(#haloN)"/>
+
+  <!-- Silueta Hamsa -->
+  <path d="M 100,38
+           C 96,40 94,48 94,62
+           C 94,82 90,100 88,112
+           C 86,120 82,120 82,112
+           C 82,95 80,75 77,66
+           C 74,57 67,57 65,68
+           C 63,82 65,100 65,118
+           C 65,128 62,134 56,130
+           C 48,126 40,118 36,110
+           C 30,98 26,108 30,122
+           C 35,138 42,148 54,156
+           C 60,160 64,168 66,180
+           C 68,194 70,206 76,212
+           L 124,212
+           C 130,206 132,194 134,180
+           C 136,168 140,160 146,156
+           C 158,148 165,138 170,122
+           C 174,108 170,98 164,110
+           C 160,118 152,126 144,130
+           C 138,134 135,128 135,118
+           C 135,100 137,82 135,68
+           C 133,57 126,57 123,66
+           C 120,75 118,95 118,112
+           C 118,120 114,120 112,112
+           C 110,100 106,82 106,62
+           C 106,48 104,40 100,38 Z"
+        fill="none" stroke="url(#goldN)" stroke-width="2.7" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Llama coronando con halo propio -->
+  <circle cx="100" cy="22" r="10" fill="url(#flameHaloN)"/>
+  <path d="M 100,38 C 95,32 95,22 100,12 C 105,22 105,32 100,38 Z"
+        fill="url(#goldN)"/>
+  <circle cx="100" cy="16" r="1.4" fill="#FFF6D6"/>
+
+  <!-- Pequeña llama en la frente del ojo -->
+  <path d="M 100,108 C 97,103 97,98 100,93 C 103,98 103,103 100,108 Z"
+        fill="url(#goldN)" opacity="0.9"/>
+
+  <!-- 9 pestañas/rayos alrededor del ojo -->
+  <g stroke="url(#goldN)" stroke-width="0.9" stroke-linecap="round" opacity="0.6">
+    <g transform="rotate(-72 100 142)"><line x1="100" y1="125" x2="100" y2="118"/></g>
+    <g transform="rotate(-54 100 142)"><line x1="100" y1="125" x2="100" y2="116"/></g>
+    <g transform="rotate(-36 100 142)"><line x1="100" y1="125" x2="100" y2="114"/></g>
+    <g transform="rotate(-18 100 142)"><line x1="100" y1="125" x2="100" y2="113"/></g>
+    <line x1="100" y1="125" x2="100" y2="112"/>
+    <g transform="rotate(18 100 142)"><line x1="100" y1="125" x2="100" y2="113"/></g>
+    <g transform="rotate(36 100 142)"><line x1="100" y1="125" x2="100" y2="114"/></g>
+    <g transform="rotate(54 100 142)"><line x1="100" y1="125" x2="100" y2="116"/></g>
+    <g transform="rotate(72 100 142)"><line x1="100" y1="125" x2="100" y2="118"/></g>
+  </g>
+
+  <!-- Ojo central con peso visual -->
+  <path d="M 76,142 C 85,127 115,127 124,142" fill="none" stroke="url(#goldN)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M 76,142 C 85,157 115,157 124,142" fill="none" stroke="url(#goldN)" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Iris glow + iris + pupila + reflejo -->
+  <circle cx="100" cy="142" r="20" fill="url(#irisGlowN)"/>
+  <circle cx="100" cy="142" r="12" fill="url(#irisN)"/>
+  <circle cx="100" cy="142" r="3.5" fill="#060D1B"/>
+  <circle cx="97.8" cy="139.8" r="1" fill="#F5E4B3" opacity="0.9"/>
+
+  <!-- 3 puntos por dedo -->
+  <g fill="url(#goldN)">
+    <!-- Dedo central (vertical) -->
+    <circle cx="100" cy="42" r="1.7"/>
+    <circle cx="100" cy="50" r="1.2" opacity="0.7"/>
+    <circle cx="100" cy="58" r="0.9" opacity="0.5"/>
+    <!-- Dedo izq -->
+    <circle cx="71" cy="62" r="1.5"/>
+    <circle cx="73" cy="70" r="1.1" opacity="0.7"/>
+    <circle cx="75" cy="78" r="0.8" opacity="0.5"/>
+    <!-- Dedo der -->
+    <circle cx="129" cy="62" r="1.5"/>
+    <circle cx="127" cy="70" r="1.1" opacity="0.7"/>
+    <circle cx="125" cy="78" r="0.8" opacity="0.5"/>
+    <!-- Pulgar izq -->
+    <circle cx="33" cy="106" r="1.5"/>
+    <circle cx="38" cy="112" r="1.1" opacity="0.7"/>
+    <circle cx="43" cy="118" r="0.8" opacity="0.5"/>
+    <!-- Pulgar der -->
+    <circle cx="167" cy="106" r="1.5"/>
+    <circle cx="162" cy="112" r="1.1" opacity="0.7"/>
+    <circle cx="157" cy="118" r="0.8" opacity="0.5"/>
+  </g>
+
+  <!-- Loto en base + 2 hojas laterales -->
+  <g transform="translate(100 192)">
+    <path d="M 0,0 C -3.5,-5 -3.5,-12 0,-16 C 3.5,-12 3.5,-5 0,0 Z" fill="none" stroke="url(#goldN)" stroke-width="1.4" stroke-linejoin="round"/>
+    <g transform="rotate(-35)"><path d="M 0,0 C -3,-5 -3,-11 0,-14 C 3,-11 3,-5 0,0 Z" fill="none" stroke="url(#goldN)" stroke-width="1.2" stroke-linejoin="round" opacity="0.85"/></g>
+    <g transform="rotate(35)"><path d="M 0,0 C -3,-5 -3,-11 0,-14 C 3,-11 3,-5 0,0 Z" fill="none" stroke="url(#goldN)" stroke-width="1.2" stroke-linejoin="round" opacity="0.85"/></g>
+    <!-- Hojas laterales -->
+    <g transform="rotate(-75)"><path d="M 0,0 C -2,-3 -2,-7 0,-9 C 2,-7 2,-3 0,0 Z" fill="none" stroke="url(#goldN)" stroke-width="1" stroke-linejoin="round" opacity="0.6"/></g>
+    <g transform="rotate(75)"><path d="M 0,0 C -2,-3 -2,-7 0,-9 C 2,-7 2,-3 0,0 Z" fill="none" stroke="url(#goldN)" stroke-width="1" stroke-linejoin="round" opacity="0.6"/></g>
+  </g>
+
+  <!-- Filigrana sutil colgando (3 elementos en cadena) -->
+  <line x1="100" y1="212" x2="100" y2="218" stroke="url(#goldN)" stroke-width="0.7" opacity="0.65"/>
+  <circle cx="100" cy="221" r="2" fill="none" stroke="url(#goldN)" stroke-width="0.7" opacity="0.7"/>
+  <line x1="100" y1="223" x2="100" y2="228" stroke="url(#goldN)" stroke-width="0.6" opacity="0.55"/>
+  <circle cx="100" cy="231" r="1.4" fill="url(#goldN)" opacity="0.75"/>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="haloJn" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#060D1B" stop-opacity="0.14"/>
+      <stop offset="60%"  stop-color="#060D1B" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="irisJn" cx="50%" cy="40%" r="55%">
+      <stop offset="0%"   stop-color="#1C2840"/>
+      <stop offset="60%"  stop-color="#0E1828"/>
+      <stop offset="100%" stop-color="#060D1B"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="94" fill="url(#haloJn)"/>
+
+  <g transform="rotate(-30 100 142)">
+    <path d="M 100,142 C 94,150 94,160 100,166 C 106,160 106,150 100,142 Z"
+          fill="none" stroke="#060D1B" stroke-width="1.4" stroke-linejoin="round" opacity="0.85"/>
+  </g>
+  <g transform="rotate(30 100 142)">
+    <path d="M 100,142 C 94,150 94,160 100,166 C 106,150 106,150 100,142 Z"
+          fill="none" stroke="#060D1B" stroke-width="1.4" stroke-linejoin="round" opacity="0.85"/>
+  </g>
+  <path d="M 100,140 C 92,150 92,164 100,172 C 108,164 108,150 100,140 Z"
+        fill="none" stroke="#060D1B" stroke-width="1.7" stroke-linejoin="round"/>
+
+  <path d="M 100,113 C 100,123 98,132 92,137 C 89,138 87,136 88,133"
+        fill="none" stroke="#060D1B" stroke-width="1.8" stroke-linecap="round"/>
+
+  <path d="M 50,95 C 65,71 135,71 150,95"
+        fill="none" stroke="#060D1B" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 50,95 C 65,113 135,113 150,95"
+        fill="none" stroke="#060D1B" stroke-width="1.6" stroke-linecap="round"/>
+
+  <circle cx="100" cy="95" r="14" fill="url(#irisJn)"/>
+  <circle cx="100" cy="95" r="4.2" fill="#060D1B"/>
+</svg>

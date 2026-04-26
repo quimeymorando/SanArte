@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" width="200" height="260">
+  <defs>
+    <radialGradient id="haloQ" cx="50%" cy="48%" r="55%">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.42"/>
+      <stop offset="40%"  stop-color="#C9A84C" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldQ" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="50%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+    <radialGradient id="irisQ" cx="50%" cy="40%" r="55%">
+      <stop offset="0%"   stop-color="#FFF6D6"/>
+      <stop offset="55%"  stop-color="#F0D080"/>
+      <stop offset="100%" stop-color="#9C7A2C"/>
+    </radialGradient>
+    <radialGradient id="irisGlowQ">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="100" cy="125" r="115" fill="url(#haloQ)"/>
+
+  <!-- Punto coronando -->
+  <circle cx="100" cy="6" r="1.8" fill="url(#goldQ)"/>
+
+  <!-- Llama coronando — más sólida -->
+  <path d="M 100,12 C 94,19 94,29 100,33 C 106,29 106,19 100,12 Z"
+        fill="none" stroke="url(#goldQ)" stroke-width="2" stroke-linejoin="round"/>
+  <line x1="100" y1="17" x2="100" y2="30" stroke="url(#goldQ)" stroke-width="0.8" opacity="0.7"/>
+
+  <!-- Hamsa con stroke más grueso para mobile -->
+  <path d="M 100,32
+           C 96,34 94,42 94,56 C 94,76 90,94 88,108 C 86,116 82,116 82,108
+           C 82,90 80,72 77,62 C 74,52 67,52 65,64 C 63,78 65,96 65,114
+           C 65,124 62,130 56,126 C 48,122 40,114 36,106 C 30,94 26,104 30,118
+           C 35,134 42,144 54,152 C 60,156 64,164 66,176
+           L 134,176 C 136,164 140,156 146,152 C 158,144 165,134 170,118
+           C 174,104 170,94 164,106 C 160,114 152,122 144,126 C 138,130 135,124 135,114
+           C 135,96 137,78 135,64 C 133,52 126,52 123,62 C 120,72 118,90 118,108
+           C 118,116 114,116 112,108 C 110,94 106,76 106,56 C 106,42 104,34 100,32 Z"
+        fill="none" stroke="url(#goldQ)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Llama frontal -->
+  <path d="M 100,58 C 95,65 95,73 100,77 C 105,73 105,65 100,58 Z"
+        fill="none" stroke="url(#goldQ)" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="100" cy="69" r="1.1" fill="url(#goldQ)"/>
+
+  <!-- Puntos por dedo: solo 2-3 por dedo (más limpio) -->
+  <g fill="url(#goldQ)">
+    <circle cx="100" cy="40" r="1.8"/>
+    <circle cx="100" cy="48" r="1.2" opacity="0.7"/>
+    <circle cx="71"  cy="60" r="1.6"/>
+    <circle cx="74"  cy="68" r="1.1" opacity="0.7"/>
+    <circle cx="129" cy="60" r="1.6"/>
+    <circle cx="126" cy="68" r="1.1" opacity="0.7"/>
+    <circle cx="33"  cy="100" r="1.6"/>
+    <circle cx="40"  cy="108" r="1.1" opacity="0.7"/>
+    <circle cx="167" cy="100" r="1.6"/>
+    <circle cx="160" cy="108" r="1.1" opacity="0.7"/>
+  </g>
+
+  <!-- 7 pestañas (un poco menos que P) -->
+  <g stroke="url(#goldQ)" stroke-width="1" stroke-linecap="round" opacity="0.7">
+    <g transform="rotate(-60 100 132)"><line x1="100" y1="116" x2="100" y2="106"/></g>
+    <g transform="rotate(-40 100 132)"><line x1="100" y1="116" x2="100" y2="104"/></g>
+    <g transform="rotate(-20 100 132)"><line x1="100" y1="116" x2="100" y2="103"/></g>
+    <line x1="100" y1="116" x2="100" y2="102"/>
+    <g transform="rotate(20 100 132)"><line x1="100" y1="116" x2="100" y2="103"/></g>
+    <g transform="rotate(40 100 132)"><line x1="100" y1="116" x2="100" y2="104"/></g>
+    <g transform="rotate(60 100 132)"><line x1="100" y1="116" x2="100" y2="106"/></g>
+  </g>
+
+  <!-- Ojo central — peso visual fuerte para 48px -->
+  <path d="M 64,132 C 76,114 124,114 136,132" fill="none" stroke="url(#goldQ)" stroke-width="2.7" stroke-linecap="round"/>
+  <path d="M 64,132 C 76,150 124,150 136,132" fill="none" stroke="url(#goldQ)" stroke-width="1.7" stroke-linecap="round"/>
+
+  <circle cx="100" cy="132" r="22" fill="url(#irisGlowQ)"/>
+  <circle cx="100" cy="132" r="13.5" fill="url(#irisQ)"/>
+  <circle cx="100" cy="132" r="4.4" fill="#060D1B"/>
+  <circle cx="100" cy="132" r="1.5" fill="url(#goldQ)"/>
+  <circle cx="97.5" cy="129.5" r="1" fill="#FFF6D6" opacity="0.95"/>
+
+  <!-- Loto base — 5 pétalos (sin hojas extras laterales) -->
+  <g transform="translate(100 178)">
+    <path d="M 0,0 C -4,-6 -4,-14 0,-18 C 4,-14 4,-6 0,0 Z"
+          fill="none" stroke="url(#goldQ)" stroke-width="1.7" stroke-linejoin="round"/>
+    <g transform="rotate(-32)">
+      <path d="M 0,0 C -3.5,-5 -3.5,-12 0,-15 C 3.5,-12 3.5,-5 0,0 Z"
+            fill="none" stroke="url(#goldQ)" stroke-width="1.4" stroke-linejoin="round" opacity="0.88"/>
+    </g>
+    <g transform="rotate(32)">
+      <path d="M 0,0 C -3.5,-5 -3.5,-12 0,-15 C 3.5,-12 3.5,-5 0,0 Z"
+            fill="none" stroke="url(#goldQ)" stroke-width="1.4" stroke-linejoin="round" opacity="0.88"/>
+    </g>
+    <g transform="rotate(-62)">
+      <path d="M 0,0 C -3,-4 -3,-10 0,-12 C 3,-10 3,-4 0,0 Z"
+            fill="none" stroke="url(#goldQ)" stroke-width="1.2" stroke-linejoin="round" opacity="0.7"/>
+    </g>
+    <g transform="rotate(62)">
+      <path d="M 0,0 C -3,-4 -3,-10 0,-12 C 3,-10 3,-4 0,0 Z"
+            fill="none" stroke="url(#goldQ)" stroke-width="1.2" stroke-linejoin="round" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- Filigrana colgante REDUCIDA a 3 elementos -->
+  <line x1="100" y1="180" x2="100" y2="194" stroke="url(#goldQ)" stroke-width="0.9" opacity="0.7"/>
+  <path d="M 100,196 L 95,202 L 100,208 L 105,202 Z" fill="none" stroke="url(#goldQ)" stroke-width="1" opacity="0.8"/>
+  <circle cx="100" cy="202" r="1.2" fill="url(#goldQ)" opacity="0.7"/>
+  <line x1="100" y1="208" x2="100" y2="222" stroke="url(#goldQ)" stroke-width="0.7" opacity="0.55"/>
+  <circle cx="100" cy="226" r="1.6" fill="url(#goldQ)" opacity="0.85"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="haloDn" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#060D1B" stop-opacity="0.18"/>
+      <stop offset="60%"  stop-color="#060D1B" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="95" fill="url(#haloDn)"/>
+
+  <circle cx="100" cy="100" r="68" fill="none" stroke="#060D1B" stroke-width="2.2"/>
+  <circle cx="100" cy="100" r="58" fill="none" stroke="#060D1B" stroke-width="0.7" opacity="0.5"/>
+
+  <line x1="100" y1="48"  x2="100" y2="152" stroke="#060D1B" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="84"  y1="68"  x2="84"  y2="132" stroke="#060D1B" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="116" y1="68"  x2="116" y2="132" stroke="#060D1B" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+
+  <circle cx="101" cy="100" r="4.2" fill="#060D1B"/>
+</svg>

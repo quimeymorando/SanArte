@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="haloD" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.42"/>
+      <stop offset="35%"  stop-color="#C9A84C" stop-opacity="0.18"/>
+      <stop offset="75%"  stop-color="#C9A84C" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldD" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="50%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+    <radialGradient id="coreD" cx="50%" cy="40%" r="60%">
+      <stop offset="0%"   stop-color="#FFF6D6"/>
+      <stop offset="55%"  stop-color="#F0D080"/>
+      <stop offset="100%" stop-color="#C9A84C"/>
+    </radialGradient>
+    <radialGradient id="coreGlowD">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Halo aura -->
+  <circle cx="100" cy="100" r="95" fill="url(#haloD)"/>
+
+  <!-- Outer portal ring (peso visual) -->
+  <circle cx="100" cy="100" r="68" fill="none" stroke="url(#goldD)" stroke-width="2.2" opacity="0.95"/>
+  <!-- Inner ring (capa secundaria, fina) -->
+  <circle cx="100" cy="100" r="58" fill="none" stroke="url(#goldD)" stroke-width="0.7" opacity="0.45"/>
+
+  <!-- 3 líneas verticales — luz que se filtra -->
+  <!-- Central, más larga y ligeramente más gruesa (asimetría sagrada) -->
+  <line x1="100" y1="48"  x2="100" y2="152" stroke="url(#goldD)" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+  <!-- Lateral izquierda, más corta y fina -->
+  <line x1="84"  y1="68"  x2="84"  y2="132" stroke="url(#goldD)" stroke-width="0.7" stroke-linecap="round" opacity="0.55"/>
+  <!-- Lateral derecha, más corta -->
+  <line x1="116" y1="68"  x2="116" y2="132" stroke="url(#goldD)" stroke-width="0.7" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- Glow del alma -->
+  <circle cx="101" cy="100" r="14" fill="url(#coreGlowD)"/>
+  <!-- Alma — punto pleno levitando, ligero offset 1px a la derecha -->
+  <circle cx="101" cy="100" r="4.2" fill="url(#coreD)"/>
+</svg>

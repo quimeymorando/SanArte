@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" width="200" height="260">
+  <defs>
+    <radialGradient id="haloR1" cx="50%" cy="48%" r="48%">
+      <stop offset="0%" stop-color="#F5E4B3" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="haloR2" cx="50%" cy="48%" r="55%">
+      <stop offset="0%" stop-color="#C9A84C" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#C9A84C" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="haloR3" cx="50%" cy="48%" r="60%">
+      <stop offset="65%" stop-color="#F5E4B3" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldR" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="50%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+    <radialGradient id="irisR" cx="50%" cy="40%" r="55%">
+      <stop offset="0%"   stop-color="#FFF6D6"/>
+      <stop offset="55%"  stop-color="#F0D080"/>
+      <stop offset="100%" stop-color="#9C7A2C"/>
+    </radialGradient>
+    <radialGradient id="irisGlowR">
+      <stop offset="0%" stop-color="#F5E4B3" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flameHaloR">
+      <stop offset="0%" stop-color="#F5E4B3" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Halo en 4 capas -->
+  <circle cx="100" cy="125" r="128" fill="url(#haloR3)"/>
+  <circle cx="100" cy="125" r="118" fill="url(#haloR2)"/>
+  <circle cx="100" cy="125" r="100" fill="url(#haloR1)"/>
+
+  <!-- Mandala perimetral: 12 puntos equidistantes (orbita la hamsa) -->
+  <g fill="url(#goldR)" opacity="0.55">
+    <circle cx="100" cy="2"   r="1.2"/>
+    <circle cx="160" cy="20"  r="1.1"/>
+    <circle cx="195" cy="68"  r="1.1"/>
+    <circle cx="198" cy="130" r="1.2"/>
+    <circle cx="195" cy="192" r="1.1"/>
+    <circle cx="160" cy="240" r="1.1"/>
+    <circle cx="100" cy="258" r="1.2"/>
+    <circle cx="40"  cy="240" r="1.1"/>
+    <circle cx="5"   cy="192" r="1.1"/>
+    <circle cx="2"   cy="130" r="1.2"/>
+    <circle cx="5"   cy="68"  r="1.1"/>
+    <circle cx="40"  cy="20"  r="1.1"/>
+  </g>
+
+  <!-- Punto coronando -->
+  <circle cx="100" cy="6" r="1.6" fill="url(#goldR)"/>
+
+  <!-- Llama coronando con halo -->
+  <circle cx="100" cy="22" r="11" fill="url(#flameHaloR)"/>
+  <path d="M 100,12 C 94,18 94,28 100,32 C 106,28 106,18 100,12 Z"
+        fill="none" stroke="url(#goldR)" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M 100,16 C 97,20 97,26 100,29 C 103,26 103,20 100,16 Z"
+        fill="none" stroke="url(#goldR)" stroke-width="0.9" stroke-linejoin="round" opacity="0.8"/>
+  <line x1="100" y1="18" x2="100" y2="28" stroke="url(#goldR)" stroke-width="0.6" opacity="0.7"/>
+
+  <!-- Hamsa -->
+  <path d="M 100,32
+           C 96,34 94,42 94,56 C 94,76 90,94 88,108 C 86,116 82,116 82,108
+           C 82,90 80,72 77,62 C 74,52 67,52 65,64 C 63,78 65,96 65,114
+           C 65,124 62,130 56,126 C 48,122 40,114 36,106 C 30,94 26,104 30,118
+           C 35,134 42,144 54,152 C 60,156 64,164 66,176
+           L 134,176 C 136,164 140,156 146,152 C 158,144 165,134 170,118
+           C 174,104 170,94 164,106 C 160,114 152,122 144,126 C 138,130 135,124 135,114
+           C 135,96 137,78 135,64 C 133,52 126,52 123,62 C 120,72 118,90 118,108
+           C 118,116 114,116 112,108 C 110,94 106,76 106,56 C 106,42 104,34 100,32 Z"
+        fill="none" stroke="url(#goldR)" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Líneas internas finas en cada dedo (textura) -->
+  <g stroke="url(#goldR)" stroke-width="0.5" stroke-linecap="round" opacity="0.4">
+    <line x1="100" y1="44" x2="100" y2="100"/>
+    <line x1="76" y1="68" x2="83" y2="105"/>
+    <line x1="124" y1="68" x2="117" y2="105"/>
+    <line x1="38" y1="106" x2="58" y2="120"/>
+    <line x1="162" y1="106" x2="142" y2="120"/>
+  </g>
+
+  <!-- Llama frontal con chispa -->
+  <path d="M 100,56 C 95,63 95,72 100,77 C 105,72 105,63 100,56 Z"
+        fill="none" stroke="url(#goldR)" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 100,60 C 97,64 97,71 100,74 C 103,71 103,64 100,60 Z"
+        fill="none" stroke="url(#goldR)" stroke-width="0.8" stroke-linejoin="round" opacity="0.75"/>
+  <line x1="100" y1="62" x2="100" y2="73" stroke="url(#goldR)" stroke-width="0.6" opacity="0.7"/>
+  <circle cx="100" cy="68" r="1.1" fill="url(#goldR)"/>
+
+  <!-- Puntos por dedo: 4 graduados (henna densa) -->
+  <g fill="url(#goldR)">
+    <circle cx="100" cy="38" r="1.7"/>
+    <circle cx="100" cy="46" r="1.3" opacity="0.78"/>
+    <circle cx="100" cy="52" r="1" opacity="0.55"/>
+    <circle cx="100" cy="58" r="0.7" opacity="0.4"/>
+    <circle cx="71"  cy="58" r="1.6"/>
+    <circle cx="73"  cy="66" r="1.2" opacity="0.78"/>
+    <circle cx="75"  cy="74" r="0.9" opacity="0.55"/>
+    <circle cx="76"  cy="82" r="0.7" opacity="0.4"/>
+    <circle cx="129" cy="58" r="1.6"/>
+    <circle cx="127" cy="66" r="1.2" opacity="0.78"/>
+    <circle cx="125" cy="74" r="0.9" opacity="0.55"/>
+    <circle cx="124" cy="82" r="0.7" opacity="0.4"/>
+    <circle cx="33"  cy="100" r="1.6"/>
+    <circle cx="38"  cy="106" r="1.2" opacity="0.78"/>
+    <circle cx="43"  cy="112" r="0.9" opacity="0.55"/>
+    <circle cx="48"  cy="118" r="0.7" opacity="0.4"/>
+    <circle cx="167" cy="100" r="1.6"/>
+    <circle cx="162" cy="106" r="1.2" opacity="0.78"/>
+    <circle cx="157" cy="112" r="0.9" opacity="0.55"/>
+    <circle cx="152" cy="118" r="0.7" opacity="0.4"/>
+  </g>
+
+  <!-- 11 pestañas radiales -->
+  <g stroke="url(#goldR)" stroke-width="0.9" stroke-linecap="round" opacity="0.65">
+    <g transform="rotate(-75 100 132)"><line x1="100" y1="116" x2="100" y2="108"/></g>
+    <g transform="rotate(-60 100 132)"><line x1="100" y1="116" x2="100" y2="106"/></g>
+    <g transform="rotate(-45 100 132)"><line x1="100" y1="116" x2="100" y2="105"/></g>
+    <g transform="rotate(-30 100 132)"><line x1="100" y1="116" x2="100" y2="103"/></g>
+    <g transform="rotate(-15 100 132)"><line x1="100" y1="116" x2="100" y2="102"/></g>
+    <line x1="100" y1="116" x2="100" y2="100"/>
+    <g transform="rotate(15 100 132)"><line x1="100" y1="116" x2="100" y2="102"/></g>
+    <g transform="rotate(30 100 132)"><line x1="100" y1="116" x2="100" y2="103"/></g>
+    <g transform="rotate(45 100 132)"><line x1="100" y1="116" x2="100" y2="105"/></g>
+    <g transform="rotate(60 100 132)"><line x1="100" y1="116" x2="100" y2="106"/></g>
+    <g transform="rotate(75 100 132)"><line x1="100" y1="116" x2="100" y2="108"/></g>
+  </g>
+
+  <!-- Ojo -->
+  <path d="M 62,132 C 75,114 125,114 138,132" fill="none" stroke="url(#goldR)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 62,132 C 75,150 125,150 138,132" fill="none" stroke="url(#goldR)" stroke-width="1.6" stroke-linecap="round"/>
+
+  <circle cx="100" cy="132" r="24" fill="url(#irisGlowR)"/>
+  <circle cx="100" cy="132" r="14" fill="url(#irisR)"/>
+  <circle cx="100" cy="132" r="4.4" fill="#060D1B"/>
+  <circle cx="100" cy="132" r="1.5" fill="url(#goldR)"/>
+  <circle cx="97.6" cy="129.6" r="1.1" fill="#FFF6D6" opacity="0.95"/>
+
+  <!-- Loto base completo (7 elementos) -->
+  <g transform="translate(100 178)">
+    <path d="M 0,0 C -4,-6 -4,-14 0,-18 C 4,-14 4,-6 0,0 Z" fill="none" stroke="url(#goldR)" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M 0,-3 C -2,-7 -2,-13 0,-15 C 2,-13 2,-7 0,-3" fill="none" stroke="url(#goldR)" stroke-width="0.7" opacity="0.6"/>
+    <g transform="rotate(-32)"><path d="M 0,0 C -3.5,-5 -3.5,-12 0,-15 C 3.5,-12 3.5,-5 0,0 Z" fill="none" stroke="url(#goldR)" stroke-width="1.3" stroke-linejoin="round" opacity="0.88"/></g>
+    <g transform="rotate(32)"><path d="M 0,0 C -3.5,-5 -3.5,-12 0,-15 C 3.5,-12 3.5,-5 0,0 Z" fill="none" stroke="url(#goldR)" stroke-width="1.3" stroke-linejoin="round" opacity="0.88"/></g>
+    <g transform="rotate(-62)"><path d="M 0,0 C -3,-4 -3,-10 0,-12 C 3,-10 3,-4 0,0 Z" fill="none" stroke="url(#goldR)" stroke-width="1.1" stroke-linejoin="round" opacity="0.7"/></g>
+    <g transform="rotate(62)"><path d="M 0,0 C -3,-4 -3,-10 0,-12 C 3,-10 3,-4 0,0 Z" fill="none" stroke="url(#goldR)" stroke-width="1.1" stroke-linejoin="round" opacity="0.7"/></g>
+    <g transform="rotate(-90)"><path d="M 0,0 C -2,-3 -2,-7 0,-8.5 C 2,-7 2,-3 0,0 Z" fill="none" stroke="url(#goldR)" stroke-width="0.9" stroke-linejoin="round" opacity="0.5"/></g>
+    <g transform="rotate(90)"><path d="M 0,0 C -2,-3 -2,-7 0,-8.5 C 2,-7 2,-3 0,0 Z" fill="none" stroke="url(#goldR)" stroke-width="0.9" stroke-linejoin="round" opacity="0.5"/></g>
+    <path d="M -16,-2 C -22,-4 -24,-2 -22,2" fill="none" stroke="url(#goldR)" stroke-width="0.8" opacity="0.55"/>
+    <path d="M 16,-2 C 22,-4 24,-2 22,2" fill="none" stroke="url(#goldR)" stroke-width="0.8" opacity="0.55"/>
+  </g>
+
+  <!-- Filigrana colgante COMPLETA (5 elementos + ornamentos) -->
+  <line x1="100" y1="180" x2="100" y2="188" stroke="url(#goldR)" stroke-width="0.8" opacity="0.7"/>
+  <path d="M 100,191 L 96,196 L 100,201 L 104,196 Z" fill="none" stroke="url(#goldR)" stroke-width="0.8" opacity="0.75"/>
+  <circle cx="100" cy="196" r="0.8" fill="url(#goldR)" opacity="0.7"/>
+  <line x1="100" y1="201" x2="100" y2="208" stroke="url(#goldR)" stroke-width="0.7" opacity="0.6"/>
+  <path d="M 100,210 L 93,219 L 100,228 L 107,219 Z" fill="none" stroke="url(#goldR)" stroke-width="0.9" opacity="0.75"/>
+  <circle cx="100" cy="219" r="1.4" fill="url(#goldR)" opacity="0.8"/>
+  <path d="M 93,219 C 88,217 86,220 89,222" fill="none" stroke="url(#goldR)" stroke-width="0.6" opacity="0.55"/>
+  <path d="M 107,219 C 112,217 114,220 111,222" fill="none" stroke="url(#goldR)" stroke-width="0.6" opacity="0.55"/>
+  <line x1="100" y1="228" x2="100" y2="240" stroke="url(#goldR)" stroke-width="0.6" opacity="0.5"/>
+  <path d="M 100,242 L 97,246 L 100,250 L 103,246 Z" fill="none" stroke="url(#goldR)" stroke-width="0.6" opacity="0.6"/>
+  <circle cx="100" cy="256" r="1.4" fill="url(#goldR)" opacity="0.85"/>
+</svg>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="haloG" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.55"/>
+      <stop offset="30%"  stop-color="#C9A84C" stop-opacity="0.25"/>
+      <stop offset="65%"  stop-color="#C9A84C" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#060D1B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="irisG" cx="50%" cy="40%" r="55%">
+      <stop offset="0%"   stop-color="#FFF6D6"/>
+      <stop offset="40%"  stop-color="#F5E4B3"/>
+      <stop offset="80%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#9C7A2C"/>
+    </radialGradient>
+    <radialGradient id="irisGlowOuterG">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="irisGlowMidG">
+      <stop offset="0%"   stop-color="#F5E4B3" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="goldG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#F5E4B3"/>
+      <stop offset="50%"  stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#F0D080"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Halo aura -->
+  <circle cx="100" cy="100" r="92" fill="url(#haloG)"/>
+
+  <!-- 7 rayos saliendo desde los bordes del ojo (no del centro) -->
+  <g stroke="url(#goldG)" stroke-width="1" stroke-linecap="round" opacity="0.6">
+    <line x1="100" y1="40"  x2="100" y2="22"/>
+    <line x1="72"  y1="50"  x2="58"  y2="36"/>
+    <line x1="128" y1="50"  x2="142" y2="36"/>
+    <line x1="55"  y1="100" x2="38"  y2="100"/>
+    <line x1="145" y1="100" x2="162" y2="100"/>
+    <line x1="72"  y1="150" x2="58"  y2="164"/>
+    <line x1="128" y1="150" x2="142" y2="164"/>
+  </g>
+
+  <!-- Bindis sagrados arriba y abajo -->
+  <circle cx="100" cy="14"  r="2.5" fill="url(#goldG)"/>
+  <circle cx="100" cy="186" r="2"   fill="url(#goldG)" opacity="0.75"/>
+
+  <!-- Vesica: arco superior fino · arco inferior más grueso (asimetría sagrada) -->
+  <path d="M 60,100 C 60,68 75,40 100,40 C 125,40 140,68 140,100"
+        fill="none" stroke="url(#goldG)" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M 60,100 C 60,132 75,160 100,160 C 125,160 140,132 140,100"
+        fill="none" stroke="url(#goldG)" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- Halo glow del iris en 3 capas -->
+  <circle cx="100" cy="100" r="32" fill="url(#irisGlowOuterG)"/>
+  <circle cx="100" cy="100" r="24" fill="url(#irisGlowMidG)"/>
+
+  <!-- Iris dorado luminoso -->
+  <circle cx="100" cy="100" r="18" fill="url(#irisG)"/>
+
+  <!-- Pupila navy: el alma que mira desde adentro de la luz -->
+  <circle cx="100" cy="100" r="4.8" fill="#060D1B"/>
+
+  <!-- Reflejo ligero (vida en la pupila) -->
+  <circle cx="96.5" cy="96.5" r="1.4" fill="#F5E4B3" opacity="0.9"/>
+</svg>
